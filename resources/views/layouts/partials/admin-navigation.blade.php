@@ -40,6 +40,7 @@
                     <a href="{{ route('admin.rewards.index') ?? '#' }}" class="text-sm font-semibold text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">Rewards</a>
                     <a href="{{ route('admin.notifications.index') ?? '#' }}" class="text-sm font-semibold text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">Notifications</a>
                     <a href="{{ route('admin.feedbacks.index') ?? '#' }}" class="text-sm font-semibold text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">Feedbacks</a>
+                    <a href="{{ route('admin.tap-nominations.task-chain') }}" class="text-sm font-semibold text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white {{ request()->routeIs('admin.tap-nominations.task-chain') ? 'border-b-2 border-teal-500 pb-1' : '' }}">🔗 Task Chain</a>
                 </div>
             </div>
 
@@ -77,6 +78,7 @@
             <a href="{{ route('admin.rewards.index') ?? '#' }}" class="block text-sm font-semibold text-gray-600 dark:text-gray-300">Rewards</a>
             <a href="{{ route('admin.notifications.index') ?? '#' }}" class="block text-sm font-semibold text-gray-600 dark:text-gray-300">Notifications</a>
             <a href="{{ route('admin.feedbacks.index') ?? '#' }}" class="block text-sm font-semibold text-gray-600 dark:text-gray-300">Feedbacks</a>
+            <a href="{{ route('admin.tap-nominations.task-chain') }}" class="block text-sm font-semibold text-gray-600 dark:text-gray-300">🔗 Task Chain</a>
             <form method="POST" action="{{ route('logout') }}" class="pt-2 border-t border-gray-100 dark:border-gray-800">
                 @csrf
                 <button class="mt-2 text-sm font-medium text-red-600">Log out</button>

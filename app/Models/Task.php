@@ -166,4 +166,20 @@ class Task extends Model
                $this->task_type === 'user_uploaded' && 
                in_array($this->status, ['pending', 'rejected']);
     }
+
+    /**
+     * Get all nominations for this task
+     */
+    public function nominations()
+    {
+        return $this->hasMany(TapNomination::class, 'FK1_taskId', 'taskId');
+    }
+
+    /**
+     * Check if this task is a daily task
+     */
+    public function isDailyTask()
+    {
+        return $this->task_type === 'daily';
+    }
 }

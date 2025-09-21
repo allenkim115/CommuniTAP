@@ -15,26 +15,74 @@
             <!-- Toast Notifications -->
             <x-session-toast />
 
+            <!-- Task Filter Tabs -->
+            <div class="mb-6">
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-1">
+                    <nav class="flex space-x-1" aria-label="Tabs">
+                        <a href="{{ route('tasks.index', ['filter' => 'available']) }}" 
+                           class="flex-1 text-center px-3 py-2 text-sm font-medium rounded-md transition-colors {{ $filter === 'available' ? 'bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-200' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300' }}">
+                            Available ({{ $taskStats['available'] }})
+                        </a>
+                        <a href="{{ route('tasks.index', ['filter' => 'assigned']) }}" 
+                           class="flex-1 text-center px-3 py-2 text-sm font-medium rounded-md transition-colors {{ $filter === 'assigned' ? 'bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-200' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300' }}">
+                            Assigned ({{ $taskStats['assigned'] }})
+                        </a>
+                        <a href="{{ route('tasks.index', ['filter' => 'submitted']) }}" 
+                           class="flex-1 text-center px-3 py-2 text-sm font-medium rounded-md transition-colors {{ $filter === 'submitted' ? 'bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-200' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300' }}">
+                            Submitted ({{ $taskStats['submitted'] }})
+                        </a>
+                        <a href="{{ route('tasks.index', ['filter' => 'completed']) }}" 
+                           class="flex-1 text-center px-3 py-2 text-sm font-medium rounded-md transition-colors {{ $filter === 'completed' ? 'bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-200' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300' }}">
+                            Completed ({{ $taskStats['completed'] }})
+                        </a>
+                        <a href="{{ route('tasks.index', ['filter' => 'all']) }}" 
+                           class="flex-1 text-center px-3 py-2 text-sm font-medium rounded-md transition-colors {{ $filter === 'all' ? 'bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-200' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300' }}">
+                            All ({{ $taskStats['all'] }})
+                        </a>
+                    </nav>
+                </div>
+            </div>
+
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <!-- Left Column - Available Tasks -->
+                <!-- Left Column - Filtered Tasks -->
                 <div class="lg:col-span-1">
                     <div class="mb-6">
-                        <h3 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-4">Available Tasks</h3>
+                        <h3 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-4">
+                            @switch($filter)
+                                @case('available')
+                                    Available Tasks
+                                    @break
+                                @case('assigned')
+                                    Assigned Tasks
+                                    @break
+                                @case('submitted')
+                                    Submitted Tasks
+                                    @break
+                                @case('completed')
+                                    Completed Tasks
+                                    @break
+                                @case('all')
+                                    All Tasks
+                                    @break
+                                @default
+                                    Available Tasks
+                            @endswitch
+                        </h3>
                         
-                        <!-- Filter Bar -->
+                        <!-- Task Type Filter -->
                         <div class="flex items-center space-x-4 mb-4">
-                            <select id="task-filter" class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500 dark:bg-gray-700 dark:text-white" onchange="filterTasks()">
-                                <option value="all">All type</option>
-                                <option value="daily">Daily Task</option>
-                                <option value="one_time">One-Time Task</option>
-                                <option value="user_uploaded">User-Uploaded Task</option>
+                            <select id="task-type-filter" class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500 dark:bg-gray-700 dark:text-white" onchange="filterByTaskType()">
+                                <option value="all">All Types</option>
+                                <option value="daily">Daily Tasks</option>
+                                <option value="one_time">One-Time Tasks</option>
+                                <option value="user_uploaded">User-Uploaded Tasks</option>
                             </select>
                         </div>
                     </div>
 
-                    @if($availableTasks->count() > 0)
+                    @if($filteredTasks->count() > 0)
                         <div class="space-y-4 max-h-96 overflow-y-auto">
-                            @foreach($availableTasks as $task)
+                            @foreach($filteredTasks as $task)
                             <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 transition-all duration-200 hover:shadow-md cursor-pointer task-card" 
                                  data-task-id="{{ $task->taskId }}" 
                                  data-task-type="{{ $task->task_type }}"
@@ -43,9 +91,20 @@
                                 <!-- Task Header -->
                                 <div class="flex justify-between items-start mb-2">
                                     <h4 class="font-bold text-gray-900 dark:text-white text-lg">{{ $task->title }}</h4>
-                                    <span class="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 rounded-full">
-                                        {{ ucfirst(str_replace('_', ' ', $task->task_type)) }}
-                                    </span>
+                                    <div class="flex flex-col items-end space-y-1">
+                                        <span class="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 rounded-full">
+                                            {{ ucfirst(str_replace('_', ' ', $task->task_type)) }}
+                                        </span>
+                                        @if(isset($task->pivot) && $task->pivot->status)
+                                            <span class="px-2 py-1 text-xs font-medium rounded-full
+                                                @if($task->pivot->status === 'assigned') bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200
+                                                @elseif($task->pivot->status === 'submitted') bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200
+                                                @elseif($task->pivot->status === 'completed') bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200
+                                                @else bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200 @endif">
+                                                {{ ucfirst($task->pivot->status) }}
+                                            </span>
+                                        @endif
+                                    </div>
                                 </div>
                                 
                                 <!-- Task Date -->
@@ -76,7 +135,27 @@
                             <svg class="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
                             </svg>
-                            <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">No available tasks at the moment</p>
+                            <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                                @switch($filter)
+                                    @case('available')
+                                        No available tasks at the moment
+                                        @break
+                                    @case('assigned')
+                                        No assigned tasks
+                                        @break
+                                    @case('submitted')
+                                        No submitted tasks
+                                        @break
+                                    @case('completed')
+                                        No completed tasks
+                                        @break
+                                    @case('all')
+                                        No tasks found
+                                        @break
+                                    @default
+                                        No tasks available
+                                @endswitch
+                            </p>
                         </div>
                     @endif
                 </div>
@@ -106,7 +185,7 @@
     <!-- JavaScript for task details -->
     <script>
         // Store task data for JavaScript access
-        const tasks = @json($availableTasks->keyBy('taskId'));
+        const tasks = @json($filteredTasks->keyBy('taskId'));
         const userAssignments = @json($userTasks->keyBy('taskId'));
         let currentActiveTab = 'details';
         
@@ -242,26 +321,81 @@
                     </div>
 
                         ${hasJoined ? `
-                        <!-- Upload Photos Section - Only show if user has joined -->
-                        <div class="mb-8">
-                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Upload Photos</h3>
-                            <div class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-8 text-center">
-                                <svg class="mx-auto h-12 w-12 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                                </svg>
-                                <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">Click to upload or drag and drop</p>
-                            </div>
-                        </div>
-
-                        <!-- Complete Task Button - Only show if user has joined -->
-                        <div class="text-center">
-                            <button class="bg-orange-500 hover:bg-orange-700 text-white font-bold py-3 px-8 rounded-lg text-lg">
-                                Complete Task
-                            </button>
-                        </div>
+                            ${assignmentStatus === 'assigned' ? `
+                                <!-- Complete Task Button - Redirect to task details page -->
+                                <div class="text-center">
+                                    <a href="/tasks/${taskId}" class="inline-block bg-orange-500 hover:bg-orange-700 text-white font-bold py-3 px-8 rounded-lg text-lg transition-colors">
+                                        Complete Task
+                                    </a>
+                                </div>
+                            ` : assignmentStatus === 'submitted' ? `
+                                <!-- Pending Approval Status -->
+                                <div class="mb-6">
+                                    <div class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-6 text-center">
+                                        <div class="flex flex-col items-center">
+                                            <svg class="w-12 h-12 text-yellow-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                            </svg>
+                                            <h3 class="text-lg font-semibold text-yellow-800 dark:text-yellow-200 mb-2">Pending Approval</h3>
+                                            <p class="text-sm text-yellow-700 dark:text-yellow-300">
+                                                Your task completion has been submitted and is waiting for admin approval.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            ` : assignmentStatus === 'completed' ? `
+                                <!-- Completed Status -->
+                                <div class="mb-6">
+                                    <div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-6 text-center">
+                                        <div class="flex flex-col items-center">
+                                            <svg class="w-12 h-12 text-green-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                            </svg>
+                                            <h3 class="text-lg font-semibold text-green-800 dark:text-green-200 mb-2">Task Completed</h3>
+                                            <p class="text-sm text-green-700 dark:text-green-300 mb-4">
+                                                Congratulations! Your task has been approved and completed.
+                                            </p>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Action Buttons -->
+                                    <div class="text-center space-y-3">
+                                        <!-- Task Feedback Button -->
+                                        <a href="/feedback/${taskId}/create" class="inline-flex items-center px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-lg transition-colors">
+                                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                                            </svg>
+                                            Task Feedback
+                                        </a>
+                                        
+                                        <!-- Tap & Pass Button - Only for daily tasks completed TODAY -->
+                                        ${task.task_type === 'daily' && userAssignments[taskId] && userAssignments[taskId].pivot && userAssignments[taskId].pivot.completed_today ? `
+                                        <div>
+                                            <a href="/tap-nominations/create/${taskId}" class="inline-flex items-center px-4 py-2 bg-green-500 hover:bg-green-600 text-white font-medium rounded-lg transition-colors">
+                                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                                </svg>
+                                                🎯 Tap & Pass
+                                            </a>
+                                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Nominate someone for a daily task (completed today)</p>
+                                        </div>
+                                        ` : task.task_type === 'daily' && userAssignments[taskId] && userAssignments[taskId].pivot && !userAssignments[taskId].pivot.completed_today ? `
+                                        <div class="text-center">
+                                            <div class="inline-flex items-center px-4 py-2 bg-gray-400 text-white font-medium rounded-lg cursor-not-allowed opacity-60">
+                                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                                </svg>
+                                                🎯 Tap & Pass
+                                            </div>
+                                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Only available for tasks completed today</p>
+                                        </div>
+                                        ` : ''}
+                                    </div>
+                                </div>
+                            ` : ''}
                         ` : `
                         <!-- Join Task Button - Show if user hasn't joined -->
-                        <div class="text-center">
+                        <div class="text-center space-y-3">
                             <form action="/tasks/${taskId}/join" method="POST" class="inline">
                                 <input type="hidden" name="_token" value="{{ csrf_token() }}">
                                 <button type="submit" class="bg-orange-500 hover:bg-orange-700 text-white font-bold py-3 px-8 rounded-lg text-lg">
@@ -326,8 +460,8 @@
             document.getElementById('participants-content').classList.toggle('hidden', tabName !== 'participants');
         }
 
-        function filterTasks() {
-            const filterValue = document.getElementById('task-filter').value;
+        function filterByTaskType() {
+            const filterValue = document.getElementById('task-type-filter').value;
             const taskCards = document.querySelectorAll('.task-card');
             
             taskCards.forEach(card => {
@@ -360,5 +494,6 @@
                 showTaskDetails(parseInt(taskId));
             }
         });
+
     </script>
 </x-app-layout>

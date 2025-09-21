@@ -20,6 +20,28 @@
                         {{ __('Tasks') }}
                     </x-nav-link>
                     
+                    @php
+                        $pendingNominationsCount = Auth::user() ? 
+                            \App\Models\TapNomination::where('FK3_nomineeId', Auth::user()->userId)
+                            ->where('status', 'pending')
+                            ->count() : 0;
+                    @endphp
+                    
+                    <x-nav-link :href="route('tap-nominations.index')" :active="request()->routeIs('tap-nominations.*')">
+                        🎯 {{ __('Nominations') }}
+                        @if($pendingNominationsCount > 0)
+                            <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                {{ $pendingNominationsCount }}
+                            </span>
+                        @endif
+                    </x-nav-link>
+                    
+                    @if(Auth::user()->isAdmin())
+                        <x-nav-link :href="route('admin.tap-nominations.task-chain')" :active="request()->routeIs('admin.tap-nominations.task-chain')">
+                            🔗 {{ __('Task Chain') }}
+                        </x-nav-link>
+                    @endif
+                    
                     <x-nav-link :href="route('progress')" :active="request()->routeIs('progress')">
                         {{ __('Progress') }}
                     </x-nav-link>
@@ -114,6 +136,21 @@
                 {{ __('Tasks') }}
             </x-responsive-nav-link>
             
+            <x-responsive-nav-link :href="route('tap-nominations.index')" :active="request()->routeIs('tap-nominations.*')">
+                🎯 {{ __('Nominations') }}
+                @if($pendingNominationsCount > 0)
+                    <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                        {{ $pendingNominationsCount }}
+                    </span>
+                @endif
+            </x-responsive-nav-link>
+            
+            @if(Auth::user()->isAdmin())
+                <x-responsive-nav-link :href="route('admin.tap-nominations.task-chain')" :active="request()->routeIs('admin.tap-nominations.task-chain')">
+                    🔗 {{ __('Task Chain') }}
+                </x-responsive-nav-link>
+            @endif
+            
             <x-responsive-nav-link :href="route('progress')" :active="request()->routeIs('progress')">
                 {{ __('Progress') }}
             </x-responsive-nav-link>
@@ -179,3 +216,4 @@
         </div>
     </div>
 </nav>
+

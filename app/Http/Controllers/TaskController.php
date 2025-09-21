@@ -13,9 +13,10 @@ class TaskController extends Controller
     /**
      * Display a listing of tasks for the authenticated user
      */
-    public function index()
+    public function index(Request $request)
     {
         $user = Auth::user();
+        $filter = $request->get('filter', 'available'); // Default to available tasks
         
         // Get tasks assigned to the user through task_assignments table with pivot data
         $userTasks = $user->assignedTasks()
@@ -23,6 +24,15 @@ class TaskController extends Controller
             ->with('assignments.user')
             ->orderBy('created_at', 'desc')
             ->get();
+            
+        // Add completion date check for each user task
+        $userTasks->each(function($task) {
+            if ($task->pivot && $task->pivot->completed_at) {
+                $task->pivot->completed_today = \Carbon\Carbon::parse($task->pivot->completed_at)->isToday();
+            } else {
+                $task->pivot->completed_today = false;
+            }
+        });
             
         // Get available tasks that user can join (published tasks)
         $availableTasks = Task::where('status', 'published')
@@ -32,8 +42,40 @@ class TaskController extends Controller
             ->with('assignments.user')
             ->orderBy('created_at', 'desc')
             ->get();
-            
-        return view('tasks.index', compact('userTasks', 'availableTasks'));
+
+        // Filter user tasks based on selected filter
+        $filteredTasks = collect();
+        
+        switch($filter) {
+            case 'available':
+                $filteredTasks = $availableTasks;
+                break;
+            case 'assigned':
+                $filteredTasks = $userTasks->where('pivot.status', 'assigned');
+                break;
+            case 'submitted':
+                $filteredTasks = $userTasks->where('pivot.status', 'submitted');
+                break;
+            case 'completed':
+                $filteredTasks = $userTasks->where('pivot.status', 'completed');
+                break;
+            case 'all':
+                $filteredTasks = $userTasks->merge($availableTasks);
+                break;
+            default:
+                $filteredTasks = $availableTasks;
+        }
+
+        // Task statistics for display
+        $taskStats = [
+            'available' => $availableTasks->count(),
+            'assigned' => $userTasks->where('pivot.status', 'assigned')->count(),
+            'submitted' => $userTasks->where('pivot.status', 'submitted')->count(),
+            'completed' => $userTasks->where('pivot.status', 'completed')->count(),
+            'all' => $userTasks->count() + $availableTasks->count()
+        ];
+
+        return view('tasks.index', compact('userTasks', 'availableTasks', 'filteredTasks', 'filter', 'taskStats'));
     }
 
     /**

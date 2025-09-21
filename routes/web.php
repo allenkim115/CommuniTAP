@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\TaskController as AdminTaskController;
 use App\Http\Controllers\Admin\TaskSubmissionController;
 use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\Admin\FeedbackController as AdminFeedbackController;
+use App\Http\Controllers\TapNominationController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -37,6 +38,184 @@ Route::middleware('auth')->group(function () {
     Route::get('/feedback/{feedback}/edit', [FeedbackController::class, 'edit'])->name('feedback.edit');
     Route::patch('/feedback/{feedback}/update', [FeedbackController::class, 'update'])->name('feedback.update');
     Route::get('/feedback/{task}/show', [FeedbackController::class, 'show'])->name('feedback.show');
+    
+    // Tap & Pass nomination routes
+    Route::get('/tap-nominations/create/{task}', [TapNominationController::class, 'create'])->name('tap-nominations.create');
+    Route::post('/tap-nominations', [TapNominationController::class, 'store'])->name('tap-nominations.store');
+    Route::get('/tap-nominations', [TapNominationController::class, 'index'])->name('tap-nominations.index');
+    Route::post('/tap-nominations/{nomination}/accept', [TapNominationController::class, 'accept'])->name('tap-nominations.accept');
+    Route::post('/tap-nominations/{nomination}/decline', [TapNominationController::class, 'decline'])->name('tap-nominations.decline');
+    
+    // Debug route for testing nominations
+    Route::get('/debug-nominations', function() {
+        $user = Auth::user();
+        $allNominations = \App\Models\TapNomination::all();
+        $userNominations = $user->nominationsReceived()->get();
+        
+        // Check database structure
+        $tableStructure = \Illuminate\Support\Facades\DB::select("DESCRIBE tap_nominations");
+        
+        return response()->json([
+            'user_id' => $user->userId,
+            'total_nominations' => $allNominations->count(),
+            'user_nominations' => $userNominations->count(),
+            'all_nominations' => $allNominations,
+            'user_nominations_data' => $userNominations,
+            'table_structure' => $tableStructure,
+            'nominations_for_user_5' => \App\Models\TapNomination::where('FK3_nomineeId', 5)->get(),
+            'nominations_from_user_6' => \App\Models\TapNomination::where('FK2_nominatorId', 6)->get(),
+            'manual_check_current_user' => \App\Models\TapNomination::where('FK3_nomineeId', $user->userId)->get()
+        ]);
+    })->name('debug.nominations');
+    
+    // Test route to manually create a nomination
+    Route::get('/test-create-nomination', function() {
+        $user = Auth::user();
+        $task = \App\Models\Task::where('task_type', 'daily')->first();
+        $nominee = \App\Models\User::where('userId', '!=', $user->userId)->first();
+        
+        if (!$task || !$nominee) {
+            return response()->json(['error' => 'No task or nominee found']);
+        }
+        
+        try {
+            $nomination = \App\Models\TapNomination::create([
+                'FK1_taskId' => $task->taskId,
+                'FK2_nominatorId' => $user->userId,
+                'FK3_nomineeId' => $nominee->userId,
+                'nomination_date' => now(),
+                'status' => 'pending'
+            ]);
+            
+            return response()->json([
+                'success' => true,
+                'nomination_id' => $nomination->nominationId,
+                'task_id' => $task->taskId,
+                'nominator_id' => $user->userId,
+                'nominee_id' => $nominee->userId,
+                'nominee_nominations_count' => \App\Models\TapNomination::where('FK3_nomineeId', $nominee->userId)->count()
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+        }
+    })->name('test.create.nomination');
+    
+    // Simple test route to check foreign key issues
+    Route::get('/test-foreign-keys', function() {
+        $user = Auth::user();
+        
+        // Check what the actual foreign key values are in the database
+        $nominations = \App\Models\TapNomination::all();
+        $userNominations = [];
+        
+        foreach ($nominations as $nomination) {
+            $userNominations[] = [
+                'nomination_id' => $nomination->nominationId,
+                'FK2_nominatorId' => $nomination->FK2_nominatorId,
+                'FK3_nomineeId' => $nomination->FK3_nomineeId,
+                'current_user_id' => $user->userId,
+                'matches_nominator' => $nomination->FK2_nominatorId == $user->userId,
+                'matches_nominee' => $nomination->FK3_nomineeId == $user->userId
+            ];
+        }
+        
+        return response()->json([
+            'current_user_id' => $user->userId,
+            'total_nominations' => $nominations->count(),
+            'nominations' => $userNominations,
+            'user_primary_key' => $user->getKeyName(),
+            'user_key_value' => $user->getKey()
+        ]);
+    })->name('test.foreign.keys');
+    
+    // Test route to create a nomination for current user
+    Route::get('/test-create-nomination-for-me', function() {
+        $user = Auth::user();
+        $task = \App\Models\Task::where('task_type', 'daily')->first();
+        
+        if (!$task) {
+            return response()->json(['error' => 'No daily task found']);
+        }
+        
+        try {
+            // Create a self-nomination for testing
+            $nomination = \App\Models\TapNomination::create([
+                'FK1_taskId' => $task->taskId,
+                'FK2_nominatorId' => $user->userId,
+                'FK3_nomineeId' => $user->userId, // Self-nomination
+                'nomination_date' => now(),
+                'status' => 'pending'
+            ]);
+            
+            // Check if it shows up in relationships
+            $nominationsReceived = $user->nominationsReceived()->count();
+            $nominationsMade = $user->nominationsMade()->count();
+            
+            return response()->json([
+                'success' => true,
+                'nomination_id' => $nomination->nominationId,
+                'task_id' => $task->taskId,
+                'nominator_id' => $user->userId,
+                'nominee_id' => $user->userId,
+                'nominations_received_count' => $nominationsReceived,
+                'nominations_made_count' => $nominationsMade,
+                'message' => 'Test nomination created! Check /tap-nominations to see it.'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+        }
+    })->name('test.create.nomination.for.me');
+    
+    // Debug route to check task and user assignment details
+    Route::get('/debug-task-assignments', function() {
+        $user = Auth::user();
+        
+        // Get task 10 details
+        $task10 = \App\Models\Task::find(10);
+        
+        // Get user's completed tasks
+        $userAssignments = \App\Models\TaskAssignment::where('userId', $user->userId)
+            ->where('status', 'completed')
+            ->with('task')
+            ->get();
+        
+        // Check if user has completed task 10
+        $task10Assignment = \App\Models\TaskAssignment::where('userId', $user->userId)
+            ->where('taskId', 10)
+            ->where('status', 'completed')
+            ->first();
+        
+        return response()->json([
+            'current_user_id' => $user->userId,
+            'task_10_details' => $task10 ? $task10->toArray() : null,
+            'user_completed_tasks' => $userAssignments->toArray(),
+            'task_10_assignment' => $task10Assignment ? $task10Assignment->toArray() : null,
+            'has_completed_task_10' => $task10Assignment ? true : false
+        ]);
+    })->name('debug.task.assignments');
+    
+    // Debug route to check admin status and navigation
+    Route::get('/debug-admin-status', function() {
+        $user = Auth::user();
+        
+        return response()->json([
+            'user_id' => $user->userId,
+            'user_email' => $user->email,
+            'user_role' => $user->role,
+            'is_admin' => $user->isAdmin(),
+            'is_admin_method_result' => method_exists($user, 'isAdmin') ? $user->isAdmin() : 'method not found',
+            'current_url' => request()->url(),
+            'is_admin_page' => request()->is('admin*'),
+            'navigation_should_show' => $user->isAdmin() ? 'YES' : 'NO'
+        ]);
+    })->name('debug.admin.status');
+    
 });
 
 // Admin routes
@@ -90,6 +269,9 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/feedbacks', function () {
         return view('admin.feedbacks.index');
     })->name('feedbacks.index');
+    
+    // Admin Tap & Pass Task Chain Tracking
+    Route::get('/tap-nominations/task-chain', [TapNominationController::class, 'taskChain'])->name('tap-nominations.task-chain');
 });
 
 require __DIR__.'/auth.php';

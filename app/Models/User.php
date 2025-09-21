@@ -147,4 +147,28 @@ class User extends Authenticatable
     {
         return $this->assignedTasks()->wherePivot('status', 'completed');
     }
+
+    /**
+     * Get nominations made by this user
+     */
+    public function nominationsMade()
+    {
+        return $this->hasMany(TapNomination::class, 'FK2_nominatorId', 'userId');
+    }
+
+    /**
+     * Get nominations received by this user
+     */
+    public function nominationsReceived()
+    {
+        return $this->hasMany(TapNomination::class, 'FK3_nomineeId', 'userId');
+    }
+
+    /**
+     * Get pending nominations received by this user
+     */
+    public function pendingNominations()
+    {
+        return $this->nominationsReceived()->pending();
+    }
 }

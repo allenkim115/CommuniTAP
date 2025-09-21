@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 10, 2025 at 04:06 PM
+-- Generation Time: Sep 21, 2025 at 05:13 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `laravel`
+-- Database: `communitap`
 --
 
 -- --------------------------------------------------------
@@ -157,7 +157,9 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 (21, '2025_09_06_143740_add_photos_to_task_assignments', 5),
 (22, '2025_09_06_143750_add_photos_to_task_assignments', 5),
 (23, '2025_09_06_150236_add_time_location_to_tasks_table', 6),
-(24, '2025_09_06_161722_add_rejection_count_to_task_assignments_table', 7);
+(24, '2025_09_06_161722_add_rejection_count_to_task_assignments_table', 7),
+(25, '2025_09_21_140000_create_tap_nominations_table_fix', 8),
+(26, '2025_09_21_142411_add_chain_columns_to_tap_nominations_table', 9);
 
 -- --------------------------------------------------------
 
@@ -295,8 +297,7 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
-('SIfLoZ3WDuiKgnFR4G43T5j7wKDGVM06Bdj4ioei', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiVjlXSE9ZWG9keWJjR3RWaGVLaWJzRmpMbHRDZjZwZG12a1htRVpVUyI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMCI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=', 1757508941),
-('W97YL8Tg8bZ6C0EIgQWzHkJgE61TRvKwMCSjBItl', 6, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoicldRVXBQVlBNeXNuUXhYVTNRODFwNlo4WDM3TURhbDI1eTlWejdmayI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6Mjc6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC90YXNrcyI7fXM6NTA6ImxvZ2luX3dlYl81OWJhMzZhZGRjMmIyZjk0MDE1ODBmMDE0YzdmNThlYTRlMzA5ODlkIjtpOjY7fQ==', 1757512970);
+('tRAXzWzOoD35mNcHhf2iOvg6sM2ySoeKEdHq17ke', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiRFRoVWoxbVZtd1JuV3YwUEtZNHJiNzVCUVg2YXZUT1BqZ2xDMEtFNSI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMCI7fX0=', 1758467576);
 
 -- --------------------------------------------------------
 
@@ -314,6 +315,14 @@ CREATE TABLE `tap_nominations` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `tap_nominations`
+--
+
+INSERT INTO `tap_nominations` (`nominationId`, `FK1_taskId`, `FK2_nominatorId`, `FK3_nomineeId`, `nomination_date`, `status`, `created_at`, `updated_at`) VALUES
+(1, 9, 6, 5, '2025-09-21 12:51:34', 'accepted', '2025-09-21 04:51:34', '2025-09-21 06:36:10'),
+(3, 10, 5, 7, '2025-09-21 14:06:30', 'accepted', '2025-09-21 06:06:30', '2025-09-21 06:36:10');
 
 -- --------------------------------------------------------
 
@@ -351,7 +360,9 @@ INSERT INTO `tasks` (`taskId`, `FK1_userId`, `title`, `description`, `task_type`
 (5, NULL, 'another test', '231sdadasdsa', 'daily', 12, 'published', '2025-09-06 16:10:22', NULL, '2025-09-08 00:00:00', '16:10:00', '17:10:00', 'sda', '2025-09-06 16:10:22', '2025-09-06 08:10:22', '2025-09-06 08:10:22'),
 (6, 5, 'need man power', 'building a dog house', 'user_uploaded', 10, 'published', '2025-09-06 16:14:08', '2025-09-06 16:14:37', '2025-09-08 00:00:00', '14:13:00', '15:13:00', 'balay', '2025-09-06 16:14:43', '2025-09-06 08:14:08', '2025-09-06 08:14:43'),
 (7, 5, 'User TEst', 'test 123 123', 'user_uploaded', 20, 'published', '2025-09-10 13:10:39', '2025-09-10 13:12:09', '2025-09-12 00:00:00', '10:10:00', '12:10:00', 'House', '2025-09-10 13:12:26', '2025-09-10 05:10:39', '2025-09-10 05:12:26'),
-(8, NULL, 'Tap and Pass Test', 'this is a test hehu', 'daily', 10, 'published', '2025-09-10 13:40:59', NULL, '2025-09-12 00:00:00', '22:40:00', '23:41:00', 'sports complex', '2025-09-10 13:40:59', '2025-09-10 05:40:59', '2025-09-10 05:40:59');
+(8, NULL, 'Tap and Pass Test', 'this is a test hehu', 'daily', 10, 'published', '2025-09-10 13:40:59', NULL, '2025-09-12 00:00:00', '22:40:00', '23:41:00', 'sports complex', '2025-09-10 13:40:59', '2025-09-10 05:40:59', '2025-09-10 05:40:59'),
+(9, NULL, 'TapPass2', 'test 2', 'daily', 12, 'published', '2025-09-21 12:25:11', NULL, '2025-09-24 00:00:00', '11:24:00', '12:30:00', 'park', '2025-09-21 12:25:11', '2025-09-21 04:25:11', '2025-09-21 04:25:11'),
+(10, NULL, 'tapPass3', 'test3', 'daily', 13, 'published', '2025-09-21 12:52:56', NULL, '2025-09-24 00:00:00', '10:54:00', '13:00:00', 'covered court', '2025-09-21 12:52:56', '2025-09-21 04:52:56', '2025-09-21 04:52:56');
 
 -- --------------------------------------------------------
 
@@ -402,7 +413,13 @@ INSERT INTO `task_assignments` (`assignmentId`, `taskId`, `userId`, `status`, `a
 (6, 2, 5, 'completed', '2025-09-06 07:40:05', '2025-09-06 07:40:05', '2025-09-06 07:56:33', '[\"task-submissions\\/IVTWKZDFbZklTSdo49UE54ITB1XtzPjzzMKESjU0.png\"]', 'Approved by admin', 0, NULL, '2025-09-06 07:40:05', '2025-09-06 07:56:33'),
 (7, 5, 5, 'completed', '2025-09-06 08:15:16', '2025-09-10 05:14:31', '2025-09-10 05:15:05', '[\"task-submissions\\/4iaElVb6MZPb11erd9YpLkpulj63o9WoShjpddtb.png\"]', 'Approved by admin', 1, 'eww', '2025-09-06 08:15:16', '2025-09-10 05:15:05'),
 (8, 6, 6, 'completed', '2025-09-10 05:42:38', '2025-09-10 05:45:19', '2025-09-10 05:45:37', '[\"task-submissions\\/RYDwXBB1l2elrvR9AzqfgtDO4abS3jBVEQYmbLtG.png\"]', 'Approved by admin', 1, 'sus', '2025-09-10 05:42:38', '2025-09-10 05:45:37'),
-(9, 4, 6, 'completed', '2025-09-10 05:47:35', '2025-09-10 05:48:43', '2025-09-10 05:49:00', '[\"task-submissions\\/S5hP9Nsp6Vu2nESo3uMyu22OwD4HlJoNmQDHo82C.png\"]', 'Approved by admin', 1, 'submit more', '2025-09-10 05:47:35', '2025-09-10 05:49:00');
+(9, 4, 6, 'completed', '2025-09-10 05:47:35', '2025-09-10 05:48:43', '2025-09-10 05:49:00', '[\"task-submissions\\/S5hP9Nsp6Vu2nESo3uMyu22OwD4HlJoNmQDHo82C.png\"]', 'Approved by admin', 1, 'submit more', '2025-09-10 05:47:35', '2025-09-10 05:49:00'),
+(10, 8, 5, 'completed', '2025-09-21 04:20:27', '2025-09-21 04:53:26', '2025-09-21 04:57:45', '[]', 'Approved by admin', 0, NULL, '2025-09-21 04:20:27', '2025-09-21 04:57:45'),
+(11, 8, 6, 'completed', '2025-09-21 04:21:03', '2025-09-21 04:21:30', '2025-09-21 04:22:40', '[\"task-submissions\\/aJJDmAd7nlGmEDJQD5gLQYL9M0FiCRG33my0uq46.png\"]', 'Approved by admin', 0, NULL, '2025-09-21 04:21:03', '2025-09-21 04:22:40'),
+(12, 9, 5, 'completed', '2025-09-21 04:52:01', '2025-09-21 05:14:39', '2025-09-21 05:15:15', '[]', 'Approved by admin', 0, NULL, '2025-09-21 04:52:01', '2025-09-21 05:15:15'),
+(13, 5, 7, 'completed', '2025-09-21 05:00:04', '2025-09-21 05:10:52', '2025-09-21 05:11:19', '[]', 'Approved by admin', 0, NULL, '2025-09-21 05:00:04', '2025-09-21 05:11:19'),
+(14, 8, 7, 'completed', '2025-09-21 05:00:30', '2025-09-21 05:27:38', '2025-09-21 05:27:55', '[]', 'Approved by admin', 0, NULL, '2025-09-21 05:00:30', '2025-09-21 05:27:55'),
+(15, 10, 7, 'completed', '2025-09-21 06:06:50', '2025-09-21 06:39:38', '2025-09-21 06:39:54', '[]', 'Approved by admin', 0, NULL, '2025-09-21 06:06:50', '2025-09-21 06:39:54');
 
 -- --------------------------------------------------------
 
@@ -452,8 +469,9 @@ CREATE TABLE `users` (
 
 INSERT INTO `users` (`userId`, `firstName`, `middleName`, `lastName`, `email`, `password`, `points`, `role`, `status`, `date_registered`, `email_verified_at`, `remember_token`, `created_at`, `updated_at`) VALUES
 (4, 'admin', NULL, 'john', 'admin@email.com', '$2y$12$O3jb/2kBP6A/O6P5IGYRtu2/x6xfoQEpNhzlLl3/v7AnPSHAvXkJC', 0, 'admin', 'active', '2025-09-01', NULL, NULL, '2025-09-01 06:42:30', '2025-09-01 06:42:30'),
-(5, 'Allen Kim', NULL, 'Rafaela', 'allenkimrafaela@gmail.com', '$2y$12$FbyrySawbj4pbKGbsaBgiekXhxBxmhPk6ojKggq/yoDuPy49GOtM2', 43, 'user', 'active', '2025-09-01', NULL, NULL, '2025-09-01 06:43:19', '2025-09-10 05:15:05'),
-(6, 'John', NULL, 'Doe', 'j.doe@email.com', '$2y$12$Fny4WoqDJmzam2YRY46fFuvpcMSOcl0GjnsgulecFw50gvzpvVIbG', 80, 'user', 'active', '2025-09-02', NULL, NULL, '2025-09-02 04:42:06', '2025-09-10 05:49:00');
+(5, 'Allen Kim', NULL, 'Rafaela', 'allenkimrafaela@gmail.com', '$2y$12$FbyrySawbj4pbKGbsaBgiekXhxBxmhPk6ojKggq/yoDuPy49GOtM2', 67, 'user', 'active', '2025-09-01', NULL, NULL, '2025-09-01 06:43:19', '2025-09-21 06:06:30'),
+(6, 'John', NULL, 'Doe', 'j.doe@email.com', '$2y$12$Fny4WoqDJmzam2YRY46fFuvpcMSOcl0GjnsgulecFw50gvzpvVIbG', 91, 'user', 'active', '2025-09-02', NULL, NULL, '2025-09-02 04:42:06', '2025-09-21 04:51:34'),
+(7, 'Jane', NULL, 'Doe', 'jane.d@email.com', '$2y$12$br36ZSNuyogIihQHXo97Vu78VCzzDu/84BJqs.1gGIXr8XCvfJawO', 36, 'user', 'active', '2025-09-21', NULL, NULL, '2025-09-21 04:59:15', '2025-09-21 06:39:54');
 
 -- --------------------------------------------------------
 
@@ -654,7 +672,7 @@ ALTER TABLE `jobs`
 -- AUTO_INCREMENT for table `migrations`
 --
 ALTER TABLE `migrations`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
 
 --
 -- AUTO_INCREMENT for table `notifications`
@@ -696,13 +714,13 @@ ALTER TABLE `roles`
 -- AUTO_INCREMENT for table `tap_nominations`
 --
 ALTER TABLE `tap_nominations`
-  MODIFY `nominationId` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `nominationId` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `tasks`
 --
 ALTER TABLE `tasks`
-  MODIFY `taskId` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `taskId` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `task_assignment`
@@ -714,7 +732,7 @@ ALTER TABLE `task_assignment`
 -- AUTO_INCREMENT for table `task_assignments`
 --
 ALTER TABLE `task_assignments`
-  MODIFY `assignmentId` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `assignmentId` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT for table `task_submission`
@@ -726,7 +744,7 @@ ALTER TABLE `task_submission`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `userId` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `userId` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- Constraints for dumped tables
