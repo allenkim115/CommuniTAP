@@ -13,7 +13,7 @@ A Laravel application with Vite, Tailwind, Alpine. This guide helps anyone who c
 ### 1) Clone and install dependencies
 
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/allenkim115/CommuniTAP.git
 cd communitap
 composer install
 npm install
