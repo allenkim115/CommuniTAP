@@ -50,7 +50,8 @@ php artisan storage:link
 ### 4) Run
 
 ```bash
-composer run dev
+php artisan serve
+npm run dev 
 ```
 
 App: http://127.0.0.1:8000 (starts Laravel, Vite, and the queue worker).
