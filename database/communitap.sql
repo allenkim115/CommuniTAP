@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 21, 2025 at 05:13 PM
+-- Generation Time: Sep 24, 2025 at 03:19 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -159,7 +159,9 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 (23, '2025_09_06_150236_add_time_location_to_tasks_table', 6),
 (24, '2025_09_06_161722_add_rejection_count_to_task_assignments_table', 7),
 (25, '2025_09_21_140000_create_tap_nominations_table_fix', 8),
-(26, '2025_09_21_142411_add_chain_columns_to_tap_nominations_table', 9);
+(26, '2025_09_21_142411_add_chain_columns_to_tap_nominations_table', 9),
+(27, '2025_09_06_152220_create_feedback_table', 10),
+(28, '2025_09_24_000100_add_max_participants_to_tasks_table', 10);
 
 -- --------------------------------------------------------
 
@@ -297,6 +299,8 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
+('4PbRackJmgcmdWrHElktaWMxr0JQYhdbcYgcHctM', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiRzFBVnZOaDhFQkpycFo0Znc5bEJ0dmdJQ1JRUm5jSllWOWZVcG40SiI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6Mjc6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9sb2dpbiI7fX0=', 1758719931),
+('7pDUdJHHRuR73mAhbJpyUPLlN9wa5KcT2YHMYF9J', 4, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoibGpSekVneGJSZlFHY0FVcXdaWGRhdTFhTHFlMVBUVmZOcndoeWExTCI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6Mjc6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9hZG1pbiI7fXM6NTA6ImxvZ2luX3dlYl81OWJhMzZhZGRjMmIyZjk0MDE1ODBmMDE0YzdmNThlYTRlMzA5ODlkIjtpOjQ7fQ==', 1758635102),
 ('tRAXzWzOoD35mNcHhf2iOvg6sM2ySoeKEdHq17ke', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiRFRoVWoxbVZtd1JuV3YwUEtZNHJiNzVCUVg2YXZUT1BqZ2xDMEtFNSI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMCI7fX0=', 1758467576);
 
 -- --------------------------------------------------------
@@ -344,6 +348,7 @@ CREATE TABLE `tasks` (
   `start_time` time DEFAULT NULL,
   `end_time` time DEFAULT NULL,
   `location` varchar(255) DEFAULT NULL,
+  `max_participants` int(10) UNSIGNED DEFAULT NULL,
   `published_date` datetime DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
@@ -353,16 +358,18 @@ CREATE TABLE `tasks` (
 -- Dumping data for table `tasks`
 --
 
-INSERT INTO `tasks` (`taskId`, `FK1_userId`, `title`, `description`, `task_type`, `points_awarded`, `status`, `creation_date`, `approval_date`, `due_date`, `start_time`, `end_time`, `location`, `published_date`, `created_at`, `updated_at`) VALUES
-(2, NULL, 'Test', 'Hello this is a test', 'one_time', 10, 'published', '2025-09-06 15:10:15', NULL, '2025-09-08 00:00:00', '13:00:00', '15:00:00', 'covered court', '2025-09-06 15:10:15', '2025-09-06 07:10:15', '2025-09-06 07:10:15'),
-(3, NULL, 'Test Daily', 'Daily Task test create', 'daily', 20, 'published', '2025-09-06 15:11:14', NULL, '2025-09-09 00:00:00', '10:00:00', '12:30:00', 'barangay hall', '2025-09-06 15:11:14', '2025-09-06 07:11:14', '2025-09-06 07:11:14'),
-(4, NULL, 'Test One TIme', 'hello this a test plss', 'one_time', 30, 'published', '2025-09-06 16:08:51', NULL, '2025-09-17 00:00:00', '12:09:00', '14:08:00', 'park', '2025-09-06 16:08:51', '2025-09-06 08:08:51', '2025-09-06 08:08:51'),
-(5, NULL, 'another test', '231sdadasdsa', 'daily', 12, 'published', '2025-09-06 16:10:22', NULL, '2025-09-08 00:00:00', '16:10:00', '17:10:00', 'sda', '2025-09-06 16:10:22', '2025-09-06 08:10:22', '2025-09-06 08:10:22'),
-(6, 5, 'need man power', 'building a dog house', 'user_uploaded', 10, 'published', '2025-09-06 16:14:08', '2025-09-06 16:14:37', '2025-09-08 00:00:00', '14:13:00', '15:13:00', 'balay', '2025-09-06 16:14:43', '2025-09-06 08:14:08', '2025-09-06 08:14:43'),
-(7, 5, 'User TEst', 'test 123 123', 'user_uploaded', 20, 'published', '2025-09-10 13:10:39', '2025-09-10 13:12:09', '2025-09-12 00:00:00', '10:10:00', '12:10:00', 'House', '2025-09-10 13:12:26', '2025-09-10 05:10:39', '2025-09-10 05:12:26'),
-(8, NULL, 'Tap and Pass Test', 'this is a test hehu', 'daily', 10, 'published', '2025-09-10 13:40:59', NULL, '2025-09-12 00:00:00', '22:40:00', '23:41:00', 'sports complex', '2025-09-10 13:40:59', '2025-09-10 05:40:59', '2025-09-10 05:40:59'),
-(9, NULL, 'TapPass2', 'test 2', 'daily', 12, 'published', '2025-09-21 12:25:11', NULL, '2025-09-24 00:00:00', '11:24:00', '12:30:00', 'park', '2025-09-21 12:25:11', '2025-09-21 04:25:11', '2025-09-21 04:25:11'),
-(10, NULL, 'tapPass3', 'test3', 'daily', 13, 'published', '2025-09-21 12:52:56', NULL, '2025-09-24 00:00:00', '10:54:00', '13:00:00', 'covered court', '2025-09-21 12:52:56', '2025-09-21 04:52:56', '2025-09-21 04:52:56');
+INSERT INTO `tasks` (`taskId`, `FK1_userId`, `title`, `description`, `task_type`, `points_awarded`, `status`, `creation_date`, `approval_date`, `due_date`, `start_time`, `end_time`, `location`, `max_participants`, `published_date`, `created_at`, `updated_at`) VALUES
+(2, NULL, 'Test', 'Hello this is a test', 'one_time', 10, 'completed', '2025-09-06 15:10:15', NULL, '2025-09-08 00:00:00', '13:00:00', '15:00:00', 'covered court', NULL, '2025-09-06 15:10:15', '2025-09-06 07:10:15', '2025-09-24 04:52:54'),
+(3, NULL, 'Test Daily', 'Daily Task test create', 'daily', 20, 'completed', '2025-09-06 15:11:14', NULL, '2025-09-09 00:00:00', '10:00:00', '12:30:00', 'barangay hall', NULL, '2025-09-06 15:11:14', '2025-09-06 07:11:14', '2025-09-24 04:52:54'),
+(4, NULL, 'Test One TIme', 'hello this a test plss', 'one_time', 30, 'completed', '2025-09-06 16:08:51', NULL, '2025-09-17 00:00:00', '12:09:00', '14:08:00', 'park', NULL, '2025-09-06 16:08:51', '2025-09-06 08:08:51', '2025-09-24 04:52:54'),
+(5, NULL, 'another test', '231sdadasdsa', 'daily', 12, 'completed', '2025-09-06 16:10:22', NULL, '2025-09-08 00:00:00', '16:10:00', '17:10:00', 'sda', NULL, '2025-09-06 16:10:22', '2025-09-06 08:10:22', '2025-09-24 04:52:54'),
+(6, 5, 'need man power', 'building a dog house', 'user_uploaded', 10, 'completed', '2025-09-06 16:14:08', '2025-09-06 16:14:37', '2025-09-08 00:00:00', '14:13:00', '15:13:00', 'balay', NULL, '2025-09-06 16:14:43', '2025-09-06 08:14:08', '2025-09-24 04:52:54'),
+(7, 5, 'User TEst', 'test 123 123', 'user_uploaded', 20, 'completed', '2025-09-10 13:10:39', '2025-09-10 13:12:09', '2025-09-12 00:00:00', '10:10:00', '12:10:00', 'House', NULL, '2025-09-10 13:12:26', '2025-09-10 05:10:39', '2025-09-24 04:52:54'),
+(8, NULL, 'Tap and Pass Test', 'this is a test hehu', 'daily', 10, 'completed', '2025-09-10 13:40:59', NULL, '2025-09-12 00:00:00', '22:40:00', '23:41:00', 'sports complex', NULL, '2025-09-10 13:40:59', '2025-09-10 05:40:59', '2025-09-24 04:52:54'),
+(9, NULL, 'TapPass2', 'test 2', 'daily', 12, 'completed', '2025-09-21 12:25:11', NULL, '2025-09-24 00:00:00', '11:24:00', '12:30:00', 'park', NULL, '2025-09-21 12:25:11', '2025-09-21 04:25:11', '2025-09-24 04:52:54'),
+(10, NULL, 'tapPass3', 'test3', 'daily', 13, 'completed', '2025-09-21 12:52:56', NULL, '2025-09-24 00:00:00', '10:54:00', '13:00:00', 'covered court', NULL, '2025-09-21 12:52:56', '2025-09-21 04:52:56', '2025-09-24 04:52:54'),
+(11, NULL, 'One Test', 'hello hi', 'one_time', 12, 'published', '2025-09-24 12:55:17', NULL, '2025-09-26 00:00:00', '09:00:00', '12:00:00', 'Community  Center', NULL, '2025-09-24 12:55:25', '2025-09-24 04:55:17', '2025-09-24 04:55:25'),
+(12, NULL, 'Limit Test', 'sdsad fdsfs1123', 'daily', 23, 'published', '2025-09-24 13:05:39', NULL, '2025-09-27 00:00:00', '10:30:00', '12:00:00', 'Park', 2, '2025-09-24 13:05:39', '2025-09-24 05:05:39', '2025-09-24 05:05:39');
 
 -- --------------------------------------------------------
 
@@ -419,7 +426,9 @@ INSERT INTO `task_assignments` (`assignmentId`, `taskId`, `userId`, `status`, `a
 (12, 9, 5, 'completed', '2025-09-21 04:52:01', '2025-09-21 05:14:39', '2025-09-21 05:15:15', '[]', 'Approved by admin', 0, NULL, '2025-09-21 04:52:01', '2025-09-21 05:15:15'),
 (13, 5, 7, 'completed', '2025-09-21 05:00:04', '2025-09-21 05:10:52', '2025-09-21 05:11:19', '[]', 'Approved by admin', 0, NULL, '2025-09-21 05:00:04', '2025-09-21 05:11:19'),
 (14, 8, 7, 'completed', '2025-09-21 05:00:30', '2025-09-21 05:27:38', '2025-09-21 05:27:55', '[]', 'Approved by admin', 0, NULL, '2025-09-21 05:00:30', '2025-09-21 05:27:55'),
-(15, 10, 7, 'completed', '2025-09-21 06:06:50', '2025-09-21 06:39:38', '2025-09-21 06:39:54', '[]', 'Approved by admin', 0, NULL, '2025-09-21 06:06:50', '2025-09-21 06:39:54');
+(15, 10, 7, 'completed', '2025-09-21 06:06:50', '2025-09-21 06:39:38', '2025-09-21 06:39:54', '[]', 'Approved by admin', 0, NULL, '2025-09-21 06:06:50', '2025-09-21 06:39:54'),
+(16, 12, 5, 'assigned', '2025-09-24 05:05:58', NULL, NULL, NULL, NULL, 0, NULL, '2025-09-24 05:05:58', '2025-09-24 05:05:58'),
+(17, 12, 6, 'assigned', '2025-09-24 05:06:16', NULL, NULL, NULL, NULL, 0, NULL, '2025-09-24 05:06:16', '2025-09-24 05:06:16');
 
 -- --------------------------------------------------------
 
@@ -672,7 +681,7 @@ ALTER TABLE `jobs`
 -- AUTO_INCREMENT for table `migrations`
 --
 ALTER TABLE `migrations`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
 
 --
 -- AUTO_INCREMENT for table `notifications`
@@ -720,7 +729,7 @@ ALTER TABLE `tap_nominations`
 -- AUTO_INCREMENT for table `tasks`
 --
 ALTER TABLE `tasks`
-  MODIFY `taskId` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `taskId` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `task_assignment`
@@ -732,7 +741,7 @@ ALTER TABLE `task_assignment`
 -- AUTO_INCREMENT for table `task_assignments`
 --
 ALTER TABLE `task_assignments`
-  MODIFY `assignmentId` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `assignmentId` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- AUTO_INCREMENT for table `task_submission`
