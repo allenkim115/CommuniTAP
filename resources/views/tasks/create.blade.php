@@ -85,11 +85,11 @@
                         <!-- Due Date -->
                         <div>
                             <label for="due_date" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                Due Date (Optional)
+                                Due Date <span class="text-red-500">*</span>
                             </label>
                             <input type="date" name="due_date" id="due_date" value="{{ old('due_date') }}" 
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white" 
-                                   min="{{ date('Y-m-d', strtotime('+1 day')) }}">
+                                   min="{{ date('Y-m-d', strtotime('+1 day')) }}" required>
                             @error('due_date')
                                 <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                             @enderror
@@ -103,10 +103,10 @@
                                 <!-- Start Time -->
                                 <div>
                                     <label for="start_time" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                        Start Time (Optional)
+                                        Start Time <span class="text-red-500">*</span>
                                     </label>
                                     <input type="time" name="start_time" id="start_time" value="{{ old('start_time') }}" 
-                                           class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
+                                           class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white" required>
                                     @error('start_time')
                                         <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                                     @enderror
@@ -115,10 +115,10 @@
                                 <!-- End Time -->
                                 <div>
                                     <label for="end_time" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                        End Time (Optional)
+                                        End Time <span class="text-red-500">*</span>
                                     </label>
                                     <input type="time" name="end_time" id="end_time" value="{{ old('end_time') }}" 
-                                           class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
+                                           class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white" required>
                                     @error('end_time')
                                         <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                                     @enderror
@@ -128,15 +128,27 @@
                             <!-- Location -->
                             <div class="mt-6">
                                 <label for="location" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                    Location (Optional)
+                                    Location <span class="text-red-500">*</span>
                                 </label>
                                 <input type="text" name="location" id="location" value="{{ old('location') }}" 
                                        class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white" 
-                                       placeholder="Enter task location (e.g., Community Center, Park, etc.)" maxlength="255">
+                                       placeholder="Enter task location (e.g., Community Center, Park, etc.)" maxlength="255" required>
                                 @error('location')
                                     <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                                 @enderror
                             </div>
+                        </div>
+
+                        <!-- Participant Limit -->
+                        <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
+                            <h4 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Participant Limit</h4>
+                            <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">Leave blank for unlimited participants.</p>
+                            <input type="number" name="max_participants" id="max_participants" value="{{ old('max_participants') }}"
+                                   class="w-full md:w-1/2 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                                   placeholder="e.g., 10" min="1">
+                            @error('max_participants')
+                                <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                            @enderror
                         </div>
                     </div>
 

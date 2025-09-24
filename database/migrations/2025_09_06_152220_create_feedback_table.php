@@ -11,24 +11,26 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('feedback', function (Blueprint $table) {
-            $table->id('feedbackId');
-            $table->unsignedBigInteger('taskId');
-            $table->unsignedBigInteger('userId');
-            $table->text('feedback_text');
-            $table->integer('rating')->nullable(); // 1-5 star rating
-            $table->enum('type', ['user_feedback', 'admin_feedback'])->default('user_feedback');
-            $table->boolean('is_public')->default(true);
-            $table->timestamps();
-            
-            // Foreign key constraints
-            $table->foreign('taskId')->references('taskId')->on('tasks')->onDelete('cascade');
-            $table->foreign('userId')->references('userId')->on('users')->onDelete('cascade');
-            
-            // Indexes
-            $table->index(['taskId', 'userId']);
-            $table->index('type');
-        });
+        if (!Schema::hasTable('feedback')) {
+            Schema::create('feedback', function (Blueprint $table) {
+                $table->id('feedbackId');
+                $table->unsignedBigInteger('taskId');
+                $table->unsignedBigInteger('userId');
+                $table->text('feedback_text');
+                $table->integer('rating')->nullable(); // 1-5 star rating
+                $table->enum('type', ['user_feedback', 'admin_feedback'])->default('user_feedback');
+                $table->boolean('is_public')->default(true);
+                $table->timestamps();
+                
+                // Foreign key constraints
+                $table->foreign('taskId')->references('taskId')->on('tasks')->onDelete('cascade');
+                $table->foreign('userId')->references('userId')->on('users')->onDelete('cascade');
+                
+                // Indexes
+                $table->index(['taskId', 'userId']);
+                $table->index('type');
+            });
+        }
     }
 
     /**

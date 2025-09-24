@@ -396,12 +396,24 @@
                         ` : `
                         <!-- Join Task Button - Show if user hasn't joined -->
                         <div class="text-center space-y-3">
-                            <form action="/tasks/${taskId}/join" method="POST" class="inline">
-                                <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                                <button type="submit" class="bg-orange-500 hover:bg-orange-700 text-white font-bold py-3 px-8 rounded-lg text-lg">
-                                    Join Task
-                                </button>
-                            </form>
+                            ${(() => {
+                                const isFull = task.max_participants !== null && task.max_participants !== undefined && task.assignments && task.assignments.length >= task.max_participants;
+                                if (isFull) {
+                                    return `
+                                        <button type="button" class="bg-gray-400 text-white font-bold py-3 px-8 rounded-lg text-lg cursor-not-allowed" title="This task has reached its participant limit" aria-disabled="true">
+                                            Join Task
+                                        </button>
+                                    `;
+                                }
+                                return `
+                                    <form action="/tasks/${taskId}/join" method="POST" class="inline">
+                                        <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                                        <button type="submit" class="bg-orange-500 hover:bg-orange-700 text-white font-bold py-3 px-8 rounded-lg text-lg">
+                                            Join Task
+                                        </button>
+                                    </form>
+                                `;
+                            })()}
                         </div>
                         `}
                     </div>

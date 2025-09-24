@@ -1,22 +1,13 @@
-@if(session('status'))
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    showToast('{{ session('status') }}', 'success', 5000);
-});
-
 function showToast(message, type = 'success', duration = 5000) {
-    // Create toast element
     const toast = document.createElement('div');
     toast.className = `fixed top-4 right-4 z-50 transform transition-all duration-300 ease-in-out translate-x-full opacity-0`;
-    
-    // Set background color based on type
     let bgColor = 'bg-green-500';
     let icon = `
         <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
         </svg>
     `;
-    
     if (type === 'error') {
         bgColor = 'bg-red-500';
         icon = `
@@ -39,15 +30,10 @@ function showToast(message, type = 'success', duration = 5000) {
             </svg>
         `;
     }
-    
     toast.innerHTML = `
         <div class="flex items-center p-4 mb-4 text-white rounded-lg shadow-lg max-w-sm w-full ${bgColor}">
-            <div class="flex-shrink-0">
-                ${icon}
-            </div>
-            <div class="ml-3 text-sm font-medium">
-                ${message}
-            </div>
+            <div class="flex-shrink-0">${icon}</div>
+            <div class="ml-3 text-sm font-medium">${message}</div>
             <div class="ml-auto pl-3">
                 <button onclick="this.closest('.fixed').remove()" class="inline-flex text-white hover:text-gray-200 focus:outline-none focus:text-gray-200 transition ease-in-out duration-150">
                     <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -57,34 +43,24 @@ function showToast(message, type = 'success', duration = 5000) {
             </div>
         </div>
     `;
-    
-    // Add to page
     document.body.appendChild(toast);
-    
-    // Show toast
     setTimeout(() => {
         toast.classList.remove('translate-x-full', 'opacity-0');
         toast.classList.add('translate-x-0', 'opacity-100');
     }, 100);
-    
-    // Auto hide after duration
     setTimeout(() => {
         toast.classList.remove('translate-x-0', 'opacity-100');
         toast.classList.add('translate-x-full', 'opacity-0');
-        setTimeout(() => {
-            if (toast.parentNode) {
-                toast.parentNode.removeChild(toast);
-            }
-        }, 300);
+        setTimeout(() => { if (toast.parentNode) { toast.parentNode.removeChild(toast); } }, 300);
     }, duration);
 }
-</script>
-@endif
 
-@if(session('error'))
-<script>
 document.addEventListener('DOMContentLoaded', function() {
-    showToast('{{ session('error') }}', 'error', 5000);
+    @if(session('status'))
+        showToast('{{ session('status') }}', 'success', 5000);
+    @endif
+    @if(session('error'))
+        showToast('{{ session('error') }}', 'error', 5000);
+    @endif
 });
 </script>
-@endif

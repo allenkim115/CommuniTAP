@@ -119,12 +119,21 @@
                         <!-- Join Task Button - Only show if user hasn't joined the task -->
                         @if(!$task->isAssignedTo(Auth::id()) && $task->status === 'published')
                         <div class="mb-6 text-center">
-                            <form action="{{ route('tasks.join', $task) }}" method="POST" class="inline">
-                                @csrf
-                                <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg transition-colors">
+                            @php
+                                $isFull = !is_null($task->max_participants) && $task->assignments->count() >= $task->max_participants;
+                            @endphp
+                            @if($isFull)
+                                <button type="button" class="bg-gray-400 text-white font-bold py-3 px-8 rounded-lg cursor-not-allowed" title="This task has reached its participant limit" aria-disabled="true">
                                     Join This Task
                                 </button>
-                            </form>
+                            @else
+                                <form action="{{ route('tasks.join', $task) }}" method="POST" class="inline">
+                                    @csrf
+                                    <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg transition-colors">
+                                        Join This Task
+                                    </button>
+                                </form>
+                            @endif
                         </div>
                         @endif
 

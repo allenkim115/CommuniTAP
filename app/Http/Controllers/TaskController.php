@@ -34,8 +34,8 @@ class TaskController extends Controller
             }
         });
             
-        // Get available tasks that user can join (published tasks)
-        $availableTasks = Task::where('status', 'published')
+        // Get available tasks that user can join (published tasks) that are not expired
+        $availableTasks = Task::where('status', 'published')->notExpired()
             ->whereDoesntHave('assignments', function($query) use ($user) {
                 $query->where('userId', $user->userId);
             })
@@ -96,10 +96,11 @@ class TaskController extends Controller
             'description' => 'required|string',
             'task_type' => 'required|in:daily,one_time,user_uploaded',
             'points_awarded' => 'required|integer|min:1',
-            'due_date' => 'nullable|date|after:today',
-            'start_time' => 'nullable|date_format:H:i',
-            'end_time' => 'nullable|date_format:H:i',
-            'location' => 'nullable|string|max:255',
+            'due_date' => 'required|date|after:today',
+            'start_time' => 'required|date_format:H:i',
+            'end_time' => 'required|date_format:H:i',
+            'location' => 'required|string|max:255',
+            'max_participants' => 'nullable|integer|min:1',
         ]);
 
         // Custom validation for end_time after start_time
@@ -130,6 +131,7 @@ class TaskController extends Controller
             'start_time' => $request->start_time,
             'end_time' => $request->end_time,
             'location' => $request->location,
+            'max_participants' => $request->max_participants,
         ]);
 
         return redirect()->route('tasks.index')->with('status', 'Task proposal submitted');
@@ -263,7 +265,7 @@ class TaskController extends Controller
 
         // Check if task can accept more users
         if (!$task->canAcceptMoreUsers()) {
-            return redirect()->back()->with('error', 'This task cannot accept more users.');
+            return redirect()->back()->with('error', 'This task has reached its participant limit.');
         }
 
         // Create task assignment

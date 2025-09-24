@@ -15,6 +15,9 @@ class TaskController extends Controller
      */
     public function index()
     {
+        // Auto-complete expired tasks before listing
+        \App\Models\Task::completeExpiredTasks();
+
         $tasks = Task::with(['assignments.user', 'assignedUser'])
             ->orderBy('created_at', 'desc')
             ->paginate(15);
@@ -50,10 +53,11 @@ class TaskController extends Controller
             'description' => 'required|string',
             'task_type' => 'required|in:daily,one_time',
             'points_awarded' => 'required|integer|min:1',
-            'due_date' => 'nullable|date|after:today',
-            'start_time' => 'nullable|date_format:H:i',
-            'end_time' => 'nullable|date_format:H:i',
-            'location' => 'nullable|string|max:255',
+            'due_date' => 'required|date|after:today',
+            'start_time' => 'required|date_format:H:i',
+            'end_time' => 'required|date_format:H:i',
+            'location' => 'required|string|max:255',
+            'max_participants' => 'nullable|integer|min:1',
             'publish_immediately' => 'boolean',
         ]);
 
@@ -76,6 +80,7 @@ class TaskController extends Controller
             'start_time' => $request->start_time,
             'end_time' => $request->end_time,
             'location' => $request->location,
+            'max_participants' => $request->max_participants,
             'FK1_userId' => null, // Tasks are not assigned initially - users join them
             'status' => $request->publish_immediately ? 'published' : 'approved',
         ];
@@ -116,10 +121,11 @@ class TaskController extends Controller
             'title' => 'required|string|max:100',
             'description' => 'required|string',
             'points_awarded' => 'required|integer|min:1',
-            'due_date' => 'nullable|date|after:today',
-            'start_time' => 'nullable|date_format:H:i',
-            'end_time' => 'nullable|date_format:H:i',
-            'location' => 'nullable|string|max:255',
+            'due_date' => 'required|date|after:today',
+            'start_time' => 'required|date_format:H:i',
+            'end_time' => 'required|date_format:H:i',
+            'location' => 'required|string|max:255',
+            'max_participants' => 'nullable|integer|min:1',
             'status' => 'required|in:pending,approved,published,assigned,submitted,completed',
         ]);
 
@@ -140,6 +146,7 @@ class TaskController extends Controller
             'start_time' => $request->start_time,
             'end_time' => $request->end_time,
             'location' => $request->location,
+            'max_participants' => $request->max_participants,
             'status' => $request->status,
         ]);
 
@@ -235,6 +242,9 @@ class TaskController extends Controller
      */
     public function filter(Request $request)
     {
+        // Auto-complete expired tasks before filtering
+        \App\Models\Task::completeExpiredTasks();
+
         $status = $request->get('status');
         $taskType = $request->get('task_type');
         

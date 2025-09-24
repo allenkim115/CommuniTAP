@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class Task extends Model
 {
@@ -24,6 +25,7 @@ class Task extends Model
         'start_time',
         'end_time',
         'location',
+        'max_participants',
         'published_date'
     ];
 
@@ -88,7 +90,11 @@ class Task extends Model
         }
         
         // Daily and One-Time tasks can have multiple users
-        return true;
+        if ($this->max_participants === null) {
+            return true;
+        }
+
+        return $this->assignments()->count() < $this->max_participants;
     }
 
     /**
@@ -140,11 +146,95 @@ class Task extends Model
     }
 
     /**
+     * Scope for tasks whose deadline (date + optional end_time) is in the past
+     */
+    public function scopeExpired($query)
+    {
+        // If end_time exists, use DATE(due_date) + end_time; otherwise use due_date directly
+        return $query->where(function ($q) {
+            $q->where(function ($q2) {
+                $q2->whereNotNull('end_time')
+                   ->whereRaw("CONCAT(DATE(due_date), ' ', end_time) < NOW()");
+            })
+            ->orWhere(function ($q3) {
+                $q3->whereNull('end_time')
+                   ->whereNotNull('due_date')
+                   ->where('due_date', '<', now());
+            });
+        });
+    }
+
+    /**
+     * Scope for tasks whose deadline has not passed yet
+     */
+    public function scopeNotExpired($query)
+    {
+        return $query->where(function ($q) {
+            $q->where(function ($q2) {
+                $q2->whereNotNull('end_time')
+                   ->whereRaw("CONCAT(DATE(due_date), ' ', end_time) >= NOW()");
+            })
+            ->orWhere(function ($q3) {
+                $q3->whereNull('end_time')
+                   ->where(function ($q4) {
+                        $q4->whereNull('due_date')
+                           ->orWhere('due_date', '>=', now());
+                   });
+            });
+        });
+    }
+
+    /**
      * Check if task is available for joining
      */
     public function isAvailable()
     {
         return $this->status === 'published' && is_null($this->FK1_userId);
+    }
+
+    /**
+     * Determine if the task is expired based on due_date and end_time
+     */
+    public function isExpired(): bool
+    {
+        if (is_null($this->due_date)) {
+            return false;
+        }
+
+        if (!is_null($this->end_time)) {
+            $deadline = \Carbon\Carbon::parse($this->due_date->toDateString() . ' ' . $this->end_time);
+            return now()->gt($deadline);
+        }
+
+        return now()->gt($this->due_date);
+    }
+
+    /**
+     * Mark all expired tasks and their active assignments as completed
+     */
+    public static function completeExpiredTasks(): int
+    {
+        $updatedCount = 0;
+
+        $expiredTasks = static::expired()
+            ->whereIn('status', ['published', 'assigned', 'submitted', 'approved', 'pending'])
+            ->get();
+
+        foreach ($expiredTasks as $task) {
+            // Complete task-level status
+            $task->status = 'completed';
+            $task->save();
+            $updatedCount++;
+
+            // Complete any active assignments
+            foreach ($task->assignments()->whereIn('status', ['assigned', 'submitted'])->get() as $assignment) {
+                $assignment->status = 'completed';
+                $assignment->completed_at = now();
+                $assignment->save();
+            }
+        }
+
+        return $updatedCount;
     }
 
     /**
