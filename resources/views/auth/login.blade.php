@@ -2,8 +2,8 @@
     <!-- Session Status -->
     <x-auth-session-status class="mb-4" :status="session('status')" />
 
-    <div class="flex justify-center">
-        <x-application-logo class="w-16 h-16" />
+    <div class="flex justify-center items-center mb-8">
+        <img src="{{ asset('images/communitaplogo1.svg') }}" alt="CommuniTAP Logo" class="w-36 h-36" />
     </div>
     <h1 class="text-2xl font-semibold text-center mt-4">Login</h1>
 

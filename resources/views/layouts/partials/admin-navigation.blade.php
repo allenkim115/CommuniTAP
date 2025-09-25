@@ -3,7 +3,7 @@
         <div class="flex items-center justify-between h-16">
             <div class="flex items-center space-x-6">
                 <a href="{{ route('admin.dashboard') ?? '#' }}" class="flex items-center space-x-2">
-                    <x-application-logo class="block h-9 w-auto fill-current text-teal-600" />
+                    <img src="{{ asset('images/communitaplogo1.svg') }}" alt="CommuniTAP Logo" class="block h-16 w-auto" />
                 </a>
 
                 <div class="hidden md:flex items-center space-x-6">

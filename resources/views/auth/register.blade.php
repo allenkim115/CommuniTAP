@@ -17,8 +17,8 @@
         @csrf
 
         <!-- Logo inside container -->
-        <div class="flex justify-center mb-4">
-            <x-application-logo class="w-16 h-16" />
+        <div class="flex justify-center items-center mb-8">
+            <img src="{{ asset('images/communitaplogo1.svg') }}" alt="CommuniTAP Logo" class="w-36 h-36" />
         </div>
 
         <!-- Heading -->
