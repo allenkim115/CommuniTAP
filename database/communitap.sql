@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 24, 2025 at 03:19 PM
+-- Generation Time: Oct 01, 2025 at 05:25 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -161,7 +161,9 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 (25, '2025_09_21_140000_create_tap_nominations_table_fix', 8),
 (26, '2025_09_21_142411_add_chain_columns_to_tap_nominations_table', 9),
 (27, '2025_09_06_152220_create_feedback_table', 10),
-(28, '2025_09_24_000100_add_max_participants_to_tasks_table', 10);
+(28, '2025_09_24_000100_add_max_participants_to_tasks_table', 10),
+(29, '2025_10_01_000001_create_personal_access_tokens_table', 11),
+(30, '2025_10_01_000100_add_progress_to_task_assignments', 12);
 
 -- --------------------------------------------------------
 
@@ -190,6 +192,25 @@ CREATE TABLE `password_reset_tokens` (
   `email` varchar(255) NOT NULL,
   `token` varchar(255) NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `personal_access_tokens`
+--
+
+CREATE TABLE `personal_access_tokens` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `tokenable_type` varchar(255) NOT NULL,
+  `tokenable_id` bigint(20) UNSIGNED NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `token` varchar(64) NOT NULL,
+  `abilities` text DEFAULT NULL,
+  `last_used_at` timestamp NULL DEFAULT NULL,
+  `expires_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -299,9 +320,9 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
-('4PbRackJmgcmdWrHElktaWMxr0JQYhdbcYgcHctM', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiRzFBVnZOaDhFQkpycFo0Znc5bEJ0dmdJQ1JRUm5jSllWOWZVcG40SiI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6Mjc6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9sb2dpbiI7fX0=', 1758719931),
-('7pDUdJHHRuR73mAhbJpyUPLlN9wa5KcT2YHMYF9J', 4, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoibGpSekVneGJSZlFHY0FVcXdaWGRhdTFhTHFlMVBUVmZOcndoeWExTCI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6Mjc6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9hZG1pbiI7fXM6NTA6ImxvZ2luX3dlYl81OWJhMzZhZGRjMmIyZjk0MDE1ODBmMDE0YzdmNThlYTRlMzA5ODlkIjtpOjQ7fQ==', 1758635102),
-('tRAXzWzOoD35mNcHhf2iOvg6sM2ySoeKEdHq17ke', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiRFRoVWoxbVZtd1JuV3YwUEtZNHJiNzVCUVg2YXZUT1BqZ2xDMEtFNSI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6MjE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMCI7fX0=', 1758467576);
+('pUXcbuFJGDbIUfIKKKoALuTqFQ67hrNZboMwURoE', 5, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36', 'YTo1OntzOjY6Il90b2tlbiI7czo0MDoiZ2U2OWQ0Vnl3THl6RzNlU1BVZUpCVzJoNENZVVFpcW5la0p1V2VlOSI7czozOiJ1cmwiO2E6MDp7fXM6OToiX3ByZXZpb3VzIjthOjE6e3M6MzoidXJsIjtzOjI3OiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvdGFza3MiO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX1zOjUwOiJsb2dpbl93ZWJfNTliYTM2YWRkYzJiMmY5NDAxNTgwZjAxNGM3ZjU4ZWE0ZTMwOTg5ZCI7aTo1O30=', 1759331776),
+('ygMC9C6rUEoovF8Nwx0MEbn7neXYgtqZC57FLezJ', 4, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36 Edg/140.0.0.0', 'YTo1OntzOjY6Il90b2tlbiI7czo0MDoiM2oycWRkVnYyV3dNcmNZcjY1QWxTaDRhZDBRcjJBM29ZV3lXODA3USI7czozOiJ1cmwiO2E6MDp7fXM6OToiX3ByZXZpb3VzIjthOjE6e3M6MzoidXJsIjtzOjQ0OiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvYWRtaW4vdGFzay1zdWJtaXNzaW9ucyI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fXM6NTA6ImxvZ2luX3dlYl81OWJhMzZhZGRjMmIyZjk0MDE1ODBmMDE0YzdmNThlYTRlMzA5ODlkIjtpOjQ7fQ==', 1759331742),
+('z9SbTNEBhLQynBGyksSw68iZLiU5yjsj3t2giy7l', 6, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoidk1UT1BRT1h2WWptbFdZRE8yUkpyNFNDSmQ3WHFHRldaMFk0VnNZeCI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6MzE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9kYXNoYm9hcmQiO31zOjUwOiJsb2dpbl93ZWJfNTliYTM2YWRkYzJiMmY5NDAxNTgwZjAxNGM3ZjU4ZWE0ZTMwOTg5ZCI7aTo2O30=', 1759331831);
 
 -- --------------------------------------------------------
 
@@ -368,8 +389,11 @@ INSERT INTO `tasks` (`taskId`, `FK1_userId`, `title`, `description`, `task_type`
 (8, NULL, 'Tap and Pass Test', 'this is a test hehu', 'daily', 10, 'completed', '2025-09-10 13:40:59', NULL, '2025-09-12 00:00:00', '22:40:00', '23:41:00', 'sports complex', NULL, '2025-09-10 13:40:59', '2025-09-10 05:40:59', '2025-09-24 04:52:54'),
 (9, NULL, 'TapPass2', 'test 2', 'daily', 12, 'completed', '2025-09-21 12:25:11', NULL, '2025-09-24 00:00:00', '11:24:00', '12:30:00', 'park', NULL, '2025-09-21 12:25:11', '2025-09-21 04:25:11', '2025-09-24 04:52:54'),
 (10, NULL, 'tapPass3', 'test3', 'daily', 13, 'completed', '2025-09-21 12:52:56', NULL, '2025-09-24 00:00:00', '10:54:00', '13:00:00', 'covered court', NULL, '2025-09-21 12:52:56', '2025-09-21 04:52:56', '2025-09-24 04:52:54'),
-(11, NULL, 'One Test', 'hello hi', 'one_time', 12, 'published', '2025-09-24 12:55:17', NULL, '2025-09-26 00:00:00', '09:00:00', '12:00:00', 'Community  Center', NULL, '2025-09-24 12:55:25', '2025-09-24 04:55:17', '2025-09-24 04:55:25'),
-(12, NULL, 'Limit Test', 'sdsad fdsfs1123', 'daily', 23, 'published', '2025-09-24 13:05:39', NULL, '2025-09-27 00:00:00', '10:30:00', '12:00:00', 'Park', 2, '2025-09-24 13:05:39', '2025-09-24 05:05:39', '2025-09-24 05:05:39');
+(11, NULL, 'One Test', 'hello hi', 'one_time', 12, 'completed', '2025-09-24 12:55:17', NULL, '2025-09-26 00:00:00', '09:00:00', '12:00:00', 'Community  Center', NULL, '2025-09-24 12:55:25', '2025-09-24 04:55:17', '2025-10-01 05:07:13'),
+(12, NULL, 'Limit Test', 'sdsad fdsfs1123', 'daily', 23, 'completed', '2025-09-24 13:05:39', NULL, '2025-09-27 00:00:00', '10:30:00', '12:00:00', 'Park', 2, '2025-09-24 13:05:39', '2025-09-24 05:05:39', '2025-10-01 05:07:13'),
+(13, 5, 'Wood Working', 'need manpower in making a wood furniture', 'user_uploaded', 12, 'published', '2025-10-01 13:06:46', '2025-10-01 13:07:27', '2025-10-04 00:00:00', '10:06:00', '12:06:00', 'PH', 2, '2025-10-01 13:07:31', '2025-10-01 05:06:46', '2025-10-01 05:07:31'),
+(14, NULL, 'redirect test', 'test for redirecting task', 'daily', 12, 'published', '2025-10-01 13:41:48', NULL, '2025-10-03 00:00:00', '09:41:00', '11:41:00', '123', 2, '2025-10-01 13:41:48', '2025-10-01 05:41:48', '2025-10-01 05:41:48'),
+(15, 5, 'uploaded test', 'user task test', 'user_uploaded', 20, 'pending', '2025-10-01 14:32:38', NULL, '2025-10-04 00:00:00', '12:32:00', '14:32:00', 'covered court', NULL, NULL, '2025-10-01 06:32:38', '2025-10-01 06:32:38');
 
 -- --------------------------------------------------------
 
@@ -398,6 +422,7 @@ CREATE TABLE `task_assignments` (
   `taskId` bigint(20) UNSIGNED NOT NULL,
   `userId` bigint(20) UNSIGNED NOT NULL,
   `status` enum('assigned','submitted','completed') NOT NULL DEFAULT 'assigned',
+  `progress` enum('accepted','on_the_way','working','done','submitted_proof') NOT NULL DEFAULT 'accepted',
   `assigned_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `submitted_at` timestamp NULL DEFAULT NULL,
   `completed_at` timestamp NULL DEFAULT NULL,
@@ -413,22 +438,25 @@ CREATE TABLE `task_assignments` (
 -- Dumping data for table `task_assignments`
 --
 
-INSERT INTO `task_assignments` (`assignmentId`, `taskId`, `userId`, `status`, `assigned_at`, `submitted_at`, `completed_at`, `photos`, `completion_notes`, `rejection_count`, `rejection_reason`, `created_at`, `updated_at`) VALUES
-(3, 3, 6, 'completed', '2025-09-06 07:15:53', '2025-09-10 05:33:07', '2025-09-10 05:38:16', '[\"task-submissions\\/0pdquLS3iIGprTPetfDJIzL7OqKJiUr8Pya7YECC.png\"]', 'Approved by admin', 1, 'please provide a proof of completion', '2025-09-06 07:15:53', '2025-09-10 05:38:16'),
-(4, 2, 6, 'completed', '2025-09-06 07:15:58', '2025-09-10 05:37:19', '2025-09-10 05:40:08', '[\"task-submissions\\/YwVq9FN1uDKWswQwgSCKGcfCNEcrY5VKVUszf67X.png\"]', 'Approved by admin', 0, NULL, '2025-09-06 07:15:58', '2025-09-10 05:40:08'),
-(5, 3, 5, 'completed', '2025-09-06 07:18:26', '2025-09-06 07:19:02', '2025-09-06 08:01:38', '[\"task-submissions\\/IVTWKZDFbZklTSdo49UE54ITB1XtzPjzzMKESjU0.png\"]', 'Approved by admin', 0, NULL, '2025-09-06 07:18:26', '2025-09-06 08:01:38'),
-(6, 2, 5, 'completed', '2025-09-06 07:40:05', '2025-09-06 07:40:05', '2025-09-06 07:56:33', '[\"task-submissions\\/IVTWKZDFbZklTSdo49UE54ITB1XtzPjzzMKESjU0.png\"]', 'Approved by admin', 0, NULL, '2025-09-06 07:40:05', '2025-09-06 07:56:33'),
-(7, 5, 5, 'completed', '2025-09-06 08:15:16', '2025-09-10 05:14:31', '2025-09-10 05:15:05', '[\"task-submissions\\/4iaElVb6MZPb11erd9YpLkpulj63o9WoShjpddtb.png\"]', 'Approved by admin', 1, 'eww', '2025-09-06 08:15:16', '2025-09-10 05:15:05'),
-(8, 6, 6, 'completed', '2025-09-10 05:42:38', '2025-09-10 05:45:19', '2025-09-10 05:45:37', '[\"task-submissions\\/RYDwXBB1l2elrvR9AzqfgtDO4abS3jBVEQYmbLtG.png\"]', 'Approved by admin', 1, 'sus', '2025-09-10 05:42:38', '2025-09-10 05:45:37'),
-(9, 4, 6, 'completed', '2025-09-10 05:47:35', '2025-09-10 05:48:43', '2025-09-10 05:49:00', '[\"task-submissions\\/S5hP9Nsp6Vu2nESo3uMyu22OwD4HlJoNmQDHo82C.png\"]', 'Approved by admin', 1, 'submit more', '2025-09-10 05:47:35', '2025-09-10 05:49:00'),
-(10, 8, 5, 'completed', '2025-09-21 04:20:27', '2025-09-21 04:53:26', '2025-09-21 04:57:45', '[]', 'Approved by admin', 0, NULL, '2025-09-21 04:20:27', '2025-09-21 04:57:45'),
-(11, 8, 6, 'completed', '2025-09-21 04:21:03', '2025-09-21 04:21:30', '2025-09-21 04:22:40', '[\"task-submissions\\/aJJDmAd7nlGmEDJQD5gLQYL9M0FiCRG33my0uq46.png\"]', 'Approved by admin', 0, NULL, '2025-09-21 04:21:03', '2025-09-21 04:22:40'),
-(12, 9, 5, 'completed', '2025-09-21 04:52:01', '2025-09-21 05:14:39', '2025-09-21 05:15:15', '[]', 'Approved by admin', 0, NULL, '2025-09-21 04:52:01', '2025-09-21 05:15:15'),
-(13, 5, 7, 'completed', '2025-09-21 05:00:04', '2025-09-21 05:10:52', '2025-09-21 05:11:19', '[]', 'Approved by admin', 0, NULL, '2025-09-21 05:00:04', '2025-09-21 05:11:19'),
-(14, 8, 7, 'completed', '2025-09-21 05:00:30', '2025-09-21 05:27:38', '2025-09-21 05:27:55', '[]', 'Approved by admin', 0, NULL, '2025-09-21 05:00:30', '2025-09-21 05:27:55'),
-(15, 10, 7, 'completed', '2025-09-21 06:06:50', '2025-09-21 06:39:38', '2025-09-21 06:39:54', '[]', 'Approved by admin', 0, NULL, '2025-09-21 06:06:50', '2025-09-21 06:39:54'),
-(16, 12, 5, 'assigned', '2025-09-24 05:05:58', NULL, NULL, NULL, NULL, 0, NULL, '2025-09-24 05:05:58', '2025-09-24 05:05:58'),
-(17, 12, 6, 'assigned', '2025-09-24 05:06:16', NULL, NULL, NULL, NULL, 0, NULL, '2025-09-24 05:06:16', '2025-09-24 05:06:16');
+INSERT INTO `task_assignments` (`assignmentId`, `taskId`, `userId`, `status`, `progress`, `assigned_at`, `submitted_at`, `completed_at`, `photos`, `completion_notes`, `rejection_count`, `rejection_reason`, `created_at`, `updated_at`) VALUES
+(3, 3, 6, 'completed', 'accepted', '2025-09-06 07:15:53', '2025-09-10 05:33:07', '2025-09-10 05:38:16', '[\"task-submissions\\/0pdquLS3iIGprTPetfDJIzL7OqKJiUr8Pya7YECC.png\"]', 'Approved by admin', 1, 'please provide a proof of completion', '2025-09-06 07:15:53', '2025-09-10 05:38:16'),
+(4, 2, 6, 'completed', 'accepted', '2025-09-06 07:15:58', '2025-09-10 05:37:19', '2025-09-10 05:40:08', '[\"task-submissions\\/YwVq9FN1uDKWswQwgSCKGcfCNEcrY5VKVUszf67X.png\"]', 'Approved by admin', 0, NULL, '2025-09-06 07:15:58', '2025-09-10 05:40:08'),
+(5, 3, 5, 'completed', 'accepted', '2025-09-06 07:18:26', '2025-09-06 07:19:02', '2025-09-06 08:01:38', '[\"task-submissions\\/IVTWKZDFbZklTSdo49UE54ITB1XtzPjzzMKESjU0.png\"]', 'Approved by admin', 0, NULL, '2025-09-06 07:18:26', '2025-09-06 08:01:38'),
+(6, 2, 5, 'completed', 'accepted', '2025-09-06 07:40:05', '2025-09-06 07:40:05', '2025-09-06 07:56:33', '[\"task-submissions\\/IVTWKZDFbZklTSdo49UE54ITB1XtzPjzzMKESjU0.png\"]', 'Approved by admin', 0, NULL, '2025-09-06 07:40:05', '2025-09-06 07:56:33'),
+(7, 5, 5, 'completed', 'accepted', '2025-09-06 08:15:16', '2025-09-10 05:14:31', '2025-09-10 05:15:05', '[\"task-submissions\\/4iaElVb6MZPb11erd9YpLkpulj63o9WoShjpddtb.png\"]', 'Approved by admin', 1, 'eww', '2025-09-06 08:15:16', '2025-09-10 05:15:05'),
+(8, 6, 6, 'completed', 'accepted', '2025-09-10 05:42:38', '2025-09-10 05:45:19', '2025-09-10 05:45:37', '[\"task-submissions\\/RYDwXBB1l2elrvR9AzqfgtDO4abS3jBVEQYmbLtG.png\"]', 'Approved by admin', 1, 'sus', '2025-09-10 05:42:38', '2025-09-10 05:45:37'),
+(9, 4, 6, 'completed', 'accepted', '2025-09-10 05:47:35', '2025-09-10 05:48:43', '2025-09-10 05:49:00', '[\"task-submissions\\/S5hP9Nsp6Vu2nESo3uMyu22OwD4HlJoNmQDHo82C.png\"]', 'Approved by admin', 1, 'submit more', '2025-09-10 05:47:35', '2025-09-10 05:49:00'),
+(10, 8, 5, 'completed', 'accepted', '2025-09-21 04:20:27', '2025-09-21 04:53:26', '2025-09-21 04:57:45', '[]', 'Approved by admin', 0, NULL, '2025-09-21 04:20:27', '2025-09-21 04:57:45'),
+(11, 8, 6, 'completed', 'accepted', '2025-09-21 04:21:03', '2025-09-21 04:21:30', '2025-09-21 04:22:40', '[\"task-submissions\\/aJJDmAd7nlGmEDJQD5gLQYL9M0FiCRG33my0uq46.png\"]', 'Approved by admin', 0, NULL, '2025-09-21 04:21:03', '2025-09-21 04:22:40'),
+(12, 9, 5, 'completed', 'accepted', '2025-09-21 04:52:01', '2025-09-21 05:14:39', '2025-09-21 05:15:15', '[]', 'Approved by admin', 0, NULL, '2025-09-21 04:52:01', '2025-09-21 05:15:15'),
+(13, 5, 7, 'completed', 'accepted', '2025-09-21 05:00:04', '2025-09-21 05:10:52', '2025-09-21 05:11:19', '[]', 'Approved by admin', 0, NULL, '2025-09-21 05:00:04', '2025-09-21 05:11:19'),
+(14, 8, 7, 'completed', 'accepted', '2025-09-21 05:00:30', '2025-09-21 05:27:38', '2025-09-21 05:27:55', '[]', 'Approved by admin', 0, NULL, '2025-09-21 05:00:30', '2025-09-21 05:27:55'),
+(15, 10, 7, 'completed', 'accepted', '2025-09-21 06:06:50', '2025-09-21 06:39:38', '2025-09-21 06:39:54', '[]', 'Approved by admin', 0, NULL, '2025-09-21 06:06:50', '2025-09-21 06:39:54'),
+(16, 12, 5, 'completed', 'accepted', '2025-09-24 05:05:58', '2025-10-01 04:46:15', '2025-10-01 05:07:13', '[\"task-submissions\\/fKkk6kruPYxkgQfi3eZT4ejkaQlVplvO2VwNAvbD.jpg\",\"task-submissions\\/FkfVQ7ay5MAKOQkFgB5s2gaLMO2wYCN80oIghGd4.png\",\"task-submissions\\/uNEk7YDcJzYOfBzgNKMM2cxGD5FlXEGLi4mhbnvV.png\"]', NULL, 0, NULL, '2025-09-24 05:05:58', '2025-10-01 05:07:13'),
+(17, 12, 6, 'completed', 'accepted', '2025-09-24 05:06:16', NULL, '2025-10-01 05:07:13', NULL, NULL, 0, NULL, '2025-09-24 05:06:16', '2025-10-01 05:07:13'),
+(18, 14, 5, 'submitted', 'accepted', '2025-10-01 05:46:30', '2025-10-01 06:02:53', NULL, '[\"task-submissions\\/qtCC54nHFpNfJ1zKm0xoBnj7p216bTTHEXc1YX9S.jpg\",\"task-submissions\\/Xkl58KLFUyBygw1ZnckO86AVzuA8VMIp0bPNceeV.jpg\",\"task-submissions\\/4mAOacIFWpfzvdSMzL9to44F8JI3NXIpilABlLaV.jpg\"]', NULL, 0, NULL, '2025-10-01 05:46:30', '2025-10-01 06:02:53'),
+(19, 14, 7, 'submitted', 'submitted_proof', '2025-10-01 06:48:42', '2025-10-01 06:55:49', NULL, '[\"task-submissions\\/dCvTpCbIa8Os0N8gRJeToM62CuriIemvK3D9P9av.jpg\",\"task-submissions\\/awNXhs5e31id7qvRsu1VOyafJOYv3NNCWAJdOEgj.jpg\",\"task-submissions\\/RKNfSLXKbA1TioMsCSpPhdbs0T2dCyqNngubU6iZ.jpg\"]', NULL, 0, NULL, '2025-10-01 06:48:42', '2025-10-01 06:55:49'),
+(20, 13, 6, 'submitted', 'submitted_proof', '2025-10-01 07:03:44', '2025-10-01 07:05:53', NULL, '[\"task-submissions\\/oNXIutT2bw9goMukCJR3oILjpGUwL9tykGhDylvb.jpg\",\"task-submissions\\/7mr7PrD9j79NdEcF4vUQCLudvWtX5UGUgRyjoIZu.jpg\",\"task-submissions\\/3E1WEqHSd5ZupNkVWkvUJr5hCPLfkv7woFximlBZ.jpg\"]', NULL, 0, NULL, '2025-10-01 07:03:44', '2025-10-01 07:05:53');
 
 -- --------------------------------------------------------
 
@@ -559,6 +587,14 @@ ALTER TABLE `password_reset_tokens`
   ADD PRIMARY KEY (`email`);
 
 --
+-- Indexes for table `personal_access_tokens`
+--
+ALTER TABLE `personal_access_tokens`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `personal_access_tokens_token_unique` (`token`),
+  ADD KEY `personal_access_tokens_tokenable_type_tokenable_id_index` (`tokenable_type`,`tokenable_id`);
+
+--
 -- Indexes for table `points_history`
 --
 ALTER TABLE `points_history`
@@ -681,13 +717,19 @@ ALTER TABLE `jobs`
 -- AUTO_INCREMENT for table `migrations`
 --
 ALTER TABLE `migrations`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
 
 --
 -- AUTO_INCREMENT for table `notifications`
 --
 ALTER TABLE `notifications`
   MODIFY `notificationId` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `personal_access_tokens`
+--
+ALTER TABLE `personal_access_tokens`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `points_history`
@@ -729,7 +771,7 @@ ALTER TABLE `tap_nominations`
 -- AUTO_INCREMENT for table `tasks`
 --
 ALTER TABLE `tasks`
-  MODIFY `taskId` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `taskId` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT for table `task_assignment`
@@ -741,7 +783,7 @@ ALTER TABLE `task_assignment`
 -- AUTO_INCREMENT for table `task_assignments`
 --
 ALTER TABLE `task_assignments`
-  MODIFY `assignmentId` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `assignmentId` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
 -- AUTO_INCREMENT for table `task_submission`

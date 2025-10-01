@@ -63,3 +63,62 @@ App: http://127.0.0.1:8000 (starts Laravel, Vite, and the queue worker).
 - Files not loading → `php artisan storage:link`
 
 Note: First registered user becomes admin automatically.
+
+### Authentication & Authorization
+
+- Web (Breeze): Session-based login, registration, password reset, and email verification remain unchanged.
+- API Tokens (Sanctum): Personal access tokens are enabled for programmatic access (mobile/SPA/CLI).
+- Authorization: `TaskPolicy` registered; admin-only for create/update/delete by default.
+- Middleware aliases:
+  - `admin`: Admin-only routes (e.g., under `prefix('admin')`).
+  - `user`: Blocks admins from accessing user-only pages.
+
+### API (Sanctum) Endpoints
+
+Base file: `routes/api.php`
+
+```
+POST   /api/login          # body: email, password, device_name? → returns token
+GET    /api/me             # header: Authorization: Bearer <token>
+POST   /api/logout         # header: Authorization: Bearer <token>
+```
+
+Example usage (bash):
+
+```bash
+curl -X POST http://127.0.0.1:8000/api/login \
+  -H "Accept: application/json" \
+  -d "email=user@example.com&password=secret&device_name=postman"
+
+curl http://127.0.0.1:8000/api/me \
+  -H "Accept: application/json" \
+  -H "Authorization: Bearer TOKEN"
+
+curl -X POST http://127.0.0.1:8000/api/logout \
+  -H "Accept: application/json" \
+  -H "Authorization: Bearer TOKEN"
+```
+
+### Setup Notes (for new machines)
+
+- No extra manual step beyond the usual install; tokens table is created by standard migrations:
+
+```bash
+php artisan migrate
+```
+
+- If using SPA/cookie-based Sanctum, configure `.env` for stateful domains (not required for Bearer tokens used above):
+
+```
+APP_URL=http://127.0.0.1:8000
+SESSION_DOMAIN=127.0.0.1
+SANCTUM_STATEFUL_DOMAINS=127.0.0.1:5173
+```
+
+### Windows Composer Tip
+
+If archive writes fail during `composer install` on Windows, prefer source installs:
+
+```bash
+composer install --prefer-source
+```
