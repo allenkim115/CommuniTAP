@@ -4,9 +4,14 @@
             <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
                 {{ __('Task Management') }}
             </h2>
-            <a href="{{ route('tasks.create') }}" class="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded">
-                + Add Task
-            </a>
+            <div class="flex items-center space-x-2">
+                <a href="{{ route('tasks.my-uploads') }}" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded">
+                    My Uploaded Tasks
+                </a>
+                <a href="{{ route('tasks.create') }}" class="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded">
+                    + Add Task
+                </a>
+            </div>
         </div>
     </x-slot>
 
@@ -107,25 +112,27 @@
                                     </div>
                                 </div>
                                 
-                                <!-- Task Date -->
+                                <!-- Uploader + Task Date -->
                                 <div class="flex items-center space-x-2 mb-2">
                                     <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                                     </svg>
                                     <span class="text-sm text-gray-600 dark:text-gray-400">
+                                        @php $uploader = $task->assignedUser; @endphp
+                                        <strong>Uploaded by:</strong> {{ $uploader?->name ?? 'Admin' }} •
                                         @if($task->due_date)
                                             {{ is_string($task->due_date) ? \Carbon\Carbon::parse($task->due_date)->format('M j, Y') : $task->due_date->format('M j, Y') }}
                                         @else
-                                            {{ is_string($task->published_date) ? \Carbon\Carbon::parse($task->published_date)->format('M j, Y') : $task->published_date->format('M j, Y') }}
+                                            {{ is_string($task->published_date) ? \Carbon\Carbon::parse($task->published_date)->format('M j, Y') : (optional($task->published_date)?->format('M j, Y') ?? 'No date') }}
                                         @endif
                                     </span>
                                 </div>
                                 
                                 <!-- Action Link -->
                                 <div class="text-right">
-                                    <span class="text-orange-500 hover:text-orange-700 text-sm font-medium">
+                                    <a href="{{ route('tasks.show', $task) }}" onclick="event.stopPropagation();" class="text-orange-500 hover:text-orange-700 text-sm font-medium">
                                         See more details →
-                                    </span>
+                                    </a>
                                 </div>
                             </div>
                             @endforeach
@@ -210,6 +217,7 @@
             const userAssignment = userAssignments[taskId];
             const hasJoined = userAssignment !== undefined;
             const assignmentStatus = hasJoined ? userAssignment.pivot.status : null;
+            const isCreator = task.FK1_userId && Number(task.FK1_userId) === Number({{ auth()->user()->userId }});
 
             // Populate task details
             taskDetails.innerHTML = `
@@ -231,10 +239,17 @@
                     <div id="details-content">
                         <!-- Task Header -->
                         <div class="flex justify-between items-start mb-6">
-                            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">${task.title}</h1>
-                            <span class="px-3 py-1 text-sm font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 rounded-full">
-                                Admin
-                            </span>
+                            <div>
+                                <h1 class="text-2xl font-bold text-gray-900 dark:text-white">${task.title}</h1>
+                                <p class="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                                    <strong>Uploaded by:</strong> ${(() => {
+                                        const u = task.assigned_user;
+                                        if (!u) return 'Admin';
+                                        const computed = u.name || [u.firstName, u.middleName, u.lastName].filter(Boolean).join(' ').trim();
+                                        return computed && computed.length > 0 ? computed : 'Admin';
+                                    })()}
+                                </p>
+                            </div>
                         </div>
 
                         <!-- Task Description -->
@@ -320,7 +335,13 @@
                         </div>
                     </div>
 
-                        ${hasJoined ? `
+                        ${(isCreator) ? `
+                            <div class="mb-6">
+                                <div class="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 text-center">
+                                    <p class="text-sm text-gray-600 dark:text-gray-300">You created this task. You cannot join your own task.</p>
+                                </div>
+                            </div>
+                        ` : hasJoined ? `
                             ${assignmentStatus === 'assigned' ? `
                                 <!-- Complete Task Button - Redirect to task details page -->
                                 <div class="text-center">
@@ -398,6 +419,13 @@
                         <div class="text-center space-y-3">
                             ${(() => {
                                 const isFull = task.max_participants !== null && task.max_participants !== undefined && task.assignments && task.assignments.length >= task.max_participants;
+                                if (isCreator) {
+                                    return `
+                                        <button type="button" class="bg-gray-400 text-white font-bold py-3 px-8 rounded-lg text-lg cursor-not-allowed" title="You created this task" aria-disabled="true">
+                                            Join Task
+                                        </button>
+                                    `;
+                                }
                                 if (isFull) {
                                     return `
                                         <button type="button" class="bg-gray-400 text-white font-bold py-3 px-8 rounded-lg text-lg cursor-not-allowed" title="This task has reached its participant limit" aria-disabled="true">

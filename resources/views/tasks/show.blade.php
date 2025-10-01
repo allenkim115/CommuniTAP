@@ -19,10 +19,13 @@
                 <!-- Task Title and Admin Label -->
                 <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
                     <div class="flex justify-between items-start">
-                        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">{{ $task->title }}</h1>
-                        @if(Auth::user()->isAdmin())
-                            <span class="text-blue-600 dark:text-blue-400 text-sm font-medium">Admin</span>
-                        @endif
+                        <div>
+                            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">{{ $task->title }}</h1>
+                            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                                @php $uploader = $task->assignedUser; @endphp
+                                <strong>Uploaded by:</strong> {{ $uploader?->name ?? 'Admin' }}
+                            </p>
+                        </div>
                     </div>
                 </div>
 
@@ -116,8 +119,9 @@
                             </div>
                         </div>
 
-                        <!-- Join Task Button - Only show if user hasn't joined the task -->
-                        @if(!$task->isAssignedTo(Auth::id()) && $task->status === 'published')
+                        <!-- Join Task Button - Only show if user hasn't joined the task and is not the creator -->
+                        @php $isCreator = $task->FK1_userId === Auth::id(); @endphp
+                        @if(!$task->isAssignedTo(Auth::id()) && !$isCreator && $task->status === 'published')
                         <div class="mb-6 text-center">
                             @php
                                 $isFull = !is_null($task->max_participants) && $task->assignments->count() >= $task->max_participants;
@@ -136,12 +140,65 @@
                             @endif
                         </div>
                         @endif
+                        @if($isCreator)
+                        <div class="mb-6 text-center">
+                            <button type="button" class="bg-gray-400 text-white font-bold py-3 px-8 rounded-lg cursor-not-allowed" title="You created this task" aria-disabled="true">
+                                Join This Task
+                            </button>
+                        </div>
+                        @endif
 
                         <!-- Task Status Section - Only show if user has joined the task -->
                         @if($task->isAssignedTo(Auth::id()))
                             @php
                                 $userAssignment = $task->assignments->where('userId', Auth::id())->first();
                             @endphp
+                            
+                            <!-- Progress tracker -->
+                            @php
+                                $steps = ['accepted' => 'Accepted', 'on_the_way' => 'On the way', 'working' => 'Working', 'done' => 'Task done', 'submitted_proof' => 'Submitted proof'];
+                                $current = $userAssignment->progress ?? 'accepted';
+                                $stepKeys = array_keys($steps);
+                                $currentIndex = array_search($current, $stepKeys);
+                                if ($currentIndex === false) { $currentIndex = 0; }
+                            @endphp
+                            <div class="mb-6">
+                                <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mb-4">
+                                    @php $percent = ($currentIndex) * (100 / (count($steps) - 1)); @endphp
+                                    <div class="bg-orange-500 h-2 rounded-full" style="width: {{ $percent }}%"></div>
+                                </div>
+                                <div class="flex justify-between">
+                                    @foreach($steps as $key => $label)
+                                        @php $index = array_search($key, $stepKeys); $active = $index <= $currentIndex; @endphp
+                                        <div class="text-xs {{ $active ? 'text-orange-600 dark:text-orange-400' : 'text-gray-500 dark:text-gray-400' }}">
+                                            {{ $label }}
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                            
+                            <!-- Progress actions (except submitted_proof which is set by submit) -->
+                            @if($userAssignment->status === 'assigned')
+                                <div class="mb-6 flex flex-wrap gap-2">
+                                    @foreach(['accepted','on_the_way','working','done'] as $p)
+                                        <form action="{{ route('tasks.progress', $task) }}" method="POST" onsubmit="return confirm('Move progress to {{ ucfirst(str_replace('_',' ', $p)) }}?');">
+                                            @csrf
+                                            @method('PATCH')
+                                            <input type="hidden" name="progress" value="{{ $p }}">
+                                            @php
+                                                $order = ['accepted','on_the_way','working','done'];
+                                                $curr = $userAssignment->progress ?? 'accepted';
+                                                $currIdx = array_search($curr, $order);
+                                                $btnIdx = array_search($p, $order);
+                                                $disabled = $btnIdx !== false && $currIdx !== false && $btnIdx < $currIdx;
+                                            @endphp
+                                            <button type="submit" {{ $disabled ? 'disabled' : '' }} class="px-3 py-1 rounded border text-sm {{ ($userAssignment->progress ?? 'accepted') === $p ? 'bg-orange-500 text-white border-orange-600' : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-600' }} {{ $disabled ? 'opacity-50 cursor-not-allowed' : '' }}">
+                                                {{ ucfirst(str_replace('_',' ', $p)) }}
+                                            </button>
+                                        </form>
+                                    @endforeach
+                                </div>
+                            @endif
                             
                             @if($userAssignment->status === 'submitted')
                                 <!-- Pending Approval Status -->
@@ -212,43 +269,9 @@
                                     </div>
                                 </div>
                                 
-                                <!-- Upload Photos Section for rejected tasks (if attempts remaining) -->
-                                @if($userAssignment->rejection_count < 3)
-                                <div class="mb-6">
-                                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">Resubmit Photos</h3>
-                                    <div id="upload-area" class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-8 text-center hover:border-gray-400 dark:hover:border-gray-500 transition-colors cursor-pointer">
-                                        <div class="flex flex-col items-center">
-                                            <svg class="w-12 h-12 text-red-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                                            </svg>
-                                            <p id="upload-text" class="text-sm text-gray-600 dark:text-gray-400 mb-2">Upload new proof of task completion</p>
-                                            <p class="text-xs text-gray-500 dark:text-gray-500">Click to select photos or drag and drop</p>
-                                        </div>
-                                    </div>
-                                    <div id="selected-files" class="mt-4 hidden">
-                                        <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Selected Files:</h4>
-                                        <div id="file-list" class="space-y-2"></div>
-                                    </div>
-                                </div>
-                                @endif
+                                <!-- Removed duplicate upload area to consolidate into the form below -->
                             @elseif($userAssignment->status === 'assigned')
-                                <!-- Upload Photos Section for assigned tasks -->
-                                <div class="mb-6">
-                                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">Upload Photos</h3>
-                                    <div id="upload-area" class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-8 text-center hover:border-gray-400 dark:hover:border-gray-500 transition-colors cursor-pointer">
-                                        <div class="flex flex-col items-center">
-                                            <svg class="w-12 h-12 text-red-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                                            </svg>
-                                            <p id="upload-text" class="text-sm text-gray-600 dark:text-gray-400 mb-2">Upload proof of task completion</p>
-                                            <p class="text-xs text-gray-500 dark:text-gray-500">Click to select photos or drag and drop</p>
-                                        </div>
-                                    </div>
-                                    <div id="selected-files" class="mt-4 hidden">
-                                        <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Selected Files:</h4>
-                                        <div id="file-list" class="space-y-2"></div>
-                                    </div>
-                                </div>
+                                <!-- Removed duplicate upload area to consolidate into the form below -->
                             @elseif($userAssignment->status === 'completed')
                                 <!-- Completed Status -->
                                 <div class="mb-6">
@@ -306,13 +329,17 @@
                             @endif
                         @endif
 
-                        <!-- Complete Task Form -->
-                        @if($task->isAssignedTo(Auth::id()) && $task->assignments->where('userId', Auth::id())->first()->status === 'assigned')
+                        <!-- Complete Task Form (only when progress is 'done') -->
+                        @php $assignmentForForm = $task->assignments->where('userId', Auth::id())->first(); @endphp
+                        @if($task->isAssignedTo(Auth::id()) 
+                            && $assignmentForForm 
+                            && $assignmentForForm->status === 'assigned' 
+                            && ($assignmentForForm->progress ?? 'accepted') === 'done')
                         <div class="flex justify-center">
-                            <form action="{{ route('tasks.submit', $task) }}" method="POST" enctype="multipart/form-data" class="w-full max-w-md">
+                            <form id="task-submit-form" action="{{ route('tasks.submit', $task) }}" method="POST" enctype="multipart/form-data" class="w-full max-w-md">
                                 @csrf
                                 
-                                <!-- Completion Notes -->
+                                <!-- Completion Notes (visible only when progress is done) -->
                                 <div class="mb-4">
                                     <label for="completion_notes" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                         Completion Notes (Optional)
@@ -323,10 +350,34 @@
                                         rows="3" 
                                         class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500 dark:bg-gray-700 dark:text-white"
                                         placeholder="Describe what you did to complete this task..."></textarea>
+                                    @error('completion_notes')
+                                        <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                                    @enderror
                                 </div>
 
-                                <!-- File input for photos -->
-                                <input type="file" id="photos" name="photos[]" multiple accept="image/*" class="hidden">
+                                <!-- File input for photos (max 3) -->
+                                <input type="file" id="photos" name="photos[]" multiple accept="image/*" class="hidden" aria-describedby="photos-help">
+                                
+                                <!-- In-form Upload Area (only when progress is done) -->
+                                <div id="form-upload-area" class="mt-4 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center hover:border-gray-400 dark:hover:border-gray-500 transition-colors cursor-pointer">
+                                    <div class="flex flex-col items-center">
+                                        <svg class="w-10 h-10 text-red-500 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                        </svg>
+                                        <p id="form-upload-text" class="text-sm text-gray-600 dark:text-gray-400 mb-1">Click to select photos or drag and drop (2–3 photos)</p>
+                                        <p id="photos-help" class="text-xs text-gray-500 dark:text-gray-400">Max 3 images. Accepted: jpeg, png, jpg, gif.</p>
+                                    </div>
+                                </div>
+                                @error('photos')
+                                    <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                                @enderror
+                                @error('photos.*')
+                                    <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                                @enderror
+                                <div id="form-selected-files" class="mt-3 hidden">
+                                    <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Selected Files:</h4>
+                                    <div id="form-file-list" class="space-y-2 grid grid-cols-3 gap-2"></div>
+                                </div>
                                 
                                 <button type="submit" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-6 rounded-lg transition-colors">
                                     Complete Task
@@ -413,73 +464,156 @@
                 detailsContent.classList.add('hidden');
             });
 
-            // Photo upload functionality
-            const uploadArea = document.getElementById('upload-area');
+            // Photo upload functionality (limit 3 files, require min 2 client-side)
+            // Support multiple upload areas elsewhere, but prioritize in-form scoped elements to prevent conflicts
             const photosInput = document.getElementById('photos');
-            const uploadText = document.getElementById('upload-text');
-            const selectedFiles = document.getElementById('selected-files');
-            const fileList = document.getElementById('file-list');
 
-            if (uploadArea && photosInput) {
-                uploadArea.addEventListener('click', function() {
+            // Scoped elements for the submission form
+            const formUploadArea = document.getElementById('form-upload-area');
+            const formUploadText = document.getElementById('form-upload-text');
+            const formSelectedFiles = document.getElementById('form-selected-files');
+            const formFileList = document.getElementById('form-file-list');
+            const MAX_FILES = 3;
+            const MIN_FILES = 2;
+            let selectedFilesState = [];
+
+            function wireUploadArea(areaEl, textEl, listContainerEl, listEl) {
+                if (!areaEl || !photosInput) return;
+
+                areaEl.addEventListener('click', function() {
                     photosInput.click();
                 });
 
                 // Drag and drop functionality
-                uploadArea.addEventListener('dragover', function(e) {
+                areaEl.addEventListener('dragover', function(e) {
                     e.preventDefault();
-                    uploadArea.classList.add('border-blue-400', 'bg-blue-50', 'dark:bg-blue-900/20');
+                    areaEl.classList.add('border-blue-400', 'bg-blue-50', 'dark:bg-blue-900/20');
                 });
 
-                uploadArea.addEventListener('dragleave', function(e) {
+                areaEl.addEventListener('dragleave', function(e) {
                     e.preventDefault();
-                    uploadArea.classList.remove('border-blue-400', 'bg-blue-50', 'dark:bg-blue-900/20');
+                    areaEl.classList.remove('border-blue-400', 'bg-blue-50', 'dark:bg-blue-900/20');
                 });
 
-                uploadArea.addEventListener('drop', function(e) {
+                areaEl.addEventListener('drop', function(e) {
                     e.preventDefault();
-                    uploadArea.classList.remove('border-blue-400', 'bg-blue-50', 'dark:bg-blue-900/20');
+                    areaEl.classList.remove('border-blue-400', 'bg-blue-50', 'dark:bg-blue-900/20');
                     
-                    const files = e.dataTransfer.files;
-                    if (files.length > 0) {
-                        photosInput.files = files;
-                        handleFileSelection(files);
+                    let newFiles = e.dataTransfer.files;
+                    if (newFiles.length > 0) {
+                        selectedFilesState = limitFiles(mergeFiles(selectedFilesState, newFiles));
+                        setInputFiles(photosInput, selectedFilesState);
+                        handleFileSelection(selectedFilesState, textEl, listContainerEl, listEl);
                     }
                 });
 
                 photosInput.addEventListener('change', function(e) {
-                    const files = e.target.files;
-                    if (files.length > 0) {
-                        handleFileSelection(files);
+                    let newFiles = e.target.files;
+                    if (newFiles.length > 0) {
+                        selectedFilesState = limitFiles(mergeFiles(selectedFilesState, newFiles));
+                        setInputFiles(photosInput, selectedFilesState);
+                        handleFileSelection(selectedFilesState, textEl, listContainerEl, listEl);
                     }
                 });
 
-                function handleFileSelection(files) {
-                    console.log('Selected files:', files.length);
-                    
-                    // Update upload text
-                    uploadText.textContent = `${files.length} photo(s) selected`;
-                    uploadText.classList.add('text-green-600', 'dark:text-green-400');
-                    
-                    // Show selected files
-                    selectedFiles.classList.remove('hidden');
-                    fileList.innerHTML = '';
-                    
-                    Array.from(files).forEach((file, index) => {
-                        const fileItem = document.createElement('div');
-                        fileItem.className = 'flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-700 rounded';
-                        fileItem.innerHTML = `
-                            <div class="flex items-center space-x-2">
-                                <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                                </svg>
-                                <span class="text-sm text-gray-700 dark:text-gray-300">${file.name}</span>
-                                <span class="text-xs text-gray-500">(${(file.size / 1024 / 1024).toFixed(2)} MB)</span>
-                            </div>
-                        `;
-                        fileList.appendChild(fileItem);
-                    });
+                function handleFileSelection(files, textTarget, containerTarget, listTarget) {
+                    // Always render from selectedFilesState to keep indices stable
+                    renderSelectedFiles(textTarget, containerTarget, listTarget);
                 }
+
+                function renderSelectedFiles(textTarget, containerTarget, listTarget) {
+                    const count = selectedFilesState.length;
+                    let message = `${count} photo(s) selected`;
+                    if (count > MAX_FILES) {
+                        message = `You can upload up to ${MAX_FILES} photos.`;
+                    } else if (count > 0 && count < MIN_FILES) {
+                        message = `Please select at least ${MIN_FILES} photos.`;
+                    }
+                    if (textTarget) {
+                        textTarget.textContent = message;
+                        textTarget.classList.add('text-green-600', 'dark:text-green-400');
+                    }
+
+                    if (containerTarget) containerTarget.classList.toggle('hidden', count === 0);
+                    if (listTarget) listTarget.innerHTML = '';
+
+                    selectedFilesState.slice(0, MAX_FILES).forEach((file, index) => {
+                        const fileItem = document.createElement('div');
+                        fileItem.className = 'relative group overflow-hidden rounded border border-gray-200 dark:border-gray-700';
+                        const objectUrl = URL.createObjectURL(file);
+                        fileItem.innerHTML = `
+                            <img src="${objectUrl}" alt="preview" class="w-full h-24 object-cover" />
+                            <button type="button" aria-label="Remove image" data-index="${index}" class="absolute top-1 right-1 bg-black/60 hover:bg-black/80 text-white text-xs leading-none rounded px-2 py-1">×</button>
+                            <div class="absolute bottom-0 left-0 right-0 bg-black/50 text-white text-[10px] px-1 truncate">${file.name}</div>
+                        `;
+                        if (listTarget) listTarget.appendChild(fileItem);
+                    });
+
+                    // Wire remove buttons
+                    if (listTarget) {
+                        listTarget.querySelectorAll('button[data-index]').forEach(btn => {
+                            btn.addEventListener('click', () => {
+                                const idx = parseInt(btn.getAttribute('data-index'));
+                                if (!isNaN(idx)) {
+                                    selectedFilesState.splice(idx, 1);
+                                    setInputFiles(photosInput, selectedFilesState);
+                                    renderSelectedFiles(textTarget, containerTarget, listTarget);
+                                }
+                            });
+                        });
+                    }
+                }
+
+                function limitFiles(fileList) {
+                    // Accept Array<File> or FileList; return Array<File> limited to MAX_FILES
+                    const files = Array.isArray(fileList) ? fileList : Array.from(fileList);
+                    if (files.length > MAX_FILES) {
+                        alert(`You can upload up to ${MAX_FILES} photos.`);
+                    }
+                    return files.slice(0, MAX_FILES);
+                }
+
+                function setInputFiles(input, filesArray) {
+                    // Create a new DataTransfer to set limited files on input
+                    const dataTransfer = new DataTransfer();
+                    filesArray.forEach(file => dataTransfer.items.add(file));
+                    input.files = dataTransfer.files;
+                }
+
+                function mergeFiles(existingList, newList) {
+                    const existing = Array.isArray(existingList) ? existingList : Array.from(existingList || []);
+                    const incoming = Array.from(newList || []);
+                    // Merge while avoiding exact duplicates (name+size)
+                    const signature = (f) => `${f.name}|${f.size}`;
+                    const seen = new Set(existing.map(signature));
+                    const merged = [...existing];
+                    for (const f of incoming) {
+                        if (seen.has(signature(f))) continue;
+                        merged.push(f);
+                        seen.add(signature(f));
+                        if (merged.length >= MAX_FILES) break;
+                    }
+                    return merged;
+                }
+            }
+
+            // Only wire the scoped form area to keep a single uploader experience
+            wireUploadArea(formUploadArea, formUploadText, formSelectedFiles, formFileList);
+
+            // Prevent submit if files are not between 2 and 3
+            const submitForm = document.getElementById('task-submit-form');
+            if (submitForm && photosInput) {
+                submitForm.addEventListener('submit', function(e) {
+                    // Ensure the input reflects our state before submit
+                    if (selectedFilesState.length > 0) {
+                        setInputFiles(photosInput, selectedFilesState);
+                    }
+                    const count = selectedFilesState.length || (photosInput.files ? photosInput.files.length : 0);
+                    if (count < MIN_FILES || count > MAX_FILES) {
+                        e.preventDefault();
+                        alert(`Please upload between ${MIN_FILES} and ${MAX_FILES} photos.`);
+                    }
+                });
             }
         });
     </script>

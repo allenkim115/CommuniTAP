@@ -29,19 +29,7 @@
                     @csrf
                     
                     <div class="space-y-6">
-                        <!-- Task Type -->
-                        <div>
-                            <label for="task_type" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                Task Type <span class="text-red-500">*</span>
-                            </label>
-                            <select name="task_type" id="task_type" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white" required>
-                                <option value="">Select Task Type</option>
-                                <option value="user_uploaded" {{ old('task_type') === 'user_uploaded' ? 'selected' : '' }}>User-Uploaded Task</option>
-                            </select>
-                            @error('task_type')
-                                <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
-                            @enderror
-                        </div>
+                        
 
                         <!-- Title -->
                         <div>

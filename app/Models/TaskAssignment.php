@@ -15,6 +15,7 @@ class TaskAssignment extends Model
         'taskId',
         'userId',
         'status',
+        'progress',
         'assigned_at',
         'submitted_at',
         'completed_at',
@@ -30,6 +31,22 @@ class TaskAssignment extends Model
         'completed_at' => 'datetime',
         'photos' => 'array',
     ];
+
+    /**
+     * Get progress steps and current index helper
+     */
+    public function getProgressSteps(): array
+    {
+        $steps = ['accepted', 'on_the_way', 'working', 'done', 'submitted_proof'];
+        $currentIndex = array_search($this->progress, $steps, true);
+        if ($currentIndex === false) {
+            $currentIndex = 0;
+        }
+        return [
+            'steps' => $steps,
+            'currentIndex' => $currentIndex,
+        ];
+    }
 
     /**
      * Get the task that this assignment belongs to

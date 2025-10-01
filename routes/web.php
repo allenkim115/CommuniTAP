@@ -15,22 +15,30 @@ Route::get('/', function () {
 });
 
 Route::get('/dashboard', [App\Http\Controllers\DashboardController::class, 'index'])
-    ->middleware(['auth', 'verified'])
+    ->middleware(['auth', 'verified', 'user'])
     ->name('dashboard');
 
 Route::get('/progress', [App\Http\Controllers\DashboardController::class, 'progress'])
-    ->middleware(['auth', 'verified'])
+    ->middleware(['auth', 'verified', 'user'])
     ->name('progress');
 
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'user'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     
     // Task management routes for regular users
-    Route::resource('tasks', TaskController::class);
+    // Place custom routes BEFORE resource to avoid being captured by /tasks/{task}
+    Route::get('/tasks/my-uploads', [TaskController::class, 'myUploads'])->name('tasks.my-uploads');
+    // Creator review of submissions for their user-uploaded tasks
+    Route::get('/tasks/creator/submissions', [TaskController::class, 'creatorSubmissions'])->name('tasks.creator.submissions');
+    Route::get('/tasks/submissions/{submission}', [TaskController::class, 'creatorShow'])->name('tasks.creator.show');
+    Route::post('/tasks/submissions/{submission}/approve', [TaskController::class, 'creatorApprove'])->name('tasks.creator.approve');
+    Route::post('/tasks/submissions/{submission}/reject', [TaskController::class, 'creatorReject'])->name('tasks.creator.reject');
     Route::post('/tasks/{task}/join', [TaskController::class, 'join'])->name('tasks.join');
     Route::post('/tasks/{task}/submit', [TaskController::class, 'submit'])->name('tasks.submit');
+    Route::patch('/tasks/{task}/progress', [TaskController::class, 'updateProgress'])->name('tasks.progress');
+    Route::resource('tasks', TaskController::class);
     
     // Feedback routes for regular users
     Route::get('/feedback/{task}/create', [FeedbackController::class, 'create'])->name('feedback.create');

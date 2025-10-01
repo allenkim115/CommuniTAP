@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
-class AdminMiddleware
+class UserMiddleware
 {
     /**
      * Handle an incoming request.
@@ -20,10 +20,13 @@ class AdminMiddleware
             return redirect()->route('login');
         }
 
-        if (!Auth::user()->isAdmin()) {
-            return redirect()->route('dashboard');
+        // Only allow non-admin users to access these routes; redirect admins to their dashboard
+        if (Auth::user()->isAdmin()) {
+            return redirect()->route('admin.dashboard');
         }
 
         return $next($request);
     }
 }
+
+

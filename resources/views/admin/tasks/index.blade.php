@@ -108,6 +108,17 @@
                             <option value="user_uploaded" {{ request('task_type') === 'user_uploaded' ? 'selected' : '' }}>User-Uploaded Task</option>
                         </select>
                     </div>
+                    <div>
+                        <label for="assignment_progress" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Assignment Progress</label>
+                        <select name="assignment_progress" id="assignment_progress" class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
+                            <option value="all" {{ request('assignment_progress') === 'all' || !request('assignment_progress') ? 'selected' : '' }}>All Progress</option>
+                            <option value="accepted" {{ request('assignment_progress') === 'accepted' ? 'selected' : '' }}>Accepted</option>
+                            <option value="on_the_way" {{ request('assignment_progress') === 'on_the_way' ? 'selected' : '' }}>On the way</option>
+                            <option value="working" {{ request('assignment_progress') === 'working' ? 'selected' : '' }}>Working</option>
+                            <option value="done" {{ request('assignment_progress') === 'done' ? 'selected' : '' }}>Task done</option>
+                            <option value="submitted_proof" {{ request('assignment_progress') === 'submitted_proof' ? 'selected' : '' }}>Submitted proof</option>
+                        </select>
+                    </div>
                     <div class="flex items-end gap-2">
                         <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
                             Filter
@@ -119,7 +130,7 @@
                 </form>
                 
                 <!-- Active Filters Display -->
-                @if(request('status') && request('status') !== 'all' || request('task_type') && request('task_type') !== 'all')
+                @if(request('status') && request('status') !== 'all' || request('task_type') && request('task_type') !== 'all' || request('assignment_progress') && request('assignment_progress') !== 'all')
                 <div class="mt-4 flex flex-wrap gap-2">
                     <span class="text-sm text-gray-600 dark:text-gray-400">Active filters:</span>
                     @if(request('status') && request('status') !== 'all')
@@ -130,6 +141,11 @@
                     @if(request('task_type') && request('task_type') !== 'all')
                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
                             Type: {{ ucfirst(str_replace('_', ' ', request('task_type'))) }}
+                        </span>
+                    @endif
+                    @if(request('assignment_progress') && request('assignment_progress') !== 'all')
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200">
+                            Progress: {{ ucfirst(str_replace('_', ' ', request('assignment_progress'))) }}
                         </span>
                     @endif
                 </div>
@@ -198,6 +214,19 @@
                                                         @endif">
                                                         {{ ucfirst($assignment->status) }}
                                                     </span>
+                                                    @if(!empty($assignment->progress))
+                                                        <span class="ml-2 px-2 py-1 text-xs rounded-full
+                                                            @switch($assignment->progress)
+                                                                @case('accepted') bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200 @break
+                                                                @case('on_the_way') bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200 @break
+                                                                @case('working') bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200 @break
+                                                                @case('done') bg-teal-100 text-teal-800 dark:bg-teal-900 dark:text-teal-200 @break
+                                                                @case('submitted_proof') bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200 @break
+                                                                @default bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200
+                                                            @endswitch">
+                                                            {{ ucfirst(str_replace('_',' ', $assignment->progress)) }}
+                                                        </span>
+                                                    @endif
                                                     <span class="ml-2">{{ $assignment->user->name }}</span>
                                                 </div>
                                             @endforeach
@@ -220,7 +249,9 @@
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                     <div class="flex space-x-2">
                                         <a href="{{ route('admin.tasks.show', $task) }}" class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300">View</a>
-                                        <a href="{{ route('admin.tasks.edit', $task) }}" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300">Edit</a>
+                                        @if($task->task_type !== 'user_uploaded' && $task->status !== 'completed')
+                                            <a href="{{ route('admin.tasks.edit', $task) }}" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300">Edit</a>
+                                        @endif
                                         
                                         @if($task->status === 'pending')
                                             <form action="{{ route('admin.tasks.approve', $task) }}" method="POST" class="inline">
@@ -244,12 +275,14 @@
                                             </form>
                                         @endif
                                         
-                                        <form action="{{ route('admin.tasks.destroy', $task) }}" method="POST" class="inline">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300" 
-                                                    onclick="return confirm('Are you sure you want to delete this task?')">Delete</button>
-                                        </form>
+                                        @if($task->status !== 'completed')
+                                            <form action="{{ route('admin.tasks.destroy', $task) }}" method="POST" class="inline">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300" 
+                                                        onclick="return confirm('Are you sure you want to deactivate this task?')">Deactivate</button>
+                                            </form>
+                                        @endif
                                     </div>
                                     </td>
                                 </tr>

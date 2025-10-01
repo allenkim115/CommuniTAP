@@ -109,6 +109,14 @@ class TaskController extends Controller
      */
     public function edit(Task $task)
     {
+        // Admin cannot edit user-uploaded tasks
+        if ($task->task_type === 'user_uploaded') {
+            return redirect()->route('admin.tasks.show', $task)->with('error', 'Admins cannot edit user-uploaded tasks. Use Approve/Reject/Publish actions instead.');
+        }
+        // Do not allow editing completed tasks
+        if ($task->status === 'completed') {
+            return redirect()->route('admin.tasks.show', $task)->with('error', 'Completed tasks cannot be edited.');
+        }
         return view('admin.tasks.edit', compact('task'));
     }
 
@@ -117,6 +125,10 @@ class TaskController extends Controller
      */
     public function update(Request $request, Task $task)
     {
+        // Admin cannot update user-uploaded tasks
+        if ($task->task_type === 'user_uploaded') {
+            return redirect()->route('admin.tasks.show', $task)->with('error', 'Admins cannot edit user-uploaded tasks.');
+        }
         $request->validate([
             'title' => 'required|string|max:100',
             'description' => 'required|string',
@@ -126,8 +138,13 @@ class TaskController extends Controller
             'end_time' => 'required|date_format:H:i',
             'location' => 'required|string|max:255',
             'max_participants' => 'nullable|integer|min:1',
-            'status' => 'required|in:pending,approved,published,assigned,submitted,completed',
+            'status' => 'required|in:pending,approved,published,assigned,submitted,completed,inactive',
         ]);
+
+        // Do not allow updating completed tasks
+        if ($task->status === 'completed') {
+            return redirect()->route('admin.tasks.show', $task)->with('error', 'Completed tasks cannot be updated.');
+        }
 
         // Custom validation for end_time after start_time
         if ($request->start_time && $request->end_time) {
@@ -159,12 +176,21 @@ class TaskController extends Controller
     }
 
     /**
-     * Remove the specified task
+     * Deactivate the specified task instead of deleting
      */
     public function destroy(Task $task)
     {
-        $task->delete();
-        return redirect()->route('admin.tasks.index')->with('status', 'Task deleted successfully.');
+        // Admin cannot deactivate user-uploaded tasks from here; manage via approval flow
+        if ($task->task_type === 'user_uploaded') {
+            return redirect()->route('admin.tasks.show', $task)->with('error', 'Admins cannot deactivate user-uploaded tasks here.');
+        }
+        // Do not allow deactivation of completed tasks
+        if ($task->status === 'completed') {
+            return redirect()->route('admin.tasks.show', $task)->with('error', 'Completed tasks cannot be deactivated.');
+        }
+
+        $task->update(['status' => 'inactive']);
+        return redirect()->route('admin.tasks.index')->with('status', 'Task deactivated successfully.');
     }
 
     /**
@@ -247,6 +273,7 @@ class TaskController extends Controller
 
         $status = $request->get('status');
         $taskType = $request->get('task_type');
+        $assignmentProgress = $request->get('assignment_progress');
         
         $query = Task::with(['assignments.user', 'assignedUser']);
         
@@ -256,6 +283,11 @@ class TaskController extends Controller
         
         if ($taskType && $taskType !== 'all') {
             $query->where('task_type', $taskType);
+        }
+        if ($assignmentProgress && $assignmentProgress !== 'all') {
+            $query->whereHas('assignments', function($q) use ($assignmentProgress) {
+                $q->where('progress', $assignmentProgress);
+            });
         }
         
         $tasks = $query->orderBy('created_at', 'desc')->paginate(15)->appends($request->query());
@@ -270,6 +302,6 @@ class TaskController extends Controller
             'completed' => Task::where('status', 'completed')->count(),
         ];
 
-        return view('admin.tasks.index', compact('tasks', 'taskStats', 'status', 'taskType'));
+        return view('admin.tasks.index', compact('tasks', 'taskStats', 'status', 'taskType', 'assignmentProgress'));
     }
 }

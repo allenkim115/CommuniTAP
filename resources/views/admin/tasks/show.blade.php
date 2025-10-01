@@ -5,9 +5,11 @@
                 {{ __('Task Details') }}
             </h2>
             <div class="flex space-x-2">
-                <a href="{{ route('admin.tasks.edit', $task) }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                    Edit Task
-                </a>
+                @if($task->task_type !== 'user_uploaded' && $task->status !== 'completed')
+                    <a href="{{ route('admin.tasks.edit', $task) }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                        Edit Task
+                    </a>
+                @endif
                 <a href="{{ route('admin.tasks.index') }}" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
                     Back to Tasks
                 </a>
@@ -136,6 +138,19 @@
                                                             @endif">
                                                             {{ ucfirst($assignment->status) }}
                                                         </span>
+                                                        @if(!empty($assignment->progress))
+                                                        <span class="px-2 py-1 text-xs rounded-full
+                                                            @switch($assignment->progress)
+                                                                @case('accepted') bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200 @break
+                                                                @case('on_the_way') bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200 @break
+                                                                @case('working') bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200 @break
+                                                                @case('done') bg-teal-100 text-teal-800 dark:bg-teal-900 dark:text-teal-200 @break
+                                                                @case('submitted_proof') bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200 @break
+                                                                @default bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200
+                                                            @endswitch">
+                                                            {{ ucfirst(str_replace('_',' ', $assignment->progress)) }}
+                                                        </span>
+                                                        @endif
                                                     </div>
                                                 </div>
                                             @endforeach
@@ -183,15 +198,17 @@
                                             </form>
                                         @endif
                                         
-                                        <form action="{{ route('admin.tasks.destroy', $task) }}" method="POST" class="w-full">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" 
-                                                    class="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-                                                    onclick="return confirm('Are you sure you want to delete this task?')">
-                                                Delete Task
-                                            </button>
-                                        </form>
+                                        @if($task->status !== 'completed')
+                                            <form action="{{ route('admin.tasks.destroy', $task) }}" method="POST" class="w-full">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" 
+                                                        class="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                                                        onclick="return confirm('Are you sure you want to deactivate this task?')">
+                                                    Deactivate Task
+                                                </button>
+                                            </form>
+                                        @endif
                                     </div>
                                 </div>
                             </div>

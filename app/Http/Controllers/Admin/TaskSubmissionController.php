@@ -17,8 +17,12 @@ class TaskSubmissionController extends Controller
      */
     public function index()
     {
+        // Exclude user-uploaded tasks; those are approved/rejected by the creator
         $submissions = TaskAssignment::with(['task', 'user'])
             ->where('status', 'submitted')
+            ->whereHas('task', function ($q) {
+                $q->where('task_type', '!=', 'user_uploaded');
+            })
             ->orderBy('submitted_at', 'desc')
             ->paginate(10);
 
@@ -40,6 +44,11 @@ class TaskSubmissionController extends Controller
      */
     public function approve(Request $request, TaskAssignment $submission)
     {
+        // Block admin from approving user-uploaded tasks; only the creator may approve
+        $task = $submission->task;
+        if ($task && $task->task_type === 'user_uploaded' && !is_null($task->FK1_userId)) {
+            return redirect()->back()->with('error', 'Only the task creator can approve user-uploaded task submissions.');
+        }
         $request->validate([
             'admin_notes' => 'nullable|string|max:1000'
         ]);
@@ -63,6 +72,11 @@ class TaskSubmissionController extends Controller
      */
     public function reject(Request $request, TaskAssignment $submission)
     {
+        // Block admin from rejecting user-uploaded tasks; only the creator may reject
+        $task = $submission->task;
+        if ($task && $task->task_type === 'user_uploaded' && !is_null($task->FK1_userId)) {
+            return redirect()->back()->with('error', 'Only the task creator can reject user-uploaded task submissions.');
+        }
         $request->validate([
             'rejection_reason' => 'required|string|max:1000'
         ]);
