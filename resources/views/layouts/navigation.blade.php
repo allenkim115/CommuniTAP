@@ -58,6 +58,10 @@
                         {{ __('Feedbacks') }}
                     </x-nav-link>
                     
+                    <x-nav-link :href="route('incident-reports.index')" :active="request()->routeIs('incident-reports.*')">
+                        🚨 {{ __('Report User') }}
+                    </x-nav-link>
+                    
                     @if(Auth::user()->isAdmin() && request()->is('admin*'))
                         <x-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.*')">
                             {{ __('Users') }}
@@ -68,8 +72,8 @@
                         <x-nav-link :href="route('admin.admin.task-submissions.index')" :active="request()->routeIs('admin.admin.task-submissions.*')">
                             {{ __('Submissions') }}
                         </x-nav-link>
-                        <x-nav-link :href="route('admin.reports.index')" :active="request()->routeIs('admin.reports.*')">
-                            {{ __('Reports') }}
+                        <x-nav-link :href="route('admin.incident-reports.index')" :active="request()->routeIs('admin.incident-reports.*')">
+                            🚨 {{ __('Incident Reports') }}
                         </x-nav-link>
                     @endif
                 </div>
@@ -167,6 +171,10 @@
                 {{ __('Feedbacks') }}
             </x-responsive-nav-link>
             
+            <x-responsive-nav-link :href="route('incident-reports.index')" :active="request()->routeIs('incident-reports.*')">
+                🚨 {{ __('Report User') }}
+            </x-responsive-nav-link>
+            
             @if(Auth::user()->isAdmin() && request()->is('admin*'))
                 <x-responsive-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.*')">
                     {{ __('Users') }}
@@ -177,8 +185,8 @@
                 <x-responsive-nav-link :href="route('admin.admin.task-submissions.index')" :active="request()->routeIs('admin.admin.task-submissions.*')">
                     {{ __('Submissions') }}
                 </x-responsive-nav-link>
-                <x-responsive-nav-link :href="route('admin.reports.index')" :active="request()->routeIs('admin.reports.*')">
-                    {{ __('Reports') }}
+                <x-responsive-nav-link :href="route('admin.incident-reports.index')" :active="request()->routeIs('admin.incident-reports.*')">
+                    🚨 {{ __('Incident Reports') }}
                 </x-responsive-nav-link>
             @endif
         </div>

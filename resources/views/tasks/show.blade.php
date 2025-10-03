@@ -416,6 +416,13 @@
                                                     @endif">
                                                     {{ ucfirst($assignment->status) }}
                                                 </span>
+                                                @if($assignment->user->userId !== Auth::id())
+                                                    <a href="{{ route('incident-reports.create', ['reported_user' => $assignment->user->userId, 'task' => $task->taskId]) }}" 
+                                                       class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 text-xs font-medium"
+                                                       title="Report this user">
+                                                        🚨 Report
+                                                    </a>
+                                                @endif
                                             </div>
                                         </div>
                                     @endforeach
