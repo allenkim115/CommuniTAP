@@ -117,7 +117,7 @@
         <div class="flex h-screen w-full">
             <main class="flex w-full flex-col lg:flex-row">
                 <div class="flex-1 flex flex-col justify-center p-6 lg:p-20 bg-white dark:bg-white dark:text-[#EDEDEC] pl-16 lg:pl-32">
-                    <h1 class="mb-1 font-medium text-4xl font-bold text-[#1b1b18]">CommuniTap</h1>
+                    <h1 class="mb-1 font-medium text-4xl text-[#1b1b18]">CommuniTap</h1>
                     <p class="mb-6 text-lg text-[#706f6c] dark:text-[#A1A09A]">Helping the neighborhood with fun tasks.</p>
                     
                     <!-- Call to Action Button -->
