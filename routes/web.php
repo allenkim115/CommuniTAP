@@ -24,6 +24,17 @@ Route::get('/progress', [App\Http\Controllers\DashboardController::class, 'progr
     ->middleware(['auth', 'verified', 'user'])
     ->name('progress');
 
+// Public test route for debugging (no auth required)
+Route::get('/test-search-public', function() {
+    return response()->json([
+        'message' => 'Public test route working',
+        'users_count' => \App\Models\User::count(),
+        'tasks_count' => \App\Models\Task::count(),
+        'sample_users' => \App\Models\User::limit(3)->get(['userId', 'firstName', 'lastName', 'email']),
+        'sample_tasks' => \App\Models\Task::limit(3)->get(['taskId', 'title', 'description'])
+    ]);
+})->name('test.search.public');
+
 Route::middleware(['auth', 'user'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -63,6 +74,16 @@ Route::middleware(['auth', 'user'])->group(function () {
     Route::get('/incident-reports/{incidentReport}', [IncidentReportController::class, 'show'])->name('incident-reports.show');
     Route::get('/incident-reports/users/search', [IncidentReportController::class, 'getUsers'])->name('incident-reports.users.search');
     Route::get('/incident-reports/tasks/search', [IncidentReportController::class, 'getTasks'])->name('incident-reports.tasks.search');
+    
+    // Test route for debugging
+    Route::get('/test-search', function() {
+        return response()->json([
+            'message' => 'Test route working',
+            'user_id' => Auth::id(),
+            'users' => \App\Models\User::where('firstName', 'like', '%john%')->limit(3)->get(['userId', 'firstName', 'lastName', 'email'])
+        ]);
+    })->name('test.search');
+    
     
     // Debug route for testing nominations
     Route::get('/debug-nominations', function() {
@@ -263,13 +284,13 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('/task-submissions/{submission}/reject', [TaskSubmissionController::class, 'reject'])->name('admin.task-submissions.reject');
     
     // Admin feedback routes
-    Route::get('/feedback', [AdminFeedbackController::class, 'index'])->name('feedback.index');
-    Route::get('/feedback/{task}/create', [AdminFeedbackController::class, 'create'])->name('feedback.create');
-    Route::post('/feedback/{task}/store', [AdminFeedbackController::class, 'store'])->name('feedback.store');
-    Route::get('/feedback/{feedback}/edit', [AdminFeedbackController::class, 'edit'])->name('feedback.edit');
-    Route::patch('/feedback/{feedback}/update', [AdminFeedbackController::class, 'update'])->name('feedback.update');
-    Route::delete('/feedback/{feedback}/destroy', [AdminFeedbackController::class, 'destroy'])->name('feedback.destroy');
-    Route::get('/feedback/{task}/show', [AdminFeedbackController::class, 'show'])->name('feedback.show');
+    Route::get('/feedback', [AdminFeedbackController::class, 'index'])->name('admin.feedback.index');
+    Route::get('/feedback/{task}/create', [AdminFeedbackController::class, 'create'])->name('admin.feedback.create');
+    Route::post('/feedback/{task}/store', [AdminFeedbackController::class, 'store'])->name('admin.feedback.store');
+    Route::get('/feedback/{feedback}/edit', [AdminFeedbackController::class, 'edit'])->name('admin.feedback.edit');
+    Route::patch('/feedback/{feedback}/update', [AdminFeedbackController::class, 'update'])->name('admin.feedback.update');
+    Route::delete('/feedback/{feedback}/destroy', [AdminFeedbackController::class, 'destroy'])->name('admin.feedback.destroy');
+    Route::get('/feedback/{task}/show', [AdminFeedbackController::class, 'show'])->name('admin.feedback.show');
     
     Route::get('/reports', function () {
         return view('admin.reports.index');
@@ -284,9 +305,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         return view('admin.notifications.index');
     })->name('notifications.index');
 
-    Route::get('/feedbacks', function () {
-        return view('admin.feedbacks.index');
-    })->name('feedbacks.index');
+    Route::get('/feedbacks', [AdminFeedbackController::class, 'index'])->name('feedbacks.index');
     
     // Admin Tap & Pass Task Chain Tracking
     Route::get('/tap-nominations/task-chain', [TapNominationController::class, 'taskChain'])->name('tap-nominations.task-chain');

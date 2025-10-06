@@ -45,9 +45,21 @@ class IncidentReportController extends Controller
             $task = Task::find($taskId);
         }
 
+        // Get all active users (excluding current user)
+        $users = User::where('userId', '!=', Auth::user()->userId)
+            ->where('status', 'active')
+            ->orderBy('firstName')
+            ->orderBy('lastName')
+            ->get(['userId', 'firstName', 'lastName', 'email']);
+
+        // Get all active/published tasks
+        $tasks = Task::whereIn('status', ['published', 'approved', 'completed'])
+            ->orderBy('title')
+            ->get(['taskId', 'title', 'description']);
+
         $incidentTypes = UserIncidentReport::getIncidentTypes();
         
-        return view('incident-reports.create', compact('reportedUser', 'task', 'incidentTypes'));
+        return view('incident-reports.create', compact('reportedUser', 'task', 'incidentTypes', 'users', 'tasks'));
     }
 
     /**
@@ -64,12 +76,12 @@ class IncidentReportController extends Controller
         ]);
 
         // Prevent users from reporting themselves
-        if ($request->reported_user_id == Auth::id()) {
+        if ($request->reported_user_id == Auth::user()->userId) {
             return back()->withErrors(['reported_user_id' => 'You cannot report yourself.']);
         }
 
         // Check if user has already reported this user for the same incident type recently
-        $existingReport = UserIncidentReport::where('FK1_reporterId', Auth::id())
+        $existingReport = UserIncidentReport::where('FK1_reporterId', Auth::user()->userId)
             ->where('FK2_reportedUserId', $request->reported_user_id)
             ->where('incident_type', $request->incident_type)
             ->where('created_at', '>=', now()->subDays(7))
@@ -81,9 +93,9 @@ class IncidentReportController extends Controller
 
         try {
             UserIncidentReport::create([
-                'FK1_reporterId' => Auth::id(),
+                'FK1_reporterId' => Auth::user()->userId,
                 'FK2_reportedUserId' => $request->reported_user_id,
-                'FK3_taskId' => $request->task_id,
+                'FK3_taskId' => $request->task_id ?: null,
                 'incident_type' => $request->incident_type,
                 'description' => $request->description,
                 'evidence' => $request->evidence,
@@ -149,7 +161,7 @@ class IncidentReportController extends Controller
                 'status' => $request->status,
                 'moderator_notes' => $request->moderator_notes,
                 'action_taken' => $request->action_taken,
-                'FK4_moderatorId' => Auth::id(),
+                'FK4_moderatorId' => Auth::user()->userId,
                 'moderation_date' => now(),
             ]);
 
@@ -192,22 +204,35 @@ class IncidentReportController extends Controller
      */
     public function getUsers(Request $request)
     {
+        \Log::info('getUsers method called', [
+            'query' => $request->get('q'),
+            'user_id' => Auth::id(),
+            'headers' => $request->headers->all()
+        ]);
+        
         $query = $request->get('q');
         
         if (strlen($query) < 2) {
             return response()->json([]);
         }
 
-        $users = User::where('userId', '!=', Auth::id()) // Exclude current user
-            ->where(function ($q) use ($query) {
-                $q->where('firstName', 'like', "%{$query}%")
-                  ->orWhere('lastName', 'like', "%{$query}%")
-                  ->orWhere('email', 'like', "%{$query}%");
-            })
-            ->limit(10)
-            ->get(['userId', 'firstName', 'lastName', 'email']);
+        try {
+            $users = User::where('userId', '!=', Auth::user()->userId) // Exclude current user
+                ->where(function ($q) use ($query) {
+                    $q->where('firstName', 'like', "%{$query}%")
+                      ->orWhere('lastName', 'like', "%{$query}%")
+                      ->orWhere('email', 'like', "%{$query}%");
+                })
+                ->limit(10)
+                ->get(['userId', 'firstName', 'lastName', 'email']);
 
-        return response()->json($users);
+            \Log::info('Users found', ['count' => $users->count(), 'users' => $users->toArray()]);
+
+            return response()->json($users);
+        } catch (\Exception $e) {
+            \Log::error('Error in getUsers', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+            return response()->json(['error' => 'Search failed'], 500);
+        }
     }
 
     /**
@@ -215,17 +240,29 @@ class IncidentReportController extends Controller
      */
     public function getTasks(Request $request)
     {
+        \Log::info('getTasks method called', [
+            'query' => $request->get('q'),
+            'user_id' => Auth::id()
+        ]);
+        
         $query = $request->get('q');
         
         if (strlen($query) < 2) {
             return response()->json([]);
         }
 
-        $tasks = Task::where('title', 'like', "%{$query}%")
-            ->orWhere('description', 'like', "%{$query}%")
-            ->limit(10)
-            ->get(['taskId', 'title', 'description']);
+        try {
+            $tasks = Task::where('title', 'like', "%{$query}%")
+                ->orWhere('description', 'like', "%{$query}%")
+                ->limit(10)
+                ->get(['taskId', 'title', 'description']);
 
-        return response()->json($tasks);
+            \Log::info('Tasks found', ['count' => $tasks->count(), 'tasks' => $tasks->toArray()]);
+
+            return response()->json($tasks);
+        } catch (\Exception $e) {
+            \Log::error('Error in getTasks', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+            return response()->json(['error' => 'Search failed'], 500);
+        }
     }
 }

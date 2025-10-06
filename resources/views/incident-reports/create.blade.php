@@ -22,59 +22,31 @@
                         <!-- Reported User Selection -->
                         <div class="mb-6">
                             <x-input-label for="reported_user_id" :value="__('User to Report')" />
-                            <div class="mt-1">
-                                <input type="text" 
-                                       id="user-search" 
-                                       class="block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-red-500 focus:ring-red-500 sm:text-sm" 
-                                       placeholder="Search for user by name or email..."
-                                       autocomplete="off">
-                                <input type="hidden" name="reported_user_id" id="reported_user_id" value="{{ $reportedUser->userId ?? '' }}" required>
-                                <div id="user-search-results" class="hidden mt-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md shadow-lg max-h-60 overflow-y-auto"></div>
-                            </div>
-                            @if($reportedUser)
-                                <div class="mt-2 p-3 bg-gray-50 dark:bg-gray-700 rounded-md">
-                                    <div class="flex items-center">
-                                        <div class="h-8 w-8 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center mr-3">
-                                            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
-                                                {{ substr($reportedUser->firstName, 0, 1) }}{{ substr($reportedUser->lastName, 0, 1) }}
-                                            </span>
-                                        </div>
-                                        <div>
-                                            <div class="text-sm font-medium text-gray-900 dark:text-gray-100">
-                                                {{ $reportedUser->fullName }}
-                                            </div>
-                                            <div class="text-sm text-gray-500 dark:text-gray-400">
-                                                {{ $reportedUser->email }}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            @endif
+                            <select id="reported_user_id" name="reported_user_id" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-red-500 focus:ring-red-500 sm:text-sm" required>
+                                <option value="">Select a user to report...</option>
+                                @foreach($users as $user)
+                                    <option value="{{ $user->userId }}" {{ old('reported_user_id', $reportedUser->userId ?? '') == $user->userId ? 'selected' : '' }}>
+                                        {{ $user->firstName }} {{ $user->lastName }} ({{ $user->email }})
+                                    </option>
+                                @endforeach
+                            </select>
                             <x-input-error class="mt-2" :messages="$errors->get('reported_user_id')" />
                         </div>
 
-                        <!-- Task Selection (Optional) -->
+                        <!-- Task Selection -->
                         <div class="mb-6">
                             <x-input-label for="task_id" :value="__('Related Task (Optional)')" />
-                            <div class="mt-1">
-                                <input type="text" 
-                                       id="task-search" 
-                                       class="block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-red-500 focus:ring-red-500 sm:text-sm" 
-                                       placeholder="Search for related task..."
-                                       autocomplete="off">
-                                <input type="hidden" name="task_id" id="task_id" value="{{ $task->taskId ?? '' }}">
-                                <div id="task-search-results" class="hidden mt-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md shadow-lg max-h-60 overflow-y-auto"></div>
-                            </div>
-                            @if($task)
-                                <div class="mt-2 p-3 bg-gray-50 dark:bg-gray-700 rounded-md">
-                                    <div class="text-sm font-medium text-gray-900 dark:text-gray-100">
-                                        {{ $task->title }}
-                                    </div>
-                                    <div class="text-sm text-gray-500 dark:text-gray-400">
-                                        {{ Str::limit($task->description, 100) }}
-                                    </div>
-                                </div>
-                            @endif
+                            <select id="task_id" name="task_id" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-red-500 focus:ring-red-500 sm:text-sm">
+                                <option value="">Select a related task (optional)...</option>
+                                @foreach($tasks as $taskOption)
+                                    <option value="{{ $taskOption->taskId }}" {{ old('task_id', $task->taskId ?? '') == $taskOption->taskId ? 'selected' : '' }}>
+                                        {{ $taskOption->title }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                                Select a task if this incident is related to a specific task.
+                            </p>
                             <x-input-error class="mt-2" :messages="$errors->get('task_id')" />
                         </div>
 
@@ -121,6 +93,28 @@
                             <x-input-error class="mt-2" :messages="$errors->get('evidence')" />
                         </div>
 
+                        <!-- Debug Info -->
+                        <div class="mb-4 p-4 bg-gray-100 dark:bg-gray-700 rounded-md">
+                            <h4 class="text-sm font-medium text-gray-900 dark:text-gray-100 mb-2">Form Debug Info:</h4>
+                            <p class="text-xs text-gray-600 dark:text-gray-400">
+                                Available Users: {{ $users->count() }}<br>
+                                Available Tasks: {{ $tasks->count() }}<br>
+                                Selected User ID: <span id="debug-user-id">{{ $reportedUser->userId ?? 'Not selected' }}</span><br>
+                                Selected Task ID: <span id="debug-task-id">{{ $task->taskId ?? 'Not selected' }}</span>
+                            </p>
+                            <div class="mt-2">
+                                <button type="button" onclick="testJavaScript()" class="bg-purple-500 hover:bg-purple-600 text-white text-xs px-3 py-1 rounded">
+                                    Test JS
+                                </button>
+                                <button type="button" onclick="validateForm()" class="bg-blue-500 hover:bg-blue-600 text-white text-xs px-3 py-1 rounded ml-2">
+                                    Validate Form
+                                </button>
+                                <button type="button" onclick="fillTestData()" class="bg-green-500 hover:bg-green-600 text-white text-xs px-3 py-1 rounded ml-2">
+                                    Fill Test Data
+                                </button>
+                            </div>
+                        </div>
+
                         <!-- Submit Button -->
                         <div class="flex items-center justify-end">
                             <a href="{{ route('incident-reports.index') }}" 
@@ -128,7 +122,8 @@
                                 Cancel
                             </a>
                             <button type="submit" 
-                                    class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                                    class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                                    id="submit-button">
                                 Submit Report
                             </button>
                         </div>
@@ -140,124 +135,181 @@
 
     @push('scripts')
     <script>
-        // User search functionality
-        let userSearchTimeout;
-        const userSearchInput = document.getElementById('user-search');
-        const userSearchResults = document.getElementById('user-search-results');
-        const reportedUserIdInput = document.getElementById('reported_user_id');
+        // Debug: Check if JavaScript is loading
+        console.log('JavaScript loaded successfully!');
 
-        userSearchInput.addEventListener('input', function() {
-            clearTimeout(userSearchTimeout);
-            const query = this.value.trim();
+        // Form validation function
+        function validateForm() {
+            const reportedUserId = document.getElementById('reported_user_id').value;
+            const taskId = document.getElementById('task_id').value;
+            const incidentType = document.getElementById('incident_type').value;
+            const description = document.getElementById('description').value;
+            const submitButton = document.getElementById('submit-button');
             
-            if (query.length < 2) {
-                userSearchResults.classList.add('hidden');
-                return;
-            }
-
-            userSearchTimeout = setTimeout(() => {
-                fetch(`{{ route('incident-reports.users.search') }}?q=${encodeURIComponent(query)}`)
-                    .then(response => response.json())
-                    .then(users => {
-                        if (users.length > 0) {
-                            userSearchResults.innerHTML = users.map(user => `
-                                <div class="p-3 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer border-b border-gray-200 dark:border-gray-600 last:border-b-0" 
-                                     onclick="selectUser(${user.userId}, '${user.firstName} ${user.lastName}', '${user.email}')">
-                                    <div class="flex items-center">
-                                        <div class="h-8 w-8 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center mr-3">
-                                            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
-                                                ${user.firstName.charAt(0)}${user.lastName.charAt(0)}
-                                            </span>
-                                        </div>
-                                        <div>
-                                            <div class="text-sm font-medium text-gray-900 dark:text-gray-100">
-                                                ${user.firstName} ${user.lastName}
-                                            </div>
-                                            <div class="text-sm text-gray-500 dark:text-gray-400">
-                                                ${user.email}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            `).join('');
-                            userSearchResults.classList.remove('hidden');
-                        } else {
-                            userSearchResults.innerHTML = '<div class="p-3 text-sm text-gray-500 dark:text-gray-400">No users found</div>';
-                            userSearchResults.classList.remove('hidden');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error searching users:', error);
-                        userSearchResults.classList.add('hidden');
-                    });
-            }, 300);
-        });
-
-        function selectUser(userId, fullName, email) {
-            reportedUserIdInput.value = userId;
-            userSearchInput.value = fullName;
-            userSearchResults.classList.add('hidden');
-        }
-
-        // Task search functionality
-        let taskSearchTimeout;
-        const taskSearchInput = document.getElementById('task-search');
-        const taskSearchResults = document.getElementById('task-search-results');
-        const taskIdInput = document.getElementById('task_id');
-
-        taskSearchInput.addEventListener('input', function() {
-            clearTimeout(taskSearchTimeout);
-            const query = this.value.trim();
+            const isValid = reportedUserId && incidentType && description && description.length >= 10;
             
-            if (query.length < 2) {
-                taskSearchResults.classList.add('hidden');
-                return;
+            if (isValid) {
+                submitButton.disabled = false;
+                submitButton.classList.remove('opacity-50', 'cursor-not-allowed');
+                submitButton.classList.add('hover:bg-red-700');
+            } else {
+                submitButton.disabled = true;
+                submitButton.classList.add('opacity-50', 'cursor-not-allowed');
+                submitButton.classList.remove('hover:bg-red-700');
             }
-
-            taskSearchTimeout = setTimeout(() => {
-                fetch(`{{ route('incident-reports.tasks.search') }}?q=${encodeURIComponent(query)}`)
-                    .then(response => response.json())
-                    .then(tasks => {
-                        if (tasks.length > 0) {
-                            taskSearchResults.innerHTML = tasks.map(task => `
-                                <div class="p-3 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer border-b border-gray-200 dark:border-gray-600 last:border-b-0" 
-                                     onclick="selectTask(${task.taskId}, '${task.title}')">
-                                    <div class="text-sm font-medium text-gray-900 dark:text-gray-100">
-                                        ${task.title}
-                                    </div>
-                                    <div class="text-sm text-gray-500 dark:text-gray-400">
-                                        ${task.description ? task.description.substring(0, 100) + '...' : ''}
-                                    </div>
-                                </div>
-                            `).join('');
-                            taskSearchResults.classList.remove('hidden');
-                        } else {
-                            taskSearchResults.innerHTML = '<div class="p-3 text-sm text-gray-500 dark:text-gray-400">No tasks found</div>';
-                            taskSearchResults.classList.remove('hidden');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error searching tasks:', error);
-                        taskSearchResults.classList.add('hidden');
-                    });
-            }, 300);
-        });
-
-        function selectTask(taskId, title) {
-            taskIdInput.value = taskId;
-            taskSearchInput.value = title;
-            taskSearchResults.classList.add('hidden');
+            
+            // Update debug info
+            document.getElementById('debug-user-id').textContent = reportedUserId || 'Not selected';
+            document.getElementById('debug-task-id').textContent = taskId || 'Not selected';
+            
+            console.log('Form validation:', {
+                reportedUserId: reportedUserId || 'MISSING',
+                taskId: taskId || 'MISSING',
+                incidentType: incidentType || 'MISSING',
+                descriptionLength: description.length,
+                isValid: isValid
+            });
         }
-
-        // Hide search results when clicking outside
-        document.addEventListener('click', function(event) {
-            if (!event.target.closest('#user-search') && !event.target.closest('#user-search-results')) {
-                userSearchResults.classList.add('hidden');
+        
+        // Add event listeners for form validation
+        document.getElementById('reported_user_id').addEventListener('change', validateForm);
+        document.getElementById('task_id').addEventListener('change', validateForm);
+        document.getElementById('incident_type').addEventListener('change', validateForm);
+        document.getElementById('description').addEventListener('input', validateForm);
+        
+        // Initial validation
+        validateForm();
+        
+        // Form submission handler
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const reportedUserId = document.getElementById('reported_user_id').value;
+            const taskId = document.getElementById('task_id').value;
+            const incidentType = document.getElementById('incident_type').value;
+            const description = document.getElementById('description').value;
+            
+            console.log('Form submission attempt:', {
+                reportedUserId: reportedUserId || 'MISSING',
+                taskId: taskId || 'MISSING',
+                incidentType: incidentType || 'MISSING',
+                descriptionLength: description.length,
+                formData: new FormData(this)
+            });
+            
+            // Only prevent submission if critical fields are missing
+            if (!reportedUserId || !incidentType || !description || description.length < 10) {
+                e.preventDefault();
+                alert('Please fill in all required fields:\n- Select a user to report\n- Choose an incident type\n- Provide a description (minimum 10 characters)');
+                return false;
             }
-            if (!event.target.closest('#task-search') && !event.target.closest('#task-search-results')) {
-                taskSearchResults.classList.add('hidden');
-            }
+            
+            // Show loading state
+            const submitButton = document.getElementById('submit-button');
+            submitButton.disabled = true;
+            submitButton.textContent = 'Submitting...';
         });
+        
+        // Test if JavaScript is working
+        function testJavaScript() {
+            try {
+                console.log('JavaScript test function called');
+                
+                // Test basic DOM access
+                const debugUserId = document.getElementById('debug-user-id');
+                const debugTaskId = document.getElementById('debug-task-id');
+                
+                console.log('DOM elements found:', {
+                    debugUserId: debugUserId ? 'YES' : 'NO',
+                    debugTaskId: debugTaskId ? 'YES' : 'NO'
+                });
+                
+                // Test form elements
+                const reportedUserIdInput = document.getElementById('reported_user_id');
+                const taskIdInput = document.getElementById('task_id');
+                const incidentTypeInput = document.getElementById('incident_type');
+                const descriptionInput = document.getElementById('description');
+                
+                console.log('Form elements found:', {
+                    reportedUserIdInput: reportedUserIdInput ? 'YES' : 'NO',
+                    taskIdInput: taskIdInput ? 'YES' : 'NO',
+                    incidentTypeInput: incidentTypeInput ? 'YES' : 'NO',
+                    descriptionInput: descriptionInput ? 'YES' : 'NO'
+                });
+                
+                // Test current values
+                console.log('Current form values:', {
+                    reportedUserId: reportedUserIdInput ? reportedUserIdInput.value : 'NOT FOUND',
+                    taskId: taskIdInput ? taskIdInput.value : 'NOT FOUND',
+                    incidentType: incidentTypeInput ? incidentTypeInput.value : 'NOT FOUND',
+                    description: descriptionInput ? descriptionInput.value : 'NOT FOUND'
+                });
+                
+                // Test dropdown options
+                if (reportedUserIdInput) {
+                    console.log('User dropdown options:', reportedUserIdInput.options.length);
+                    for (let i = 0; i < reportedUserIdInput.options.length; i++) {
+                        console.log(`Option ${i}: ${reportedUserIdInput.options[i].text} (value: ${reportedUserIdInput.options[i].value})`);
+                    }
+                }
+                
+                if (taskIdInput) {
+                    console.log('Task dropdown options:', taskIdInput.options.length);
+                    for (let i = 0; i < taskIdInput.options.length; i++) {
+                        console.log(`Option ${i}: ${taskIdInput.options[i].text} (value: ${taskIdInput.options[i].value})`);
+                    }
+                }
+                
+                alert('JavaScript test completed! Check console for detailed information.');
+                
+            } catch (error) {
+                console.error('JavaScript test error:', error);
+                alert('JavaScript error: ' + error.message);
+            }
+        }
+        
+        // Fill test data for form testing
+        function fillTestData() {
+            try {
+                console.log('Filling test data...');
+                
+                const reportedUserIdInput = document.getElementById('reported_user_id');
+                const taskIdInput = document.getElementById('task_id');
+                const incidentTypeInput = document.getElementById('incident_type');
+                const descriptionInput = document.getElementById('description');
+                
+                // Select first available user (skip the empty option)
+                if (reportedUserIdInput && reportedUserIdInput.options.length > 1) {
+                    reportedUserIdInput.selectedIndex = 1; // Select first actual user
+                    console.log('Selected user:', reportedUserIdInput.options[reportedUserIdInput.selectedIndex].text);
+                }
+                
+                // Select first available task (skip the empty option)
+                if (taskIdInput && taskIdInput.options.length > 1) {
+                    taskIdInput.selectedIndex = 1; // Select first actual task
+                    console.log('Selected task:', taskIdInput.options[taskIdInput.selectedIndex].text);
+                }
+                
+                // Select first incident type (skip the empty option)
+                if (incidentTypeInput && incidentTypeInput.options.length > 1) {
+                    incidentTypeInput.selectedIndex = 1; // Select first incident type
+                    console.log('Selected incident type:', incidentTypeInput.options[incidentTypeInput.selectedIndex].text);
+                }
+                
+                // Fill description
+                if (descriptionInput) {
+                    descriptionInput.value = 'This is a test incident report description with more than 10 characters to meet the minimum requirement.';
+                    console.log('Filled description:', descriptionInput.value);
+                }
+                
+                // Trigger validation
+                validateForm();
+                
+                alert('Test data filled! Form should now be ready for submission.');
+                
+            } catch (error) {
+                console.error('Error filling test data:', error);
+                alert('Error filling test data: ' + error.message);
+            }
+        }
     </script>
     @endpush
 </x-app-layout>
