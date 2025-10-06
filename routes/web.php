@@ -54,6 +54,7 @@ Route::middleware(['auth', 'user'])->group(function () {
     Route::resource('tasks', TaskController::class);
     
     // Feedback routes for regular users
+    Route::get('/feedback', [FeedbackController::class, 'index'])->name('feedback.index');
     Route::get('/feedback/{task}/create', [FeedbackController::class, 'create'])->name('feedback.create');
     Route::post('/feedback/{task}/store', [FeedbackController::class, 'store'])->name('feedback.store');
     Route::get('/feedback/{feedback}/edit', [FeedbackController::class, 'edit'])->name('feedback.edit');
@@ -278,19 +279,14 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('/tasks/{task}/complete', [AdminTaskController::class, 'complete'])->name('tasks.complete');
     
     // Task submission verification routes
-    Route::get('/task-submissions', [TaskSubmissionController::class, 'index'])->name('admin.task-submissions.index');
-    Route::get('/task-submissions/{submission}', [TaskSubmissionController::class, 'show'])->name('admin.task-submissions.show');
-    Route::post('/task-submissions/{submission}/approve', [TaskSubmissionController::class, 'approve'])->name('admin.task-submissions.approve');
-    Route::post('/task-submissions/{submission}/reject', [TaskSubmissionController::class, 'reject'])->name('admin.task-submissions.reject');
+    Route::get('/task-submissions', [TaskSubmissionController::class, 'index'])->name('task-submissions.index');
+    Route::get('/task-submissions/{submission}', [TaskSubmissionController::class, 'show'])->name('task-submissions.show');
+    Route::post('/task-submissions/{submission}/approve', [TaskSubmissionController::class, 'approve'])->name('task-submissions.approve');
+    Route::post('/task-submissions/{submission}/reject', [TaskSubmissionController::class, 'reject'])->name('task-submissions.reject');
     
-    // Admin feedback routes
-    Route::get('/feedback', [AdminFeedbackController::class, 'index'])->name('admin.feedback.index');
-    Route::get('/feedback/{task}/create', [AdminFeedbackController::class, 'create'])->name('admin.feedback.create');
-    Route::post('/feedback/{task}/store', [AdminFeedbackController::class, 'store'])->name('admin.feedback.store');
-    Route::get('/feedback/{feedback}/edit', [AdminFeedbackController::class, 'edit'])->name('admin.feedback.edit');
-    Route::patch('/feedback/{feedback}/update', [AdminFeedbackController::class, 'update'])->name('admin.feedback.update');
-    Route::delete('/feedback/{feedback}/destroy', [AdminFeedbackController::class, 'destroy'])->name('admin.feedback.destroy');
-    Route::get('/feedback/{task}/show', [AdminFeedbackController::class, 'show'])->name('admin.feedback.show');
+    // Admin feedback routes (read-only)
+    Route::get('/feedback', [AdminFeedbackController::class, 'index'])->name('feedback.index');
+    Route::get('/feedback/{task}/show', [AdminFeedbackController::class, 'show'])->name('feedback.show');
     
     Route::get('/reports', function () {
         return view('admin.reports.index');

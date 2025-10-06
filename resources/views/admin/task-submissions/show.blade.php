@@ -9,7 +9,7 @@
                     Submitted by {{ $submission->user->name }} on {{ is_string($submission->submitted_at) ? \Carbon\Carbon::parse($submission->submitted_at)->format('M j, Y \a\t g:i A') : $submission->submitted_at->format('M j, Y \a\t g:i A') }}
                 </p>
             </div>
-            <a href="{{ route('admin.admin.task-submissions.index') }}" 
+            <a href="{{ route('admin.task-submissions.index') }}" 
                class="inline-flex items-center px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white text-sm font-medium rounded-md">
                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
@@ -172,7 +172,7 @@
                             <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Review Actions</h3>
                             
                             <!-- Approve Form -->
-                            <form action="{{ route('admin.admin.task-submissions.approve', $submission) }}" method="POST" class="mb-4">
+                            <form action="{{ route('admin.task-submissions.approve', $submission) }}" method="POST" class="mb-4">
                                 @csrf
                                 <div class="mb-4">
                                     <label for="admin_notes" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -195,7 +195,7 @@
                             </form>
 
                             <!-- Reject Form -->
-                            <form action="{{ route('admin.admin.task-submissions.reject', $submission) }}" method="POST">
+                            <form action="{{ route('admin.task-submissions.reject', $submission) }}" method="POST">
                                 @csrf
                                 <div class="mb-4">
                                     <label for="rejection_reason" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">

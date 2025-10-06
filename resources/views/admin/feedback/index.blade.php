@@ -100,19 +100,7 @@
                                                 <a href="{{ route('admin.feedback.show', $feedback->task) }}" class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300">
                                                     View
                                                 </a>
-                                                @if($feedback->FK1_userId === Auth::id())
-                                                    <a href="{{ route('admin.feedback.edit', $feedback) }}" class="text-yellow-600 dark:text-yellow-400 hover:text-yellow-800 dark:hover:text-yellow-300">
-                                                        Edit
-                                                    </a>
-                                                    <form action="{{ route('admin.feedback.destroy', $feedback) }}" method="POST" class="inline">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button type="submit" class="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300" 
-                                                                onclick="return confirm('Are you sure you want to delete this feedback?')">
-                                                            Delete
-                                                        </button>
-                                                    </form>
-                                                @endif
+                                                
                                             </div>
                                         </td>
                                     </tr>

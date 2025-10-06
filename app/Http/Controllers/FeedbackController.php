@@ -11,6 +11,19 @@ use App\Models\User;
 class FeedbackController extends Controller
 {
     /**
+     * List the current user's feedback across tasks
+     */
+    public function index()
+    {
+        $user = Auth::user();
+        $feedback = Feedback::where('FK1_userId', $user->userId)
+            ->with('task')
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
+        return view('feedback.index', compact('feedback'));
+    }
+
+    /**
      * Show the feedback form for a specific task
      */
     public function create(Task $task)

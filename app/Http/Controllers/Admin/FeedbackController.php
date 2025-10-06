@@ -25,101 +25,34 @@ class FeedbackController extends Controller
         return view('admin.feedback.index', compact('userFeedback', 'adminFeedback'));
     }
     
-    /**
-     * Show the form for creating admin feedback for a specific task
-     */
+    // Admins are not allowed to create task feedback
     public function create(Task $task)
     {
-        return view('admin.feedback.create', compact('task'));
+        abort(403, 'Admins cannot create task feedback.');
     }
     
-    /**
-     * Store admin feedback
-     */
+    // Admins are not allowed to store task feedback
     public function store(Request $request, Task $task)
     {
-        $admin = Auth::user();
-        
-        $request->validate([
-            'comment' => 'required|string|max:1000',
-            'rating' => 'required|integer|min:1|max:5',
-        ]);
-        
-        Feedback::create([
-            'FK2_taskId' => $task->taskId,
-            'FK1_userId' => $admin->userId,
-            'comment' => $request->comment,
-            'rating' => $request->rating,
-            'feedback_date' => now(),
-        ]);
-        
-        // Award points for submitting feedback
-        $admin->increment('points', 1);
-        
-        return redirect()->route('admin.feedback.index')
-            ->with('success', 'Admin feedback submitted successfully! You earned 1 point.');
+        abort(403, 'Admins cannot create task feedback.');
     }
     
-    /**
-     * Show the form for editing admin feedback
-     */
+    // Admins are not allowed to edit feedback
     public function edit(Feedback $feedback)
     {
-        $admin = Auth::user();
-        
-        // Check if admin owns this feedback
-        if ($feedback->FK1_userId !== $admin->userId) {
-            return redirect()->route('admin.feedback.index')
-                ->with('error', 'You can only edit your own feedback.');
-        }
-        
-        return view('admin.feedback.edit', compact('feedback'));
+        abort(403, 'Admins cannot edit task feedback.');
     }
     
-    /**
-     * Update admin feedback
-     */
+    // Admins are not allowed to update feedback
     public function update(Request $request, Feedback $feedback)
     {
-        $admin = Auth::user();
-        
-        // Check if admin owns this feedback
-        if ($feedback->FK1_userId !== $admin->userId) {
-            return redirect()->route('admin.feedback.index')
-                ->with('error', 'You can only edit your own feedback.');
-        }
-        
-        $request->validate([
-            'comment' => 'required|string|max:1000',
-            'rating' => 'required|integer|min:1|max:5',
-        ]);
-        
-        $feedback->update([
-            'comment' => $request->comment,
-            'rating' => $request->rating,
-        ]);
-        
-        return redirect()->route('admin.feedback.index')
-            ->with('success', 'Admin feedback updated successfully!');
+        abort(403, 'Admins cannot edit task feedback.');
     }
     
-    /**
-     * Remove admin feedback
-     */
+    // Admins are not allowed to delete feedback
     public function destroy(Feedback $feedback)
     {
-        $admin = Auth::user();
-        
-        // Check if admin owns this feedback
-        if ($feedback->FK1_userId !== $admin->userId) {
-            return redirect()->route('admin.feedback.index')
-                ->with('error', 'You can only delete your own feedback.');
-        }
-        
-        $feedback->delete();
-        
-        return redirect()->route('admin.feedback.index')
-            ->with('success', 'Admin feedback deleted successfully!');
+        abort(403, 'Admins cannot delete task feedback.');
     }
     
     /**

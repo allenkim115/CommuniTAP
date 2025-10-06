@@ -27,7 +27,7 @@
                                     </svg>
                                     Task Management
                                 </a>
-                                <a href="{{ route('admin.admin.task-submissions.index') }}" class="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 {{ request()->routeIs('admin.admin.task-submissions.*') ? 'bg-teal-50 dark:bg-teal-900 text-teal-700 dark:text-teal-300' : '' }}">
+                                <a href="{{ route('admin.task-submissions.index') }}" class="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 {{ request()->routeIs('admin.task-submissions.*') ? 'bg-teal-50 dark:bg-teal-900 text-teal-700 dark:text-teal-300' : '' }}">
                                     <svg class="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                                     </svg>
@@ -73,7 +73,7 @@
             <div class="space-y-1">
                 <div class="text-sm font-semibold text-gray-800 dark:text-gray-200">Tasks</div>
                 <a href="{{ route('admin.tasks.index') }}" class="block text-sm text-gray-600 dark:text-gray-300 ml-4">Task Management</a>
-                <a href="{{ route('admin.admin.task-submissions.index') }}" class="block text-sm text-gray-600 dark:text-gray-300 ml-4">Task Submissions</a>
+                <a href="{{ route('admin.task-submissions.index') }}" class="block text-sm text-gray-600 dark:text-gray-300 ml-4">Task Submissions</a>
             </div>
             
             <a href="{{ route('admin.rewards.index') ?? '#' }}" class="block text-sm font-semibold text-gray-600 dark:text-gray-300">Rewards</a>

@@ -44,18 +44,10 @@
                 </div>
             </div>
 
-            <!-- Admin Actions -->
-            <div class="mb-6 text-center">
-                <a href="{{ route('admin.feedback.create', $task) }}" class="inline-flex items-center px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-lg transition-colors">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                    </svg>
-                    Add Admin Feedback
-                </a>
-            </div>
+            <!-- Admin Actions: creation disabled -->
 
             <!-- Feedback Section -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="grid grid-cols-1 gap-6">
                 <!-- User Feedback Column -->
                 <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
                     <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
@@ -107,58 +99,7 @@
                     @endif
                 </div>
 
-                <!-- Admin Feedback Column -->
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
-                    <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
-                        <svg class="w-5 h-5 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                        Admin Feedback ({{ $adminFeedback->count() }})
-                    </h4>
-                    
-                    @if($adminFeedback->count() > 0)
-                        <div class="space-y-4">
-                            @foreach($adminFeedback as $feedback)
-                                <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
-                                    <div class="flex items-center justify-between mb-2">
-                                        <div class="flex items-center space-x-2">
-                                            <div class="h-8 w-8 bg-green-300 dark:bg-green-600 rounded-full flex items-center justify-center">
-                                                <span class="text-sm font-medium text-green-700 dark:text-green-300">
-                                                    {{ substr($feedback->user->name, 0, 2) }}
-                                                </span>
-                                            </div>
-                                            <div>
-                                                <span class="text-sm font-medium text-gray-900 dark:text-white">{{ $feedback->user->name }}</span>
-                                                <span class="px-2 py-1 text-xs bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 rounded-full ml-2">
-                                                    Admin
-                                                </span>
-                                            </div>
-                                        </div>
-                                        <div class="flex items-center space-x-1">
-                                            @for($i = 1; $i <= 5; $i++)
-                                                <svg class="w-4 h-4 {{ $i <= $feedback->rating ? 'text-yellow-400' : 'text-gray-300' }}" fill="currentColor" viewBox="0 0 20 20">
-                                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
-                                                </svg>
-                                            @endfor
-                                            <span class="ml-1 text-sm text-gray-600 dark:text-gray-400">{{ $feedback->rating }}/5</span>
-                                        </div>
-                                    </div>
-                                    <p class="text-sm text-gray-700 dark:text-gray-300 mb-2">{{ $feedback->comment }}</p>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400">
-                                        {{ $feedback->feedback_date->format('M j, Y \a\t g:i A') }}
-                                    </p>
-                                </div>
-                            @endforeach
-                        </div>
-                    @else
-                        <div class="text-center py-8">
-                            <svg class="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                            </svg>
-                            <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">No admin feedback yet</p>
-                        </div>
-                    @endif
-                </div>
+                
             </div>
         </div>
     </div>

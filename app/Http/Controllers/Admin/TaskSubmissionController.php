@@ -63,7 +63,7 @@ class TaskSubmissionController extends Controller
         $user = $submission->user;
         $user->increment('points', $submission->task->points_awarded);
 
-        return redirect()->route('admin.admin.task-submissions.index')
+        return redirect()->route('admin.task-submissions.index')
             ->with('status', 'Task submission approved successfully. User has been awarded ' . $submission->task->points_awarded . ' points.');
     }
 
@@ -103,7 +103,7 @@ class TaskSubmissionController extends Controller
             ? "Task submission rejected. User has {$remainingAttempts} remaining attempts to resubmit."
             : "Task submission rejected. User has reached the maximum number of attempts (3).";
 
-        return redirect()->route('admin.admin.task-submissions.index')
+        return redirect()->route('admin.task-submissions.index')
             ->with('status', $message);
     }
 

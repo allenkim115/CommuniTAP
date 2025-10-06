@@ -142,7 +142,7 @@
                                                 {{ $submission->task->points_awarded }}
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                                <a href="{{ route('admin.admin.task-submissions.show', $submission) }}" 
+                                                <a href="{{ route('admin.task-submissions.show', $submission) }}" 
                                                    class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 mr-3">
                                                     Review
                                                 </a>
