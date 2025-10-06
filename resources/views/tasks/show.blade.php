@@ -219,7 +219,49 @@
                                             @endif
                                         </div>
                                     </div>
-                                    
+                                    <!-- User Submission Preview -->
+                                    <div class="mt-6 text-left">
+                                        <h4 class="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-3">Your Submission</h4>
+                                        @if(($userAssignment->completion_notes ?? null))
+                                            <div class="mb-4 text-sm text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-700 p-4 rounded-md">
+                                                {{ $userAssignment->completion_notes }}
+                                            </div>
+                                        @endif
+                                        @php
+                                            $photos = $userAssignment->photos ?? [];
+                                        @endphp
+                                        @if(is_array($photos) && count($photos) > 0)
+                                            <div class="mb-4">
+                                                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                                                    @foreach($photos as $index => $photo)
+                                                        @php 
+                                                            // Build a robust relative URL to avoid APP_URL issues
+                                                            $photoUrl = \Illuminate\Support\Str::startsWith($photo, ['http://','https://','/'])
+                                                                ? $photo
+                                                                : '/storage/' . ltrim($photo, '/');
+                                                        @endphp
+                                                        <div class="relative group">
+                                                            <div class="relative overflow-hidden rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200" onclick="openImageModal('{{ $photoUrl }}')">
+                                                                <img src="{{ $photoUrl }}" 
+                                                                    alt="Task completion proof {{ $index + 1 }}" 
+                                                                    class="w-full h-28 object-cover cursor-pointer hover:scale-105 transition-transform duration-200"
+                                                                    data-photo-url="{{ $photoUrl }}"
+                                                                    onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjgwIiB2aWV3Qm94PSIwIDAgMTAwIDgwIiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iODAiIHJ4PSIxMiIgZmlsbD0iI0YzRjRGNiIvPjxwYXRoIGQ9Ik0zMCAzMEg3MFY1MEgzMFYzMFoiIHN0cm9rZT0iIzkzOTM5MyIgc3Ryb2tlLXdpZHRoPSIyIi8+PHBhdGggZD0iTTQyIDQyTDQ4IDQ4TDYwIDM2IiBzdHJva2U9IiM5MzkzOTMiIHN0cm9rZS13aWR0aD0iMiIvPjwvc3ZnPg==';">
+                                                            </div>
+                                                        </div>
+                                                    @endforeach
+                                                </div>
+                                                <div class="mt-3">
+                                                    <button type="button" onclick="openImageModal(document.querySelector('img[data-photo-url]')?.getAttribute('data-photo-url'))" class="inline-flex items-center px-3 py-2 bg-gray-900 text-white text-sm rounded hover:bg-black">
+                                                        Review Proof
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        @else
+                                            <p class="text-sm text-gray-500 dark:text-gray-400">No photos attached.</p>
+                                        @endif
+                                    </div>
+
                                     <!-- Task Feedback Button -->
                                     <div class="mt-4 text-center space-x-2">
                                         <a href="{{ route('feedback.create', $task) }}" class="inline-flex items-center px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-lg transition-colors">
@@ -631,5 +673,81 @@
                 });
             }
         });
+    </script>
+    
+    <!-- Image Review Modal -->
+    <div id="imageModal" class="fixed inset-0 bg-black bg-opacity-90 z-50 hidden flex items-center justify-center p-4" style="display: none;">
+        <div class="relative max-w-7xl max-h-full w-full h-full flex items-center justify-center">
+            <button onclick="closeImageModal()" class="absolute top-4 right-4 text-white hover:text-gray-300 z-10 bg-black bg-opacity-50 rounded-full p-2 transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+            <button id="prevButton" onclick="previousImage()" class="absolute left-4 top-1/2 transform -translate-y-1/2 text-white hover:text-gray-300 z-10 bg-black bg-opacity-50 rounded-full p-3 transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+            </button>
+            <button id="nextButton" onclick="nextImage()" class="absolute right-4 top-1/2 transform -translate-y-1/2 text-white hover:text-gray-300 z-10 bg-black bg-opacity-50 rounded-full p-3 transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+            </button>
+            <div class="flex items-center justify-center w-full h-full">
+                <img id="modalImage" src="" alt="Task completion proof" class="max-w-full max-h-full object-contain rounded-lg shadow-2xl">
+            </div>
+            <div id="imageCounter" class="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-white bg-black bg-opacity-50 px-4 py-2 rounded-full text-sm">
+                <span id="currentImageIndex">1</span> / <span id="totalImages">1</span>
+            </div>
+            <button id="downloadButton" onclick="downloadImage()" class="absolute bottom-4 right-4 text-white hover:text-gray-300 z-10 bg-black bg-opacity-50 rounded-full p-2 transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+            </button>
+        </div>
+    </div>
+    <script>
+        let currentImageIndex = 0;
+        let imageSources = [];
+        document.addEventListener('DOMContentLoaded', function() {
+            const imageElements = document.querySelectorAll('img[data-photo-url]');
+            imageSources = Array.from(imageElements).map(img => img.getAttribute('data-photo-url'));
+        });
+        function openImageModal(imageSrc) {
+            if (imageSources.length === 0) return;
+            currentImageIndex = imageSources.indexOf(imageSrc);
+            if (currentImageIndex === -1) currentImageIndex = 0;
+            updateModalImage();
+            const modal = document.getElementById('imageModal');
+            modal.classList.remove('hidden');
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+        function closeImageModal() {
+            const modal = document.getElementById('imageModal');
+            modal.classList.add('hidden');
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+        function nextImage() { if (imageSources.length > 1) { currentImageIndex = (currentImageIndex + 1) % imageSources.length; updateModalImage(); } }
+        function previousImage() { if (imageSources.length > 1) { currentImageIndex = (currentImageIndex - 1 + imageSources.length) % imageSources.length; updateModalImage(); } }
+        function updateModalImage() {
+            const modalImage = document.getElementById('modalImage');
+            const currentIndexSpan = document.getElementById('currentImageIndex');
+            const totalImagesSpan = document.getElementById('totalImages');
+            const prevButton = document.getElementById('prevButton');
+            const nextButton = document.getElementById('nextButton');
+            if (imageSources.length > 0) {
+                modalImage.src = imageSources[currentImageIndex];
+                currentIndexSpan.textContent = currentImageIndex + 1;
+                totalImagesSpan.textContent = imageSources.length;
+                if (imageSources.length === 1) { prevButton.style.display = 'none'; nextButton.style.display = 'none'; }
+                else { prevButton.style.display = 'block'; nextButton.style.display = 'block'; }
+            }
+        }
+        function downloadImage() { 
+            if (imageSources.length > 0) { 
+                const link = document.createElement('a'); 
+                link.href = imageSources[currentImageIndex]; 
+                link.download = `task-proof-${currentImageIndex + 1}.jpg`; 
+                document.body.appendChild(link); 
+                link.click(); 
+                document.body.removeChild(link); 
+            } 
+        }
+        document.addEventListener('click', function(e) { const modal = document.getElementById('imageModal'); if (e.target === modal) { closeImageModal(); } });
+        document.addEventListener('keydown', function(e) { const modal = document.getElementById('imageModal'); if (modal && !modal.classList.contains('hidden')) { if (e.key === 'Escape') closeImageModal(); if (e.key === 'ArrowLeft') previousImage(); if (e.key === 'ArrowRight') nextImage(); } });
     </script>
 </x-app-layout>

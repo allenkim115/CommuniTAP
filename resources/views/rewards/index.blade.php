@@ -1,20 +1,18 @@
-<x-admin-layout>
+<x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">{{ __('Rewards') }}</h2>
     </x-slot>
 
-    <div class="py-12">
+    <div class="py-8">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
                     @if(session('status'))
                         <div class="mb-4 text-green-600">{{ session('status') }}</div>
                     @endif
-
-                    <div class="flex justify-between items-center mb-6">
-                        <h3 class="text-lg font-semibold">Manage Rewards</h3>
-                        <a href="{{ route('admin.rewards.create') }}" class="px-4 py-2 bg-indigo-600 text-white rounded">Create Reward</a>
-                    </div>
+                    @if(session('error'))
+                        <div class="mb-4 text-red-600">{{ session('error') }}</div>
+                    @endif
 
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         @forelse($rewards as $reward)
@@ -27,29 +25,27 @@
                                 <p class="mt-2 text-sm">{{ $reward->description }}</p>
                                 <div class="mt-3 text-sm">Points: <span class="font-medium">{{ $reward->points_cost }}</span></div>
                                 <div class="text-sm">Qty left: <span class="font-medium">{{ $reward->QTY }}</span></div>
-                                <div class="mt-4 flex gap-2">
-                                    <a href="{{ route('admin.rewards.edit', $reward) }}" class="px-3 py-2 bg-gray-700 text-white rounded">Edit</a>
-                                    <form action="{{ route('admin.rewards.destroy', $reward) }}" method="POST" onsubmit="return confirm('Delete this reward?')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button class="px-3 py-2 bg-red-600 text-white rounded">Delete</button>
-                                    </form>
-                                </div>
+                                <form method="POST" action="{{ route('rewards.redeem', $reward) }}" class="mt-4">
+                                    @csrf
+                                    @if($reward->isAvailable())
+                                        <x-primary-button>
+                                            Redeem
+                                        </x-primary-button>
+                                    @else
+                                        <x-primary-button disabled>
+                                            Redeem
+                                        </x-primary-button>
+                                    @endif
+                                </form>
                             </div>
                         @empty
-                            <div>No rewards yet. Click Create Reward to add one.</div>
+                            <div>No rewards available right now.</div>
                         @endforelse
                     </div>
-
-                    @if(method_exists($rewards, 'links'))
-                        <div class="mt-6">
-                            {{ $rewards->links() }}
-                        </div>
-                    @endif
                 </div>
             </div>
         </div>
     </div>
-</x-admin-layout>
+</x-app-layout>
 
 

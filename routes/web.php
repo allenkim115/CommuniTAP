@@ -11,6 +11,8 @@ use App\Http\Controllers\Admin\FeedbackController as AdminFeedbackController;
 use App\Http\Controllers\TapNominationController;
 use App\Http\Controllers\IncidentReportController;
 use App\Http\Controllers\Admin\IncidentReportController as AdminIncidentReportController;
+use App\Http\Controllers\RewardController;
+use App\Http\Controllers\RewardImageController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -23,6 +25,11 @@ Route::get('/dashboard', [App\Http\Controllers\DashboardController::class, 'inde
 Route::get('/progress', [App\Http\Controllers\DashboardController::class, 'progress'])
     ->middleware(['auth', 'verified', 'user'])
     ->name('progress');
+
+// Shared route to stream reward images (accessible to any authenticated user)
+Route::get('/reward-images/{reward}', [RewardImageController::class, 'show'])
+    ->middleware(['auth'])
+    ->name('rewards.image');
 
 // Public test route for debugging (no auth required)
 Route::get('/test-search-public', function() {
@@ -60,6 +67,12 @@ Route::middleware(['auth', 'user'])->group(function () {
     Route::get('/feedback/{feedback}/edit', [FeedbackController::class, 'edit'])->name('feedback.edit');
     Route::patch('/feedback/{feedback}/update', [FeedbackController::class, 'update'])->name('feedback.update');
     Route::get('/feedback/{task}/show', [FeedbackController::class, 'show'])->name('feedback.show');
+
+    // Rewards - user side
+    Route::get('/rewards', [RewardController::class, 'index'])->name('rewards.index');
+    Route::post('/rewards/{reward}/redeem', [RewardController::class, 'redeem'])->name('rewards.redeem');
+    Route::get('/my-redemptions', [RewardController::class, 'myRedemptions'])->name('rewards.mine');
+    // image route is defined globally above
     
     // Tap & Pass nomination routes
     Route::get('/tap-nominations/create/{task}', [TapNominationController::class, 'create'])->name('tap-nominations.create');
@@ -293,9 +306,18 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     })->name('reports.index');
 
     // Newly added simple pages to support admin navigation
-    Route::get('/rewards', function () {
-        return view('admin.rewards.index');
-    })->name('rewards.index');
+    // Admin rewards management
+    Route::get('/rewards', [App\Http\Controllers\Admin\RewardController::class, 'index'])->name('rewards.index');
+    Route::get('/rewards/create', [App\Http\Controllers\Admin\RewardController::class, 'create'])->name('rewards.create');
+    Route::post('/rewards', [App\Http\Controllers\Admin\RewardController::class, 'store'])->name('rewards.store');
+    Route::get('/rewards/{reward}/edit', [App\Http\Controllers\Admin\RewardController::class, 'edit'])->name('rewards.edit');
+    Route::patch('/rewards/{reward}', [App\Http\Controllers\Admin\RewardController::class, 'update'])->name('rewards.update');
+    Route::delete('/rewards/{reward}', [App\Http\Controllers\Admin\RewardController::class, 'destroy'])->name('rewards.destroy');
+
+    // Admin redemption approvals
+    Route::get('/redemptions', [App\Http\Controllers\Admin\RewardRedemptionController::class, 'index'])->name('redemptions.index');
+    Route::post('/redemptions/{redemption}/approve', [App\Http\Controllers\Admin\RewardRedemptionController::class, 'approve'])->name('redemptions.approve');
+    Route::post('/redemptions/{redemption}/reject', [App\Http\Controllers\Admin\RewardRedemptionController::class, 'reject'])->name('redemptions.reject');
 
     Route::get('/notifications', function () {
         return view('admin.notifications.index');
