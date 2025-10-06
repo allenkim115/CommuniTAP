@@ -1,4 +1,16 @@
 <x-guest-layout>
+    <style>
+        body {
+            background: linear-gradient(135deg, #F1F1F1 0%, #F4A261 48%, #2A9D8F 96%) !important;
+        }
+        .min-h-screen {
+            background: linear-gradient(135deg, #F1F1F1 0%, #F4A261 48%, #2A9D8F 96%) !important;
+        }
+        .bg-white {
+            border-radius: 25px !important;
+        }
+    </style>
+    
     <!-- First User Notice -->
     @if(App\Models\User::count() === 0)
         <div class="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
@@ -13,16 +25,16 @@
         </div>
     @endif
 
-    <form method="POST" action="{{ route('register') }}" id="registerForm" class="max-w-3xl mx-auto">
+    <form method="POST" action="{{ route('register') }}" id="registerForm" class="max-w-4xl mx-auto">
         @csrf
 
         <!-- Logo inside container -->
-        <div class="flex justify-center items-center mb-8">
+        <div class="flex justify-center items-center mb-2">
             <img src="{{ asset('images/communitaplogo1.svg') }}" alt="CommuniTAP Logo" class="w-36 h-36" />
         </div>
 
         <!-- Heading -->
-        <h2 class="text-2xl font-semibold text-center mb-6">{{ __('Sign up') }}</h2>
+        <h2 class="text-2xl font-semibold text-center mb-4">{{ __('Sign up') }}</h2>
 
         <!-- Form Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
