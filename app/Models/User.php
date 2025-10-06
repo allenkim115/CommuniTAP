@@ -171,4 +171,28 @@ class User extends Authenticatable
     {
         return $this->nominationsReceived()->pending();
     }
+
+    /**
+     * Get incident reports made by this user
+     */
+    public function incidentReportsMade()
+    {
+        return $this->hasMany(UserIncidentReport::class, 'FK1_reporterId', 'userId');
+    }
+
+    /**
+     * Get incident reports made against this user
+     */
+    public function incidentReportsReceived()
+    {
+        return $this->hasMany(UserIncidentReport::class, 'FK2_reportedUserId', 'userId');
+    }
+
+    /**
+     * Get incident reports moderated by this user (admin only)
+     */
+    public function incidentReportsModerated()
+    {
+        return $this->hasMany(UserIncidentReport::class, 'FK4_moderatorId', 'userId');
+    }
 }
