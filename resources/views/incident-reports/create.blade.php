@@ -16,39 +16,33 @@
                         </p>
                     </div>
 
-                    <form method="POST" action="{{ route('incident-reports.store') }}">
+                    <form method="POST" action="{{ route('incident-reports.store') }}" enctype="multipart/form-data">
                         @csrf
 
-                        <!-- Reported User Selection -->
-                        <div class="mb-6">
-                            <x-input-label for="reported_user_id" :value="__('User to Report')" />
-                            <select id="reported_user_id" name="reported_user_id" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-red-500 focus:ring-red-500 sm:text-sm" required>
-                                <option value="">Select a user to report...</option>
-                                @foreach($users as $user)
-                                    <option value="{{ $user->userId }}" {{ old('reported_user_id', $reportedUser->userId ?? '') == $user->userId ? 'selected' : '' }}>
-                                        {{ $user->firstName }} {{ $user->lastName }} ({{ $user->email }})
-                                    </option>
-                                @endforeach
-                            </select>
-                            <x-input-error class="mt-2" :messages="$errors->get('reported_user_id')" />
-                        </div>
+						<!-- Reported User Autocomplete -->
+						<div class="mb-6">
+							<x-input-label for="reported_user_search" :value="__('User to Report')" />
+							<input id="reported_user_search" type="text" placeholder="Type a name or email..." class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-red-500 focus:ring-red-500 sm:text-sm" autocomplete="off" value="{{ isset($reportedUser) ? ($reportedUser->firstName.' '.$reportedUser->lastName.' ('.$reportedUser->email.')') : '' }}">
+							<input type="hidden" id="reported_user_id" name="reported_user_id" value="{{ old('reported_user_id', $reportedUser->userId ?? '') }}">
+							<div id="reported_user_suggestions" class="relative">
+								<ul class="absolute z-50 mt-1 w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg max-h-60 overflow-auto hidden"></ul>
+							</div>
+							<x-input-error class="mt-2" :messages="$errors->get('reported_user_id')" />
+						</div>
 
-                        <!-- Task Selection -->
-                        <div class="mb-6">
-                            <x-input-label for="task_id" :value="__('Related Task (Optional)')" />
-                            <select id="task_id" name="task_id" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-red-500 focus:ring-red-500 sm:text-sm">
-                                <option value="">Select a related task (optional)...</option>
-                                @foreach($tasks as $taskOption)
-                                    <option value="{{ $taskOption->taskId }}" {{ old('task_id', $task->taskId ?? '') == $taskOption->taskId ? 'selected' : '' }}>
-                                        {{ $taskOption->title }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                                Select a task if this incident is related to a specific task.
-                            </p>
-                            <x-input-error class="mt-2" :messages="$errors->get('task_id')" />
-                        </div>
+						<!-- Task Autocomplete -->
+						<div class="mb-6">
+						<x-input-label for="task_search" :value="__('Related Task')" />
+							<input id="task_search" type="text" placeholder="Type task title..." class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-red-500 focus:ring-red-500 sm:text-sm" autocomplete="off" value="{{ isset($task) ? $task->title : '' }}">
+							<input type="hidden" id="task_id" name="task_id" value="{{ old('task_id', $task->taskId ?? '') }}">
+							<div id="task_suggestions" class="relative">
+								<ul class="absolute z-50 mt-1 w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg max-h-60 overflow-auto hidden"></ul>
+							</div>
+						<p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+							Select the specific task related to this incident.
+						</p>
+							<x-input-error class="mt-2" :messages="$errors->get('task_id')" />
+						</div>
 
                         <!-- Incident Type -->
                         <div class="mb-6">
@@ -79,41 +73,30 @@
                             <x-input-error class="mt-2" :messages="$errors->get('description')" />
                         </div>
 
-                        <!-- Evidence -->
+                        <!-- Evidence Images Upload (Optional) -->
                         <div class="mb-6">
-                            <x-input-label for="evidence" :value="__('Additional Evidence (Optional)')" />
-                            <textarea id="evidence" 
-                                      name="evidence" 
-                                      rows="3" 
-                                      class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-red-500 focus:ring-red-500 sm:text-sm" 
-                                      placeholder="Any additional context, screenshots, or evidence...">{{ old('evidence') }}</textarea>
-                            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                                Include any relevant context, links, or additional information that might help with the investigation.
-                            </p>
-                            <x-input-error class="mt-2" :messages="$errors->get('evidence')" />
-                        </div>
-
-                        <!-- Debug Info -->
-                        <div class="mb-4 p-4 bg-gray-100 dark:bg-gray-700 rounded-md">
-                            <h4 class="text-sm font-medium text-gray-900 dark:text-gray-100 mb-2">Form Debug Info:</h4>
-                            <p class="text-xs text-gray-600 dark:text-gray-400">
-                                Available Users: {{ $users->count() }}<br>
-                                Available Tasks: {{ $tasks->count() }}<br>
-                                Selected User ID: <span id="debug-user-id">{{ $reportedUser->userId ?? 'Not selected' }}</span><br>
-                                Selected Task ID: <span id="debug-task-id">{{ $task->taskId ?? 'Not selected' }}</span>
-                            </p>
-                            <div class="mt-2">
-                                <button type="button" onclick="testJavaScript()" class="bg-purple-500 hover:bg-purple-600 text-white text-xs px-3 py-1 rounded">
-                                    Test JS
-                                </button>
-                                <button type="button" onclick="validateForm()" class="bg-blue-500 hover:bg-blue-600 text-white text-xs px-3 py-1 rounded ml-2">
-                                    Validate Form
-                                </button>
-                                <button type="button" onclick="fillTestData()" class="bg-green-500 hover:bg-green-600 text-white text-xs px-3 py-1 rounded ml-2">
-                                    Fill Test Data
-                                </button>
+                            <x-input-label for="evidence_images" :value="__('Additional Evidence (Optional)')" />
+                            <input type="file" id="evidence_images" name="evidence_images[]" multiple accept="image/*" class="hidden" aria-describedby="evidence-help">
+                            <div id="evidence-upload-area" class="mt-1 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg p-6 text-center hover:border-gray-400 dark:hover:border-gray-500 transition-colors cursor-pointer">
+                                <svg class="w-10 h-10 text-red-500 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                </svg>
+                                <p id="evidence-upload-text" class="text-sm text-gray-600 dark:text-gray-400 mb-1">Click to select photos or drag and drop (up to 3)</p>
+                                <p id="evidence-help" class="text-xs text-gray-500 dark:text-gray-400">Accepted: jpeg, png, jpg, gif. Max 3 images.</p>
+                            </div>
+                            @error('evidence_images')
+                                <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                            @enderror
+                            @error('evidence_images.*')
+                                <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                            @enderror
+                            <div id="evidence-selected-files" class="mt-3 hidden">
+                                <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Selected Files:</h4>
+                                <div id="evidence-file-list" class="space-y-2 grid grid-cols-3 gap-2"></div>
                             </div>
                         </div>
+
+
 
                         <!-- Submit Button -->
                         <div class="flex items-center justify-end">
@@ -135,8 +118,7 @@
 
     @push('scripts')
     <script>
-        // Debug: Check if JavaScript is loading
-        console.log('JavaScript loaded successfully!');
+		// JS loaded for incident report form
 
         // Form validation function
         function validateForm() {
@@ -146,7 +128,7 @@
             const description = document.getElementById('description').value;
             const submitButton = document.getElementById('submit-button');
             
-            const isValid = reportedUserId && incidentType && description && description.length >= 10;
+            const isValid = reportedUserId && incidentType && description && description.length >= 10 && document.getElementById('task_id').value;
             
             if (isValid) {
                 submitButton.disabled = false;
@@ -158,22 +140,12 @@
                 submitButton.classList.remove('hover:bg-red-700');
             }
             
-            // Update debug info
-            document.getElementById('debug-user-id').textContent = reportedUserId || 'Not selected';
-            document.getElementById('debug-task-id').textContent = taskId || 'Not selected';
-            
-            console.log('Form validation:', {
-                reportedUserId: reportedUserId || 'MISSING',
-                taskId: taskId || 'MISSING',
-                incidentType: incidentType || 'MISSING',
-                descriptionLength: description.length,
-                isValid: isValid
-            });
+			// Silent validation (no debug UI)
         }
         
-        // Add event listeners for form validation
-        document.getElementById('reported_user_id').addEventListener('change', validateForm);
-        document.getElementById('task_id').addEventListener('change', validateForm);
+		// Add event listeners for form validation
+		document.getElementById('reported_user_id').addEventListener('change', validateForm);
+		document.getElementById('task_id').addEventListener('change', validateForm);
         document.getElementById('incident_type').addEventListener('change', validateForm);
         document.getElementById('description').addEventListener('input', validateForm);
         
@@ -196,9 +168,9 @@
             });
             
             // Only prevent submission if critical fields are missing
-            if (!reportedUserId || !incidentType || !description || description.length < 10) {
+            if (!reportedUserId || !incidentType || !description || description.length < 10 || !taskId) {
                 e.preventDefault();
-                alert('Please fill in all required fields:\n- Select a user to report\n- Choose an incident type\n- Provide a description (minimum 10 characters)');
+                alert('Please fill in all required fields:\n- Select a user to report\n- Select the related task\n- Choose an incident type\n- Provide a description (minimum 10 characters)');
                 return false;
             }
             
@@ -208,108 +180,151 @@
             submitButton.textContent = 'Submitting...';
         });
         
-        // Test if JavaScript is working
-        function testJavaScript() {
-            try {
-                console.log('JavaScript test function called');
-                
-                // Test basic DOM access
-                const debugUserId = document.getElementById('debug-user-id');
-                const debugTaskId = document.getElementById('debug-task-id');
-                
-                console.log('DOM elements found:', {
-                    debugUserId: debugUserId ? 'YES' : 'NO',
-                    debugTaskId: debugTaskId ? 'YES' : 'NO'
-                });
-                
-                // Test form elements
-                const reportedUserIdInput = document.getElementById('reported_user_id');
-                const taskIdInput = document.getElementById('task_id');
-                const incidentTypeInput = document.getElementById('incident_type');
-                const descriptionInput = document.getElementById('description');
-                
-                console.log('Form elements found:', {
-                    reportedUserIdInput: reportedUserIdInput ? 'YES' : 'NO',
-                    taskIdInput: taskIdInput ? 'YES' : 'NO',
-                    incidentTypeInput: incidentTypeInput ? 'YES' : 'NO',
-                    descriptionInput: descriptionInput ? 'YES' : 'NO'
-                });
-                
-                // Test current values
-                console.log('Current form values:', {
-                    reportedUserId: reportedUserIdInput ? reportedUserIdInput.value : 'NOT FOUND',
-                    taskId: taskIdInput ? taskIdInput.value : 'NOT FOUND',
-                    incidentType: incidentTypeInput ? incidentTypeInput.value : 'NOT FOUND',
-                    description: descriptionInput ? descriptionInput.value : 'NOT FOUND'
-                });
-                
-                // Test dropdown options
-                if (reportedUserIdInput) {
-                    console.log('User dropdown options:', reportedUserIdInput.options.length);
-                    for (let i = 0; i < reportedUserIdInput.options.length; i++) {
-                        console.log(`Option ${i}: ${reportedUserIdInput.options[i].text} (value: ${reportedUserIdInput.options[i].value})`);
-                    }
-                }
-                
-                if (taskIdInput) {
-                    console.log('Task dropdown options:', taskIdInput.options.length);
-                    for (let i = 0; i < taskIdInput.options.length; i++) {
-                        console.log(`Option ${i}: ${taskIdInput.options[i].text} (value: ${taskIdInput.options[i].value})`);
-                    }
-                }
-                
-                alert('JavaScript test completed! Check console for detailed information.');
-                
-            } catch (error) {
-                console.error('JavaScript test error:', error);
-                alert('JavaScript error: ' + error.message);
-            }
-        }
-        
-        // Fill test data for form testing
-        function fillTestData() {
-            try {
-                console.log('Filling test data...');
-                
-                const reportedUserIdInput = document.getElementById('reported_user_id');
-                const taskIdInput = document.getElementById('task_id');
-                const incidentTypeInput = document.getElementById('incident_type');
-                const descriptionInput = document.getElementById('description');
-                
-                // Select first available user (skip the empty option)
-                if (reportedUserIdInput && reportedUserIdInput.options.length > 1) {
-                    reportedUserIdInput.selectedIndex = 1; // Select first actual user
-                    console.log('Selected user:', reportedUserIdInput.options[reportedUserIdInput.selectedIndex].text);
-                }
-                
-                // Select first available task (skip the empty option)
-                if (taskIdInput && taskIdInput.options.length > 1) {
-                    taskIdInput.selectedIndex = 1; // Select first actual task
-                    console.log('Selected task:', taskIdInput.options[taskIdInput.selectedIndex].text);
-                }
-                
-                // Select first incident type (skip the empty option)
-                if (incidentTypeInput && incidentTypeInput.options.length > 1) {
-                    incidentTypeInput.selectedIndex = 1; // Select first incident type
-                    console.log('Selected incident type:', incidentTypeInput.options[incidentTypeInput.selectedIndex].text);
-                }
-                
-                // Fill description
-                if (descriptionInput) {
-                    descriptionInput.value = 'This is a test incident report description with more than 10 characters to meet the minimum requirement.';
-                    console.log('Filled description:', descriptionInput.value);
-                }
-                
-                // Trigger validation
-                validateForm();
-                
-                alert('Test data filled! Form should now be ready for submission.');
-                
-            } catch (error) {
-                console.error('Error filling test data:', error);
-                alert('Error filling test data: ' + error.message);
-            }
-        }
+		// Simple debounce helper
+		function debounce(fn, delay) {
+			let timer;
+			return function(...args) {
+				clearTimeout(timer);
+				timer = setTimeout(() => fn.apply(this, args), delay);
+			};
+		}
+
+		function renderSuggestions(containerUl, items, formatItem, onSelect) {
+			containerUl.innerHTML = '';
+			if (!items || items.length === 0) {
+				containerUl.classList.add('hidden');
+				return;
+			}
+			items.forEach(item => {
+				const li = document.createElement('li');
+				li.className = 'px-3 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 text-sm';
+				li.textContent = formatItem(item);
+				li.addEventListener('click', () => onSelect(item));
+				containerUl.appendChild(li);
+			});
+			containerUl.classList.remove('hidden');
+		}
+
+		// Autocomplete: Users
+		(function initUserAutocomplete(){
+			const input = document.getElementById('reported_user_search');
+			const hidden = document.getElementById('reported_user_id');
+			const list = document.querySelector('#reported_user_suggestions ul');
+			const search = debounce(async (q) => {
+				if (!q || q.length < 2) { list.classList.add('hidden'); return; }
+				try {
+			// Search users
+					const res = await fetch(`{{ route('incident-reports.users.search') }}?q=${encodeURIComponent(q)}`, { headers: { 'X-Requested-With': 'XMLHttpRequest' }});
+					const data = await res.json();
+					// render results
+					renderSuggestions(list, data, (u) => `${u.firstName} ${u.lastName} (${u.email})`, (u) => {
+						input.value = `${u.firstName} ${u.lastName} (${u.email})`;
+						hidden.value = u.userId;
+						list.classList.add('hidden');
+						validateForm();
+					});
+				} catch (e) { /* swallow */ }
+			}, 200);
+			input.addEventListener('input', (e) => { hidden.value = ''; search(e.target.value); validateForm(); });
+			input.addEventListener('blur', () => setTimeout(() => list.classList.add('hidden'), 150));
+		})();
+
+		// Autocomplete: Tasks
+		(function initTaskAutocomplete(){
+			const input = document.getElementById('task_search');
+			const hidden = document.getElementById('task_id');
+			const list = document.querySelector('#task_suggestions ul');
+			const search = debounce(async (q) => {
+				if (!q || q.length < 2) { list.classList.add('hidden'); return; }
+				try {
+			// Search tasks
+					const res = await fetch(`{{ route('incident-reports.tasks.search') }}?q=${encodeURIComponent(q)}`, { headers: { 'X-Requested-With': 'XMLHttpRequest' }});
+					const data = await res.json();
+					// render results
+					renderSuggestions(list, data, (t) => `${t.title}`, (t) => {
+						input.value = t.title;
+						hidden.value = t.taskId;
+						list.classList.add('hidden');
+						validateForm();
+					});
+				} catch (e) { /* swallow */ }
+			}, 200);
+			input.addEventListener('input', (e) => { if (!e.target.value) hidden.value=''; search(e.target.value); });
+			input.addEventListener('blur', () => setTimeout(() => list.classList.add('hidden'), 150));
+		})();
+
+		// Removed debug/testing helpers
+
+		// Evidence image uploader (up to 3 images) similar to task submission
+		(function initEvidenceUploader(){
+			const input = document.getElementById('evidence_images');
+			const area = document.getElementById('evidence-upload-area');
+			const text = document.getElementById('evidence-upload-text');
+			const selectedContainer = document.getElementById('evidence-selected-files');
+			const fileList = document.getElementById('evidence-file-list');
+			const MAX_FILES = 3;
+			let filesState = [];
+
+			if (!area || !input) return;
+
+			area.addEventListener('click', () => input.click());
+			area.addEventListener('dragover', (e) => { e.preventDefault(); area.classList.add('border-blue-400','bg-blue-50','dark:bg-blue-900/20'); });
+			area.addEventListener('dragleave', (e) => { e.preventDefault(); area.classList.remove('border-blue-400','bg-blue-50','dark:bg-blue-900/20'); });
+			area.addEventListener('drop', (e) => {
+				e.preventDefault();
+				area.classList.remove('border-blue-400','bg-blue-50','dark:bg-blue-900/20');
+				mergeAndRender(Array.from(e.dataTransfer.files || []).filter(f => f.type.startsWith('image/')));
+			});
+
+			input.addEventListener('change', () => mergeAndRender(Array.from(input.files || [])));
+
+			function mergeAndRender(newFiles){
+				filesState = mergeFiles(filesState, newFiles).slice(0, MAX_FILES);
+				render();
+			}
+
+			function render(){
+				text.textContent = `${filesState.length} photo(s) selected`;
+				selectedContainer.classList.toggle('hidden', filesState.length === 0);
+				fileList.innerHTML = '';
+				filesState.forEach((file, index) => {
+					const wrapper = document.createElement('div');
+					wrapper.className = 'relative group overflow-hidden rounded border border-gray-200 dark:border-gray-700';
+					const url = URL.createObjectURL(file);
+					wrapper.innerHTML = `<img src="${url}" alt="evidence" class="w-full h-24 object-cover" />
+					<button type="button" data-index="${index}" class="absolute top-1 right-1 bg-black/60 hover:bg-black/80 text-white text-xs rounded px-2 py-1">×</button>`;
+					fileList.appendChild(wrapper);
+				});
+				fileList.querySelectorAll('button[data-index]').forEach(btn => btn.addEventListener('click', () => {
+					const idx = Number(btn.getAttribute('data-index'));
+					filesState.splice(idx,1);
+					setInputFiles(input, filesState);
+					render();
+				}));
+				setInputFiles(input, filesState);
+			}
+
+			function setInputFiles(target, files){
+				const dt = new DataTransfer();
+				files.forEach(f => dt.items.add(f));
+				target.files = dt.files;
+			}
+
+			function mergeFiles(existing, incoming){
+				const out = [...existing];
+				const sig = (f) => `${f.name}|${f.size}`;
+				const seen = new Set(out.map(sig));
+				for (const f of incoming){
+					if (!f.type.startsWith('image/')) continue;
+					const s = sig(f);
+					if (seen.has(s)) continue;
+					out.push(f);
+					seen.add(s);
+					if (out.length >= MAX_FILES) break;
+				}
+				return out;
+			}
+		})();
     </script>
     @endpush
 </x-app-layout>

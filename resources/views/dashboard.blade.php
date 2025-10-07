@@ -7,21 +7,21 @@
         </div>
     </x-slot>
 
-    <div class="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
+    <div class="min-h-screen transition-colors duration-200" style="background-color:#f1f1f1">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <!-- Toast Notifications -->
             <x-session-toast />
 
             <!-- Main Dashboard Grid -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <!-- Left Column -->
-                <div class="lg:col-span-2 space-y-8">
+                <div class="lg:col-span-1 space-y-8">
                     <!-- On Going Tasks Section -->
                     <div>
                         <h3 class="text-lg font-bold text-gray-800 dark:text-gray-200 mb-4">On Going Tasks</h3>
                         @if(isset($ongoingTasks) && $ongoingTasks->count() > 0)
                             @foreach($ongoingTasks->take(3) as $task)
-                            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mb-4 transition-all duration-200 hover:shadow-md">
+                            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mb-4 transition-all duration-200 hover:shadow-md border border-gray-200 dark:border-gray-700">
                                 <div class="flex justify-between items-start mb-3">
                                     <h4 class="font-bold text-gray-800 dark:text-gray-200 text-lg">{{ $task->title ?? 'Task Title' }}</h4>
                                     <span class="px-3 py-1 text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200 rounded-full">
@@ -56,7 +56,7 @@
                             </div>
                             @endforeach
                         @else
-                            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 text-center">
+                            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 text-center border border-gray-200 dark:border-gray-700">
                                 <svg class="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
                                 </svg>
@@ -68,7 +68,7 @@
                     <!-- Leaderboards Section -->
                     <div>
                         <h3 class="text-lg font-bold text-gray-800 dark:text-gray-200 mb-4">Leaderboards</h3>
-                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden">
+                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden border border-gray-200 dark:border-gray-700">
                             <div class="overflow-x-auto">
                                 <table class="min-w-full">
                                     <thead class="bg-gray-50 dark:bg-gray-700">
@@ -151,7 +151,7 @@
                         <div class="space-y-4 max-h-96 overflow-y-auto">
                             @if(isset($completedTasks) && $completedTasks->count() > 0)
                                 @foreach($completedTasks->take(5) as $task)
-                                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 transition-all duration-200 hover:shadow-md">
+                                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 transition-all duration-200 hover:shadow-md border border-gray-200 dark:border-gray-700">
                                     <div class="flex justify-between items-start mb-3">
                                         <h4 class="font-bold text-gray-800 dark:text-gray-200 text-lg">{{ $task->title ?? 'Task Title' }}</h4>
                                         <span class="px-3 py-1 text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 rounded-full">
@@ -182,7 +182,7 @@
                                 </div>
                                 @endforeach
                             @else
-                                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 text-center">
+                                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 text-center border border-gray-200 dark:border-gray-700">
                                     <svg class="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                     </svg>

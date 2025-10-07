@@ -77,7 +77,10 @@
                     </x-nav-link>
                     
                     <x-nav-link :href="route('incident-reports.index')" :active="request()->routeIs('incident-reports.*')">
-                        🚨 {{ __('Report User') }}
+                        <svg class="w-4 h-4 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v16m0-12l2-1a4 4 0 013.2 0l1.6.8a4 4 0 003.2 0l2-1A4 4 0 0118 6v9m-14 5h4" />
+                        </svg>
+                        {{ __('Report User') }}
                     </x-nav-link>
                     
                     @if(Auth::user()->isAdmin() && request()->is('admin*'))
@@ -213,7 +216,10 @@
             </x-responsive-nav-link>
             
             <x-responsive-nav-link :href="route('incident-reports.index')" :active="request()->routeIs('incident-reports.*')">
-                🚨 {{ __('Report User') }}
+                <svg class="w-4 h-4 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v16m0-12l2-1a4 4 0 013.2 0l1.6.8a4 4 0 003.2 0l2-1A4 4 0 0118 6v9m-14 5h4" />
+                </svg>
+                {{ __('Report User') }}
             </x-responsive-nav-link>
             
             @if(Auth::user()->isAdmin() && request()->is('admin*'))

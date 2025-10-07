@@ -18,7 +18,7 @@
         <style>
             /* Force light mode with CSS overrides */
             html, body { 
-                background-color: #f9fafb !important; 
+                background-color: #f1f1f1 !important; 
                 color: #111827 !important;
             }
             
@@ -28,7 +28,7 @@
                 color: inherit !important; 
             }
             
-            .dark\:bg-gray-900 { background-color: #f9fafb !important; }
+            .dark\:bg-gray-900 { background-color: #f1f1f1 !important; }
             .dark\:bg-gray-800 { background-color: #ffffff !important; }
             .dark\:bg-gray-700 { background-color: #f3f4f6 !important; }
             .dark\:text-gray-200 { color: #111827 !important; }
@@ -75,12 +75,12 @@
                 document.documentElement.classList.remove('dark');
             }
         </script>
-        <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
+        <div class="min-h-screen" style="background-color:#f1f1f1">
             @include('layouts.navigation')
 
             <!-- Page Heading -->
             @isset($header)
-                <header class="bg-white dark:bg-gray-800 shadow">
+                <header class="shadow" style="background-color:#f1f1f1">
                     <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
                         {{ $header }}
                     </div>
@@ -91,6 +91,7 @@
             <main>
                 {{ $slot }}
             </main>
-        </div>
+		</div>
+		@stack('scripts')
     </body>
 </html>

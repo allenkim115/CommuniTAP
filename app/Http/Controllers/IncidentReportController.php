@@ -72,7 +72,9 @@ class IncidentReportController extends Controller
             'incident_type' => 'required|string|max:50',
             'description' => 'required|string|min:10|max:1000',
             'evidence' => 'nullable|string|max:1000',
-            'task_id' => 'nullable|exists:tasks,taskId',
+            'evidence_images' => 'nullable|array',
+            'evidence_images.*' => 'image|mimes:jpeg,png,jpg,gif|max:4096',
+            'task_id' => 'required|exists:tasks,taskId',
         ]);
 
         // Prevent users from reporting themselves
@@ -92,7 +94,7 @@ class IncidentReportController extends Controller
         }
 
         try {
-            UserIncidentReport::create([
+            $created = UserIncidentReport::create([
                 'FK1_reporterId' => Auth::user()->userId,
                 'FK2_reportedUserId' => $request->reported_user_id,
                 'FK3_taskId' => $request->task_id ?: null,
@@ -102,6 +104,18 @@ class IncidentReportController extends Controller
                 'status' => 'pending',
                 'report_date' => now(),
             ]);
+
+            // Store uploaded evidence images, if any
+            if ($request->hasFile('evidence_images')) {
+                foreach ($request->file('evidence_images') as $file) {
+                    if (!$file->isValid()) { continue; }
+                    $path = $file->store('incident_evidence/'.$created->reportId, 'public');
+                    // Optionally append stored paths to evidence text
+                    $evidenceText = trim(($created->evidence ?? '')."\n".'Image: '.$path);
+                    $created->evidence = $evidenceText;
+                    $created->save();
+                }
+            }
 
             return redirect()->route('incident-reports.index')
                 ->with('success', 'Incident report submitted successfully. Our moderation team will review it shortly.');
