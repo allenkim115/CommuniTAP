@@ -88,21 +88,26 @@ public function adminDashboard()
         $userPoints = $user->points;
         $completedTasksCount = $user->completedTasks()->count();
         $claimedRewardsCount = 0;
+        
+        // Preserve filter inputs for the view
+        $startDate = $request->get('start_date');
+        $endDate = $request->get('end_date');
+        $taskType = $request->get('task_type', 'all');
 
         $query = $user->completedTasks()
             ->withPivot('status', 'assigned_at', 'submitted_at', 'completed_at', 'photos', 'completion_notes')
             ->orderBy('task_assignments.completed_at', 'desc');
 
-        if ($request->start_date) {
-            $query->where('task_assignments.completed_at', '>=', $request->start_date);
+        if ($startDate) {
+            $query->where('task_assignments.completed_at', '>=', $startDate);
         }
 
-        if ($request->end_date) {
-            $query->where('task_assignments.completed_at', '<=', $request->end_date . ' 23:59:59');
+        if ($endDate) {
+            $query->where('task_assignments.completed_at', '<=', $endDate . ' 23:59:59');
         }
 
-        if ($request->task_type && $request->task_type !== 'all') {
-            $query->where('task_type', $request->task_type);
+        if ($taskType && $taskType !== 'all') {
+            $query->where('task_type', $taskType);
         }
 
         $completedTasks = $query->get();
@@ -111,7 +116,10 @@ public function adminDashboard()
             'userPoints', 
             'completedTasksCount', 
             'claimedRewardsCount', 
-            'completedTasks'
+            'completedTasks',
+            'startDate',
+            'endDate',
+            'taskType'
         ));
     }
 

@@ -11,7 +11,10 @@ class RewardController extends Controller
 {
     public function index()
     {
-        $rewards = Reward::active()->orderBy('reward_name')->get();
+        $rewards = Reward::active()
+            ->where('QTY', '>', 0)
+            ->orderBy('reward_name')
+            ->get();
         return view('rewards.index', compact('rewards'));
     }
 

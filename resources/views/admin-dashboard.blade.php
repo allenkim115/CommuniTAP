@@ -53,10 +53,10 @@
                         <div class="absolute inset-0 bg-white/10 rounded-2xl blur-xl group-hover:blur-2xl transition"></div>
                         <div class="relative z-10">
                             <div class="text-5xl font-black text-white">{{ $totalPoints ?? 890 }}</div>
-                            <p class="text-purple-100 font-semibold mt-1 text-sm">Total Points</p>
+                            <p class="text-purple-100 font-semibold mt-1 text-sm">Total Incidents</p>
                             <a href="{{ route('admin.incident-reports.index') }}"
                                class="text-white/90 hover:text-white font-medium text-sm mt-3 inline-flex items-center gap-1 transition">
-                                View Points <i class="fas fa-arrow-right text-xs"></i>
+                                View Incidents <i class="fas fa-arrow-right text-xs"></i>
                             </a>
                         </div>
                     </div>
