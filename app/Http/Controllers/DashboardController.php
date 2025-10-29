@@ -27,15 +27,40 @@ class DashboardController extends Controller
         return $this->userDashboard();
     }
 
-    public function adminDashboard()
-    {
-        $totalUsers = User::count();
-        $activeUsers = User::where('status', 'active')->count();
-        $totalTasks = Task::count();
-        $totalPoints = User::sum('points');
+public function adminDashboard()
+{
+    // Overview Cards
+    $totalUsers = User::count();
+    $totalTasks = Task::count();
+    $totalPoints = User::sum('points'); // fixed
 
-        return view('admin-dashboard', compact('totalUsers', 'activeUsers', 'totalTasks', 'totalPoints'));
+    // Task status counts for chart
+    $tasksCompleted = Task::where('status', 'completed')->count();
+    $tasksPending = Task::where('status', 'pending')->count();
+    $tasksInProgress = Task::where('status', 'in_progress')->count();
+
+    // User growth per month (last 6 months)
+    $userGrowth = [];
+    $labels = [];
+    for ($i = 5; $i >= 0; $i--) {
+        $month = now()->subMonths($i)->format('M');
+        $count = User::whereMonth('created_at', now()->subMonths($i)->month)->count();
+        $labels[] = $month;
+        $userGrowth[] = $count;
     }
+
+    return view('admin-dashboard', compact(
+        'totalUsers',
+        'totalTasks',
+        'totalPoints',
+        'tasksCompleted',
+        'tasksPending',
+        'tasksInProgress',
+        'labels',
+        'userGrowth'
+    ));
+}
+
 
     private function userDashboard()
     {
