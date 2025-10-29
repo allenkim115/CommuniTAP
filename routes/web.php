@@ -13,6 +13,8 @@ use App\Http\Controllers\IncidentReportController;
 use App\Http\Controllers\Admin\IncidentReportController as AdminIncidentReportController;
 use App\Http\Controllers\RewardController;
 use App\Http\Controllers\RewardImageController;
+use App\Http\Controllers\Admin\PDFController;
+
 
 Route::get('/', function () {
     return view('welcome');
@@ -331,6 +333,10 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     // Admin Incident Report routes
     Route::get('/incident-reports', [AdminIncidentReportController::class, 'index'])->name('incident-reports.index');
     
+
+    // Admin Generate PDF Report
+        Route::get('/reports/generate', [PDFController::class, 'generate'])->name('reports.generate');
+
     // Debug route for testing
     Route::get('/debug-incident-reports', function() {
         try {
