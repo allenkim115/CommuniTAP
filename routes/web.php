@@ -13,16 +13,18 @@ use App\Http\Controllers\IncidentReportController;
 use App\Http\Controllers\Admin\IncidentReportController as AdminIncidentReportController;
 use App\Http\Controllers\RewardController;
 use App\Http\Controllers\RewardImageController;
+use App\Http\Controllers\DashboardController;
+
 
 Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/dashboard', [App\Http\Controllers\DashboardController::class, 'index'])
+Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth', 'verified', 'user'])
     ->name('dashboard');
 
-Route::get('/progress', [App\Http\Controllers\DashboardController::class, 'progress'])
+Route::get('/progress', [DashboardController::class, 'progress'])
     ->middleware(['auth', 'verified', 'user'])
     ->name('progress');
 
@@ -331,6 +333,11 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     // Admin Incident Report routes
     Route::get('/incident-reports', [AdminIncidentReportController::class, 'index'])->name('incident-reports.index');
     
+
+    // Admin Generate PDF Report
+    Route::get('/dashboard/pdf', [DashboardController::class, 'generateAdminPdf'])
+    ->name('dashboard.pdf');
+
     // Debug route for testing
     Route::get('/debug-incident-reports', function() {
         try {

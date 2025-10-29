@@ -39,17 +39,18 @@ class IncidentReportController extends Controller
         // Search by reporter or reported user name
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->whereHas('reporter', function ($q) use ($search) {
-                $q->where('firstName', 'like', "%{$search}%")
-                  ->orWhere('lastName', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%");
-            })->orWhereHas('reportedUser', function ($q) use ($search) {
-                $q->where('firstName', 'like', "%{$search}%")
-                  ->orWhere('lastName', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%");
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('reporter', function ($q2) use ($search) {
+                    $q2->where('firstName', 'like', "%{$search}%")
+                    ->orWhere('lastName', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
+                })->orWhereHas('reportedUser', function ($q2) use ($search) {
+                    $q2->where('firstName', 'like', "%{$search}%")
+                    ->orWhere('lastName', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
+                });
             });
         }
-
         $reports = $query->orderBy('report_date', 'desc')->paginate(15);
 
         $statuses = UserIncidentReport::getStatuses();

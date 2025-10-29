@@ -6,107 +6,135 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use App\Models\Task;
-use App\Models\Role;
+use App\Models\Reward;
+
+
+use Barryvdh\DomPDF\Facade\Pdf; 
+
+
 
 class DashboardController extends Controller
 {
     public function index()
     {
         $user = Auth::user();
-        
-        // Check if user is admin
+
+        // Redirect to correct dashboard
         if ($user->role === 'admin') {
             return $this->adminDashboard();
         }
-        
-        // Regular user dashboard
+
         return $this->userDashboard();
     }
-    
-    public function adminDashboard()
-    {
-        // Get admin statistics
-        $totalUsers = User::count();
-        $activeUsers = User::where('status', 'active')->count();
-        $totalTasks = Task::count();
-        $totalPoints = User::sum('points');
-        
-        return view('admin-dashboard', compact('totalUsers', 'activeUsers', 'totalTasks', 'totalPoints'));
+
+public function adminDashboard()
+{
+    // Overview Cards
+    $totalUsers = User::count();
+    $totalTasks = Task::count();
+    $totalPoints = User::sum('points'); // fixed
+
+    // Task status counts for chart
+    $tasksCompleted = Task::where('status', 'completed')->count();
+    $tasksPending = Task::where('status', 'pending')->count();
+    $tasksInProgress = Task::where('status', 'in_progress')->count();
+
+    // User growth per month (last 6 months)
+    $userGrowth = [];
+    $labels = [];
+    for ($i = 5; $i >= 0; $i--) {
+        $month = now()->subMonths($i)->format('M');
+        $count = User::whereMonth('created_at', now()->subMonths($i)->month)->count();
+        $labels[] = $month;
+        $userGrowth[] = $count;
     }
-    
+
+    return view('admin-dashboard', compact(
+        'totalUsers',
+        'totalTasks',
+        'totalPoints',
+        'tasksCompleted',
+        'tasksPending',
+        'tasksInProgress',
+        'labels',
+        'userGrowth'
+    ));
+}
+
+
     private function userDashboard()
     {
-        // Get user-specific data
         $user = Auth::user();
-        
-        // Get tasks assigned to user through the new assignment system
+
         $userTasks = $user->assignedTasks()->get();
-        
-        // Get ongoing tasks (assigned, submitted statuses)
         $ongoingTasks = $user->ongoingTasks()->get();
-        
-        // Get completed tasks (completed status)
         $completedTasks = $user->completedTasks()->get();
-        
-        // Count tasks by status
+
         $ongoingTasksCount = $ongoingTasks->count();
         $completedTasksCount = $completedTasks->count();
-        
-        return view('dashboard', compact('userTasks', 'ongoingTasks', 'completedTasks', 'ongoingTasksCount', 'completedTasksCount'));
+
+        return view('dashboard', compact(
+            'userTasks', 
+            'ongoingTasks', 
+            'completedTasks', 
+            'ongoingTasksCount', 
+            'completedTasksCount'
+        ));
     }
-    
-    /**
-     * Display the progress page for the authenticated user
-     */
+
     public function progress(Request $request)
     {
         $user = Auth::user();
-        
-        // Get user statistics
         $userPoints = $user->points;
         $completedTasksCount = $user->completedTasks()->count();
-        
-        // Get claimed rewards count (placeholder - would need RewardRedemption model)
-        $claimedRewardsCount = 0; // TODO: Implement when reward redemption is available
-        
-        // Get all completed tasks for history
-        $completedTasks = $user->completedTasks()
+        $claimedRewardsCount = 0;
+
+        $query = $user->completedTasks()
             ->withPivot('status', 'assigned_at', 'submitted_at', 'completed_at', 'photos', 'completion_notes')
-            ->orderBy('task_assignments.completed_at', 'desc')
-            ->get();
-        
-        // Apply filters if provided
-        $startDate = $request->get('start_date');
-        $endDate = $request->get('end_date');
-        $taskType = $request->get('task_type');
-        
-        if ($startDate || $endDate || $taskType) {
-            $query = $user->completedTasks()
-                ->withPivot('status', 'assigned_at', 'submitted_at', 'completed_at', 'photos', 'completion_notes');
-            
-            if ($startDate) {
-                $query->where('task_assignments.completed_at', '>=', $startDate);
-            }
-            
-            if ($endDate) {
-                $query->where('task_assignments.completed_at', '<=', $endDate . ' 23:59:59');
-            }
-            
-            if ($taskType && $taskType !== 'all') {
-                $query->where('task_type', $taskType);
-            }
-            
-            $completedTasks = $query->orderBy('task_assignments.completed_at', 'desc')->get();
+            ->orderBy('task_assignments.completed_at', 'desc');
+
+        if ($request->start_date) {
+            $query->where('task_assignments.completed_at', '>=', $request->start_date);
         }
-        
+
+        if ($request->end_date) {
+            $query->where('task_assignments.completed_at', '<=', $request->end_date . ' 23:59:59');
+        }
+
+        if ($request->task_type && $request->task_type !== 'all') {
+            $query->where('task_type', $request->task_type);
+        }
+
+        $completedTasks = $query->get();
+
         return view('progress', compact(
             'userPoints', 
             'completedTasksCount', 
             'claimedRewardsCount', 
-            'completedTasks',
-            'startDate',
-            'endDate', 
-            'taskType'
+            'completedTasks'
         ));
     }
+
+
+    public function generateAdminPdf()
+    {
+        $totalUsers = User::count();
+        $activeUsers = User::where('status', 'active')->count();
+        $totalTasks = Task::count();
+        $totalPoints = User::sum('points');
+        $totalRewards = Reward::count();
+
+        $users = User::all();
+        $tasks = Task::with('assignedUsers')->get();
+        $rewards = Reward::all();
+
+        $pdf = Pdf::loadView('admin/pdf/pdf-generate', compact(
+            'totalUsers', 'activeUsers', 'totalTasks', 'totalPoints', 'users', 'tasks',
+             'rewards',
+            'totalRewards'
+        ));
+
+        return $pdf->download('admin_dashboard_report.pdf');
+    }
+
 }

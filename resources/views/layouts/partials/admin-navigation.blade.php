@@ -8,7 +8,7 @@
 
                 <div class="hidden md:flex items-center space-x-6">
                     <a href="{{ route('admin.dashboard') ?? '#' }}" class="text-sm font-semibold text-gray-800 dark:text-gray-200 {{ request()->routeIs('admin.dashboard') ? 'border-b-2 border-teal-500 pb-1' : '' }}">Dashboard</a>
-                    <a href="{{ route('admin.users.index') ?? '#' }}" class="text-sm font-semibold text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">Users</a>
+                    {{-- <a href="{{ route('admin.users.index') ?? '#' }}" class="text-sm font-semibold text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">Users</a> --}}
                     
                     <!-- Tasks Dropdown -->
                     <div class="relative" x-data="{ open: false }">
@@ -40,7 +40,7 @@
                     <a href="{{ route('admin.rewards.index') ?? '#' }}" class="text-sm font-semibold text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">Rewards</a>
                     <a href="{{ route('admin.notifications.index') ?? '#' }}" class="text-sm font-semibold text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">Notifications</a>
                     <a href="{{ route('admin.feedbacks.index') ?? '#' }}" class="text-sm font-semibold text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">Feedbacks</a>
-                    <a href="{{ route('admin.incident-reports.index') }}" class="text-sm font-semibold text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white {{ request()->routeIs('admin.incident-reports.*') ? 'border-b-2 border-teal-500 pb-1' : '' }}">🚨 Incident Reports</a>
+                    {{-- <a href="{{ route('admin.incident-reports.index') }}" class="text-sm font-semibold text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white {{ request()->routeIs('admin.incident-reports.*') ? 'border-b-2 border-teal-500 pb-1' : '' }}">🚨 Incident Reports</a> --}}
                     <a href="{{ route('admin.tap-nominations.task-chain') }}" class="text-sm font-semibold text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white {{ request()->routeIs('admin.tap-nominations.task-chain') ? 'border-b-2 border-teal-500 pb-1' : '' }}">🔗 Task Chain</a>
                 </div>
             </div>
@@ -67,7 +67,7 @@
     <div x-show="open" class="md:hidden border-t border-gray-100 dark:border-gray-800">
         <div class="px-4 py-3 space-y-2">
             <a href="{{ route('admin.dashboard') ?? '#' }}" class="block text-sm font-semibold text-gray-800 dark:text-gray-200">Dashboard</a>
-            <a href="{{ route('admin.users.index') ?? '#' }}" class="block text-sm font-semibold text-gray-600 dark:text-gray-300">Users</a>
+            {{-- <a href="{{ route('admin.users.index') ?? '#' }}" class="block text-sm font-semibold text-gray-600 dark:text-gray-300">Users</a> --}}
             
             <!-- Tasks Section -->
             <div class="space-y-1">
