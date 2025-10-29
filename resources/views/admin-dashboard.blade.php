@@ -2,93 +2,96 @@
     <div class="py-10">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-10">
 
-            <!-- 🔹 Dashboard Overview -->
-            <div>
-                <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6">Admin Dashboard Overview</h2>
+            <!-- 🔹 Dashboard Section -->
+            <section class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow space-y-8">
 
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <!-- Header: Title + PDF Button -->
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                        Admin Dashboard Overview
+                    </h2>
+                    <a href="{{ route('admin.dashboard.pdf') }}"
+                       class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold flex items-center gap-2">
+                        <i class="fas fa-file-pdf"></i>
+                        Download PDF
+                    </a>
+                </div>
 
-                    <!-- 🟦 Total Users -->
-                    <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow hover:shadow-lg transition">
+                <!-- Overview Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Total Users -->
+                    <div class="bg-white dark:bg-gray-700 p-6 rounded-2xl shadow hover:shadow-lg transition">
                         <div class="text-4xl font-extrabold text-blue-500">{{ $totalUsers ?? 128 }}</div>
-                        <p class="text-gray-600 dark:text-gray-400 font-semibold mt-1">Total Users</p>
-
+                        <p class="text-gray-600 dark:text-gray-300 font-semibold mt-1">Total Users</p>
                         <a href="{{ route('admin.users.index') }}"
-                            class="text-blue-600 dark:text-blue-400 hover:underline font-medium mt-3 inline-block">
+                           class="text-blue-600 dark:text-blue-400 hover:underline font-medium mt-3 inline-block">
                             Manage Users →
                         </a>
                     </div>
 
-                    <!-- 🟩 Active Users -->
-                    <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow hover:shadow-lg transition">
-                        <div class="text-4xl font-extrabold text-green-500">{{ $activeUsers ?? 95 }}</div>
-                        <p class="text-gray-600 dark:text-gray-400 font-semibold mt-1">Active Users</p>
-
-                        <a href="#"
-                            class="text-green-600 dark:text-green-400 hover:underline font-medium mt-3 inline-block">
-                            View Active Users →
-                        </a>
-                    </div>
-
-                    <!-- 🟧 Total Tasks -->
-                    <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow hover:shadow-lg transition">
+                    <!-- Total Tasks -->
+                    <div class="bg-white dark:bg-gray-700 p-6 rounded-2xl shadow hover:shadow-lg transition">
                         <div class="text-4xl font-extrabold text-orange-500">{{ $totalTasks ?? 340 }}</div>
-                        <p class="text-gray-600 dark:text-gray-400 font-semibold mt-1">Total Tasks</p>
-
+                        <p class="text-gray-600 dark:text-gray-300 font-semibold mt-1">Total Tasks</p>
                         <a href="{{ route('admin.tasks.index') }}"
-                            class="text-orange-600 dark:text-orange-400 hover:underline font-medium mt-3 inline-block">
+                           class="text-orange-600 dark:text-orange-400 hover:underline font-medium mt-3 inline-block">
                             View Tasks →
                         </a>
                     </div>
 
-                    <!-- 🟪 Total Points -->
-                    <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow hover:shadow-lg transition">
+                    <!-- Total Incidents -->
+                    <div class="bg-white dark:bg-gray-700 p-6 rounded-2xl shadow hover:shadow-lg transition">
                         <div class="text-4xl font-extrabold text-purple-500">{{ $totalPoints ?? 890 }}</div>
-                        <p class="text-gray-600 dark:text-gray-400 font-semibold mt-1">Total Incidents</p>
-
+                        <p class="text-gray-600 dark:text-gray-300 font-semibold mt-1">Total Incidents</p>
                         <a href="{{ route('admin.incident-reports.index') }}"
-                            class="text-purple-600 dark:text-purple-400 hover:underline font-medium mt-3 inline-block">
+                           class="text-purple-600 dark:text-purple-400 hover:underline font-medium mt-3 inline-block">
                             View Points →
                         </a>
                     </div>
-
-                </div>
-            </div>
-
-            <!-- 🔹 Charts Section -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <!-- Line Chart -->
-                <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow">
-                    <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100 mb-3">User Growth (Static)</h3>
-                    <canvas id="userGrowthChart"></canvas>
                 </div>
 
-                <!-- Pie Chart -->
-                <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow">
-                    <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100 mb-3">Task Distribution (Static)</h3>
-                    <canvas id="taskDistributionChart"></canvas>
-                </div>
-            </div>
+                <!-- Charts -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- User Growth Line Chart -->
+                    <div class="bg-white dark:bg-gray-700 p-6 rounded-2xl shadow">
+                        <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100 mb-3">
+                            User Growth (Static)
+                        </h3>
+                        <canvas id="userGrowthChart"></canvas>
+                    </div>
 
-            <!-- 🔹 Leaderboard -->
-            <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow">
+                    <!-- Task Distribution Pie Chart -->
+                    <div class="bg-white dark:bg-gray-700 p-6 rounded-2xl shadow">
+                        <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100 mb-3">
+                            Task Distribution (Static)
+                        </h3>
+                        <canvas id="taskDistributionChart"></canvas>
+                    </div>
+                </div>
+
+            </section>
+
+            <!-- 🔹 Leaderboard Section -->
+            <section class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow">
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="text-xl font-bold text-gray-900 dark:text-gray-100">🏆 Leaderboard</h3>
-                    <button class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg text-sm">View
-                        All</button>
+                    <button class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg text-sm">
+                        View All
+                    </button>
                 </div>
+
                 <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                     <thead class="bg-gray-50 dark:bg-gray-700">
                         <tr>
-                            <th
-                                class="px-6 py-3 text-left text-xs font-bold text-gray-800 dark:text-gray-200 uppercase tracking-wider">
-                                Rank</th>
-                            <th
-                                class="px-6 py-3 text-left text-xs font-bold text-gray-800 dark:text-gray-200 uppercase tracking-wider">
-                                Name</th>
-                            <th
-                                class="px-6 py-3 text-left text-xs font-bold text-gray-800 dark:text-gray-200 uppercase tracking-wider">
-                                Points</th>
+                            <th class="px-6 py-3 text-left text-xs font-bold text-gray-800 dark:text-gray-200 uppercase tracking-wider">
+                                Rank
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-bold text-gray-800 dark:text-gray-200 uppercase tracking-wider">
+                                Name
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-bold text-gray-800 dark:text-gray-200 uppercase tracking-wider">
+                                Points
+                            </th>
                         </tr>
                     </thead>
                     <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
@@ -109,12 +112,12 @@
                         </tr>
                     </tbody>
                 </table>
-            </div>
+            </section>
 
         </div>
     </div>
 
-    <!-- 🔹 Chart.js CDN + Static Data Script -->
+    <!-- 🔹 Chart.js CDN + Static Data -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         // Line Chart (User Growth)
@@ -135,9 +138,7 @@
             options: {
                 responsive: true,
                 plugins: {
-                    legend: {
-                        display: false
-                    }
+                    legend: { display: false }
                 }
             }
         });
@@ -158,9 +159,7 @@
                 plugins: {
                     legend: {
                         position: 'bottom',
-                        labels: {
-                            color: '#9ca3af'
-                        }
+                        labels: { color: '#9ca3af' }
                     }
                 }
             }

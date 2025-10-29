@@ -6,6 +6,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use App\Models\Task;
+use Barryvdh\DomPDF\Facade\Pdf; 
+
+
 
 class DashboardController extends Controller
 {
@@ -83,4 +86,23 @@ class DashboardController extends Controller
             'completedTasks'
         ));
     }
+
+
+    public function generateAdminPdf()
+    {
+        $totalUsers = User::count();
+        $activeUsers = User::where('status', 'active')->count();
+        $totalTasks = Task::count();
+        $totalPoints = User::sum('points');
+
+        $users = User::all();
+        $tasks = Task::with('assignedUsers')->get();
+
+        $pdf = Pdf::loadView('admin/pdf/pdf-generate', compact(
+            'totalUsers', 'activeUsers', 'totalTasks', 'totalPoints', 'users', 'tasks'
+        ));
+
+        return $pdf->download('admin_dashboard_report.pdf');
+    }
+
 }
