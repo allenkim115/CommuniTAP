@@ -18,7 +18,7 @@
 
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         @forelse($rewards as $reward)
-                            <div class="border dark:border-gray-700 rounded p-4">
+                            <div class="border dark:border-gray-700 rounded p-4 @if($reward->QTY === 0) border-red-700 @endif">
                                 @if($reward->image_path)
                                     <img src="{{ route('rewards.image', $reward) }}" alt="{{ $reward->reward_name }}" class="w-full h-40 object-cover rounded mb-3" />
                                 @endif
@@ -26,7 +26,13 @@
                                 <div class="text-sm text-gray-600 dark:text-gray-300">Sponsor: {{ $reward->sponsor_name }}</div>
                                 <p class="mt-2 text-sm">{{ $reward->description }}</p>
                                 <div class="mt-3 text-sm">Points: <span class="font-medium">{{ $reward->points_cost }}</span></div>
-                                <div class="text-sm">Qty left: <span class="font-medium">{{ $reward->QTY }}</span></div>
+                                <div class="text-sm flex items-center gap-2">
+                                    <span>Qty left:</span>
+                                    <span class="font-medium">{{ $reward->QTY }}</span>
+                                    @if($reward->QTY === 0)
+                                        <span class="px-2 py-0.5 text-xs rounded bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300">Out of stock</span>
+                                    @endif
+                                </div>
                                 <div class="mt-4 flex gap-2">
                                     <a href="{{ route('admin.rewards.edit', $reward) }}" class="px-3 py-2 bg-gray-700 text-white rounded">Edit</a>
                                     <form action="{{ route('admin.rewards.destroy', $reward) }}" method="POST" onsubmit="return confirm('Delete this reward?')">
