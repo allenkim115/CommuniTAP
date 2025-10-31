@@ -131,9 +131,20 @@
                                 <label for="location" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                     Location <span class="text-red-500">*</span>
                                 </label>
-                                <input type="text" name="location" id="location" value="{{ old('location') }}" 
-                                       class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white" 
-                                       placeholder="Enter task location (e.g., Community Center, Park, etc.)" maxlength="255" required>
+                                <select name="location" id="location"
+                                        class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                                        required>
+                                    <option value="" disabled selected hidden>Select a sitio</option>
+                                    <option value="Pig Vendor" {{ old('location') == 'Pig Vendor' ? 'selected' : '' }}>Pig Vendor</option>
+                                    <option value="Ermita Proper" {{ old('location') == 'Ermita Proper' ? 'selected' : '' }}>Ermita Proper</option>
+                                    <option value="Kastilaan" {{ old('location') == 'Kastilaan' ? 'selected' : '' }}>Kastilaan</option>
+                                    <option value="Sitio Bato" {{ old('location') == 'Sitio Bato' ? 'selected' : '' }}>Sitio Bato</option>
+                                    <option value="YHC" {{ old('location') == 'YHC' ? 'selected' : '' }}>YHC</option>
+                                    <option value="Eyeseekers" {{ old('location') == 'Eyeseekers' ? 'selected' : '' }}>Eyeseekers</option>
+                                    <option value="Panagdait" {{ old('location') == 'Panagdait' ? 'selected' : '' }}>Panagdait</option>
+                                    <option value="Kawit" {{ old('location') == 'Kawit' ? 'selected' : '' }}>Kawit</option>
+                                </select>
+                                <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Select the sitio for this task.</p>
                                 @error('location')
                                     <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                                 @enderror

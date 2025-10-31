@@ -33,13 +33,24 @@ class TaskController extends Controller
             return redirect()->back()->with('error', 'Submit proof using the submit action.');
         }
 
-        // Prevent backtracking progress
+        // Enforce STRICT forward-only, one-step-at-a-time progress
         $order = ['accepted','on_the_way','working','done'];
         $currentProgress = $assignment->progress ?? 'accepted';
         $currentIndex = array_search($currentProgress, $order);
         $requestedIndex = array_search($request->progress, $order);
-        if ($currentIndex !== false && $requestedIndex !== false && $requestedIndex < $currentIndex) {
+
+        if ($currentIndex === false || $requestedIndex === false) {
+            return redirect()->back()->with('error', 'Invalid progress transition.');
+        }
+
+        // No backtracking
+        if ($requestedIndex < $currentIndex) {
             return redirect()->back()->with('error', 'You cannot move progress backward.');
+        }
+
+        // No skipping steps; must move exactly to the next step
+        if ($requestedIndex !== $currentIndex + 1) {
+            return redirect()->back()->with('error', 'Please follow the sequence step-by-step.');
         }
 
         $assignment->update([
@@ -385,6 +396,22 @@ class TaskController extends Controller
             return redirect()->back()->with('error', 'Cannot edit approved, published, completed, or inactive tasks.');
         }
 
+        // Normalize 12-hour time inputs (e.g., "10:30 am") to 24-hour H:i before validation
+        foreach (['start_time', 'end_time'] as $timeField) {
+            $value = $request->input($timeField);
+            if (is_string($value) && trim($value) !== '') {
+                $trimmed = trim($value);
+                if (preg_match('/\b(am|pm)\b/i', $trimmed)) {
+                    try {
+                        $normalized = \Carbon\Carbon::createFromFormat('g:i a', strtolower($trimmed))->format('H:i');
+                        $request->merge([$timeField => $normalized]);
+                    } catch (\Exception $e) {
+                        // Fall through to validator which will surface a helpful message
+                    }
+                }
+            }
+        }
+
         $request->validate([
             'title' => 'required|string|max:100',
             'description' => 'required|string',
@@ -415,7 +442,7 @@ class TaskController extends Controller
             'status' => 'pending', // Reset to pending after edit
         ]);
 
-        return redirect()->route('tasks.index')->with('status', 'Task updated successfully and resubmitted for approval.');
+        return redirect()->route('tasks.my-uploads')->with('status', 'Task updated successfully and resubmitted for approval.');
     }
 
     /**
@@ -436,6 +463,24 @@ class TaskController extends Controller
         $task->update(['status' => 'inactive']);
 
         return redirect()->route('tasks.index')->with('status', 'Task deactivated successfully.');
+    }
+
+    /**
+     * Reactivate a deactivated user-uploaded task (creator only)
+     */
+    public function reactivate(Task $task)
+    {
+        // Only the creator can reactivate their user-uploaded task
+        if ($task->FK1_userId !== Auth::id() || $task->task_type !== 'user_uploaded') {
+            abort(403, 'You can only reactivate your own user-uploaded tasks.');
+        }
+        if ($task->status !== 'inactive') {
+            return redirect()->back()->with('error', 'Only deactivated tasks can be reactivated.');
+        }
+
+        // Send back to pending for admin review
+        $task->update(['status' => 'pending']);
+        return redirect()->route('tasks.my-uploads')->with('status', 'Task reactivated and sent for approval.');
     }
 
     /**

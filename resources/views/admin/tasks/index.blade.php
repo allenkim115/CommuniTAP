@@ -249,7 +249,7 @@
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                     <div class="flex space-x-2">
                                         <a href="{{ route('admin.tasks.show', $task) }}" class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300">View</a>
-                                        @if($task->task_type !== 'user_uploaded' && $task->status !== 'completed')
+                                        @if($task->task_type !== 'user_uploaded' && $task->status !== 'completed' && $task->status !== 'published')
                                             <a href="{{ route('admin.tasks.edit', $task) }}" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300">Edit</a>
                                         @endif
                                         
@@ -275,12 +275,17 @@
                                             </form>
                                         @endif
                                         
-                                        @if($task->status !== 'completed')
+                                        @if($task->status !== 'completed' && $task->status !== 'inactive')
                                             <form action="{{ route('admin.tasks.destroy', $task) }}" method="POST" class="inline">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300" 
                                                         onclick="return confirm('Are you sure you want to deactivate this task?')">Deactivate</button>
+                                            </form>
+                                        @elseif($task->status === 'inactive')
+                                            <form action="{{ route('admin.tasks.reactivate', $task) }}" method="POST" class="inline">
+                                                @csrf
+                                                <button type="submit" class="text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300">Reactivate</button>
                                             </form>
                                         @endif
                                     </div>

@@ -6,6 +6,7 @@ use App\Models\Reward;
 use App\Models\RewardRedemption;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class RewardController extends Controller
 {
@@ -30,11 +31,16 @@ class RewardController extends Controller
             return back()->with('error', 'Not enough points to redeem.');
         }
 
+        // Generate a coupon code and auto-approve the redemption
+        $couponCode = strtoupper(Str::random(10));
+
         $redemption = RewardRedemption::create([
             'FK1_rewardId' => $reward->rewardId,
             'FK2_userId' => $user->userId,
             'redemption_date' => now(),
-            'status' => 'pending',
+            'status' => 'approved',
+            'approval_date' => now(),
+            'admin_notes' => 'Coupon: ' . $couponCode,
         ]);
 
         // Reserve quantity immediately to avoid oversubscription
@@ -44,13 +50,14 @@ class RewardController extends Controller
         $user->points = max(0, $user->points - $reward->points_cost);
         $user->save();
 
-        return redirect()->route('rewards.mine')->with('status', 'Redemption requested. Awaiting admin approval.');
+        return redirect()->route('rewards.mine')->with('status', 'Redemption successful. Your coupon: ' . $couponCode);
     }
 
     public function myRedemptions()
     {
         $redemptions = RewardRedemption::with('reward')
             ->where('FK2_userId', Auth::user()->userId)
+            ->where('status', 'approved')
             ->latest()
             ->get();
 

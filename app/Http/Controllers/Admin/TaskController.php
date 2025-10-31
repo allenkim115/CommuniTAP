@@ -113,6 +113,10 @@ class TaskController extends Controller
         if ($task->task_type === 'user_uploaded') {
             return redirect()->route('admin.tasks.show', $task)->with('error', 'Admins cannot edit user-uploaded tasks. Use Approve/Reject/Publish actions instead.');
         }
+        // Do not allow editing published tasks
+        if ($task->status === 'published') {
+            return redirect()->route('admin.tasks.show', $task)->with('error', 'Published tasks cannot be edited.');
+        }
         // Do not allow editing completed tasks
         if ($task->status === 'completed') {
             return redirect()->route('admin.tasks.show', $task)->with('error', 'Completed tasks cannot be edited.');
@@ -128,6 +132,10 @@ class TaskController extends Controller
         // Admin cannot update user-uploaded tasks
         if ($task->task_type === 'user_uploaded') {
             return redirect()->route('admin.tasks.show', $task)->with('error', 'Admins cannot edit user-uploaded tasks.');
+        }
+        // Do not allow updating published tasks
+        if ($task->status === 'published') {
+            return redirect()->route('admin.tasks.show', $task)->with('error', 'Published tasks cannot be updated.');
         }
         $request->validate([
             'title' => 'required|string|max:100',
@@ -191,6 +199,19 @@ class TaskController extends Controller
 
         $task->update(['status' => 'inactive']);
         return redirect()->route('admin.tasks.index')->with('status', 'Task deactivated successfully.');
+    }
+
+    /**
+     * Reactivate a deactivated task (admin)
+     */
+    public function reactivate(Task $task)
+    {
+        if ($task->status !== 'inactive') {
+            return redirect()->back()->with('error', 'Only deactivated tasks can be reactivated.');
+        }
+        // For admin-managed tasks, bring back to approved state; publishing is a separate step
+        $task->update(['status' => 'approved']);
+        return redirect()->back()->with('status', 'Task reactivated to approved status.');
     }
 
     /**

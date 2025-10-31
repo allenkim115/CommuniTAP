@@ -5,7 +5,7 @@
                 {{ __('Task Details') }}
             </h2>
             <div class="flex space-x-2">
-                @if($task->task_type !== 'user_uploaded' && $task->status !== 'completed')
+                @if($task->task_type !== 'user_uploaded' && $task->status !== 'completed' && $task->status !== 'published')
                     <a href="{{ route('admin.tasks.edit', $task) }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                         Edit Task
                     </a>
@@ -198,7 +198,7 @@
                                             </form>
                                         @endif
                                         
-                                        @if($task->status !== 'completed')
+                                        @if($task->status !== 'completed' && $task->status !== 'inactive')
                                             <form action="{{ route('admin.tasks.destroy', $task) }}" method="POST" class="w-full">
                                                 @csrf
                                                 @method('DELETE')
@@ -206,6 +206,14 @@
                                                         class="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
                                                         onclick="return confirm('Are you sure you want to deactivate this task?')">
                                                     Deactivate Task
+                                                </button>
+                                            </form>
+                                        @elseif($task->status === 'inactive')
+                                            <form action="{{ route('admin.tasks.reactivate', $task) }}" method="POST" class="w-full">
+                                                @csrf
+                                                <button type="submit" 
+                                                        class="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                                                    Reactivate Task
                                                 </button>
                                             </form>
                                         @endif

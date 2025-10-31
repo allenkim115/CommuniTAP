@@ -67,8 +67,24 @@
                     @if($incidentReport->evidence)
                         <div class="mb-6">
                             <h4 class="text-sm font-medium text-gray-900 dark:text-gray-100 mb-2">Additional Evidence</h4>
-                            <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-                                <p class="text-sm text-gray-900 dark:text-gray-100 whitespace-pre-wrap">{{ $incidentReport->evidence }}</p>
+                            <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg space-y-3">
+                                @php
+                                    $evidenceLines = preg_split("/\r?\n/", (string) $incidentReport->evidence);
+                                @endphp
+                                @foreach($evidenceLines as $line)
+                                    @php $trimmed = trim($line); @endphp
+                                    @if($trimmed !== '')
+                                        @if(strpos($trimmed, 'Image: ') === 0)
+                                            @php $path = trim(substr($trimmed, 7)); @endphp
+                                            <div>
+                                                <img src="{{ asset('storage/' . $path) }}" alt="Incident evidence image" class="max-h-80 rounded border border-gray-200 dark:border-gray-600">
+                                                <div class="mt-1 text-xs text-gray-500 break-all">{{ $path }}</div>
+                                            </div>
+                                        @else
+                                            <p class="text-sm text-gray-900 dark:text-gray-100 whitespace-pre-wrap">{{ $trimmed }}</p>
+                                        @endif
+                                    @endif
+                                @endforeach
                             </div>
                         </div>
                     @endif

@@ -18,45 +18,22 @@ class UserController extends Controller
 
     public function create(): View
     {
-        return view('admin.users.create');
+        return redirect()->route('admin.users.index')->with('error', 'Admins cannot create new users.');
     }
 
     public function store(Request $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'firstName' => ['required','string','max:100'],
-            'middleName' => ['nullable','string','max:100'],
-            'lastName' => ['required','string','max:100'],
-            'email' => ['required','email','max:100','unique:users,email'],
-            'password' => ['required','string','min:8'],
-            'role' => ['required','in:user,admin'],
-        ]);
-
-        $validated['date_registered'] = now()->toDateString();
-        $validated['status'] = 'active';
-
-        User::create($validated);
-
-        return redirect()->route('admin.users.index')->with('status', 'User created successfully.');
+        return redirect()->route('admin.users.index')->with('error', 'Admins cannot create new users.');
     }
 
-    public function edit(User $user): View
+    public function edit(User $user)
     {
-        return view('admin.users.edit', compact('user'));
+        return redirect()->route('admin.users.show', $user)->with('error', 'Admins cannot edit user profiles. Viewing only.');
     }
 
     public function update(Request $request, User $user): RedirectResponse
     {
-        $validated = $request->validate([
-            'firstName' => ['required','string','max:100'],
-            'middleName' => ['nullable','string','max:100'],
-            'lastName' => ['required','string','max:100'],
-            'email' => ['required','email','max:100','unique:users,email,'.$user->userId.',userId'],
-            'role' => ['required','in:user,admin'],
-        ]);
-
-        $user->update($validated);
-        return redirect()->route('admin.users.index')->with('status', 'User updated successfully.');
+        return redirect()->route('admin.users.show', $user)->with('error', 'Admins cannot edit user profiles.');
     }
 
     public function show(User $user): View

@@ -6,9 +6,6 @@
                 <div class="p-6">
                     <div class="flex justify-between items-center mb-6">
                         <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">All Users</h3>
-                        <a href="{{ route('admin.users.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium">
-                            Add New User
-                        </a>
                     </div>
                     
                     <div class="overflow-x-auto">
@@ -44,7 +41,6 @@
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{{ $user->points }}</td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-3">
                                             <a href="{{ route('admin.users.show', $user) }}" class="text-blue-600 hover:text-blue-800">View</a>
-                                            <a href="{{ route('admin.users.edit', $user) }}" class="text-indigo-600 hover:text-indigo-800">Edit</a>
                                             @if($user->status === 'active')
                                                 <form method="POST" action="{{ route('admin.users.suspend', $user) }}" class="inline">
                                                     @csrf

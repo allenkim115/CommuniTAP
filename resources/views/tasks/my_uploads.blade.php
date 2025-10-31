@@ -99,11 +99,29 @@
                         </div>
 
                         <!-- Action Link -->
-                        <div class="text-right">
+                        <div class="flex items-center justify-between mt-3">
                             <a href="#" onclick="openUploadTaskModal({{ $task->taskId }}); return false;" class="inline-flex items-center gap-1 text-orange-600 text-sm font-medium">
                                 <span>See more details</span>
                                 <span class="transition transform">→</span>
                             </a>
+                            <div class="flex items-center gap-3">
+                                @if($task->status === 'inactive')
+                                    <form action="{{ route('tasks.reactivate', $task) }}" method="POST" class="inline">
+                                        @csrf
+                                        <button type="submit" class="text-green-600 hover:text-green-800 text-sm font-medium">Reactivate</button>
+                                    </form>
+                                @else
+                                    @php $canEdit = !in_array($task->status, ['approved','published','completed','inactive']); @endphp
+                                    @if($canEdit)
+                                        <a href="{{ route('tasks.edit', $task) }}" class="text-indigo-600 hover:text-indigo-800 text-sm font-medium">Edit</a>
+                                        <form action="{{ route('tasks.destroy', $task) }}" method="POST" class="inline" onsubmit="return confirm('Deactivate this task proposal?');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="text-red-600 hover:text-red-800 text-sm font-medium">Deactivate</button>
+                                        </form>
+                                    @endif
+                                @endif
+                            </div>
                         </div>
                     </div>
                     @endforeach

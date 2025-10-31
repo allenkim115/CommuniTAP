@@ -21,16 +21,16 @@ Route::get('/', function () {
 });
 
 Route::get('/dashboard', [DashboardController::class, 'index'])
-    ->middleware(['auth', 'verified', 'user'])
+    ->middleware(['auth', 'verified', 'user', 'active'])
     ->name('dashboard');
 
 Route::get('/progress', [DashboardController::class, 'progress'])
-    ->middleware(['auth', 'verified', 'user'])
+    ->middleware(['auth', 'verified', 'user', 'active'])
     ->name('progress');
 
 // Shared route to stream reward images (accessible to any authenticated user)
 Route::get('/reward-images/{reward}', [RewardImageController::class, 'show'])
-    ->middleware(['auth'])
+    ->middleware(['auth', 'active'])
     ->name('rewards.image');
 
 // Public test route for debugging (no auth required)
@@ -44,7 +44,7 @@ Route::get('/test-search-public', function() {
     ]);
 })->name('test.search.public');
 
-Route::middleware(['auth', 'user'])->group(function () {
+Route::middleware(['auth', 'user', 'active'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
@@ -60,6 +60,7 @@ Route::middleware(['auth', 'user'])->group(function () {
     Route::post('/tasks/{task}/join', [TaskController::class, 'join'])->name('tasks.join');
     Route::post('/tasks/{task}/submit', [TaskController::class, 'submit'])->name('tasks.submit');
     Route::patch('/tasks/{task}/progress', [TaskController::class, 'updateProgress'])->name('tasks.progress');
+    Route::post('/tasks/{task}/reactivate', [TaskController::class, 'reactivate'])->name('tasks.reactivate');
     Route::resource('tasks', TaskController::class);
     
     // Feedback routes for regular users
@@ -274,7 +275,7 @@ Route::middleware(['auth', 'user'])->group(function () {
 });
 
 // Admin routes
-Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth', 'admin', 'active'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', [App\Http\Controllers\DashboardController::class, 'adminDashboard'])->name('dashboard');
     Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
     Route::get('/users/create', [AdminUserController::class, 'create'])->name('users.create');
@@ -292,6 +293,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('/tasks/{task}/reject', [AdminTaskController::class, 'reject'])->name('tasks.reject');
     Route::post('/tasks/{task}/publish', [AdminTaskController::class, 'publish'])->name('tasks.publish');
     Route::post('/tasks/{task}/complete', [AdminTaskController::class, 'complete'])->name('tasks.complete');
+    Route::post('/tasks/{task}/reactivate', [AdminTaskController::class, 'reactivate'])->name('tasks.reactivate');
     
     // Task submission verification routes
     Route::get('/task-submissions', [TaskSubmissionController::class, 'index'])->name('task-submissions.index');

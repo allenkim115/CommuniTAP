@@ -190,7 +190,8 @@
                                                 $curr = $userAssignment->progress ?? 'accepted';
                                                 $currIdx = array_search($curr, $order);
                                                 $btnIdx = array_search($p, $order);
-                                                $disabled = $btnIdx !== false && $currIdx !== false && $btnIdx < $currIdx;
+                                                // Only allow the immediate next step; disable current, previous, or skipping ahead
+                                                $disabled = $btnIdx === false || $currIdx === false || $btnIdx !== $currIdx + 1;
                                             @endphp
                                             <button type="submit" {{ $disabled ? 'disabled' : '' }} class="px-3 py-1 rounded border text-sm {{ ($userAssignment->progress ?? 'accepted') === $p ? 'bg-orange-500 text-white border-orange-600' : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-600' }} {{ $disabled ? 'opacity-50 cursor-not-allowed' : '' }}">
                                                 {{ ucfirst(str_replace('_',' ', $p)) }}
