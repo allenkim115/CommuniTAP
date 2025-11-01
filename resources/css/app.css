@@ -1,3 +1,8 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Global borders for box-like containers */
+.rounded-2xl.shadow-sm { @apply border border-gray-200 dark:border-gray-700; }
+.rounded-xl.shadow-sm { @apply border border-gray-200 dark:border-gray-700; }
+.rounded-lg.shadow-sm { @apply border border-gray-200 dark:border-gray-700; }
