@@ -14,6 +14,7 @@ use App\Http\Controllers\Admin\IncidentReportController as AdminIncidentReportCo
 use App\Http\Controllers\RewardController;
 use App\Http\Controllers\RewardImageController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\NotificationController;
 
 
 Route::get('/', function () {
@@ -274,6 +275,12 @@ Route::middleware(['auth', 'user', 'active'])->group(function () {
     
 });
 
+Route::middleware(['auth', 'active'])->group(function () {
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllRead'])->name('notifications.mark-all-read');
+    Route::post('/notifications/{notification}/mark-read', [NotificationController::class, 'markAsRead'])->name('notifications.mark-read');
+});
+
 // Admin routes
 Route::middleware(['auth', 'admin', 'active'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', [App\Http\Controllers\DashboardController::class, 'adminDashboard'])->name('dashboard');
@@ -323,9 +330,7 @@ Route::middleware(['auth', 'admin', 'active'])->prefix('admin')->name('admin.')-
     Route::post('/redemptions/{redemption}/approve', [App\Http\Controllers\Admin\RewardRedemptionController::class, 'approve'])->name('redemptions.approve');
     Route::post('/redemptions/{redemption}/reject', [App\Http\Controllers\Admin\RewardRedemptionController::class, 'reject'])->name('redemptions.reject');
 
-    Route::get('/notifications', function () {
-        return view('admin.notifications.index');
-    })->name('notifications.index');
+    Route::get('/notifications', fn () => redirect()->route('notifications.index'))->name('notifications.index');
 
     Route::get('/feedbacks', [AdminFeedbackController::class, 'index'])->name('feedbacks.index');
     

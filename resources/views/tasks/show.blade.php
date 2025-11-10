@@ -14,32 +14,230 @@
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <!-- Toast Notifications -->
             <x-session-toast />
-            <!-- Task Header with Tabs -->
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden">
-                <!-- Task Title and Admin Label -->
-                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">{{ $task->title }}</h1>
-                            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                                @php $uploader = $task->assignedUser; @endphp
-                                <strong>Uploaded by:</strong> {{ $uploader?->name ?? 'Admin' }}
-                            </p>
+            
+            @php 
+                $showAdminLayout = $isCreator && $task->task_type === 'user_uploaded';
+            @endphp
+            
+            @if($showAdminLayout)
+                <!-- Admin-style layout for creators of user-uploaded tasks -->
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden">
+                    <!-- Task Header -->
+                    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                        <div class="flex justify-between items-start">
+                            <div class="flex-1">
+                                <h1 class="text-2xl font-bold text-gray-900 dark:text-white">{{ $task->title }}</h1>
+                                <div class="mt-2 flex items-center space-x-4">
+                                    <span class="px-3 py-1 text-sm font-medium rounded-full
+                                        @if($task->status === 'pending') bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200
+                                        @elseif($task->status === 'approved') bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200
+                                        @elseif($task->status === 'published') bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200
+                                        @elseif($task->status === 'assigned') bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200
+                                        @elseif($task->status === 'submitted') bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200
+                                        @elseif($task->status === 'completed') bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200
+                                        @elseif($task->status === 'rejected') bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200
+                                        @else bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200
+                                        @endif">
+                                        {{ ucfirst($task->status) }}
+                                    </span>
+                                    <span class="px-3 py-1 text-sm font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200 rounded-full">
+                                        {{ ucfirst(str_replace('_', ' ', $task->task_type)) }}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-2xl font-bold text-blue-600 dark:text-blue-400">{{ $task->points_awarded }}</div>
+                                <div class="text-sm text-gray-500 dark:text-gray-400">Points</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Task Content -->
+                    <div class="px-6 py-6">
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                            <!-- Main Content -->
+                            <div class="lg:col-span-2">
+                                <div class="mb-6">
+                                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">Description</h3>
+                                    <div class="prose dark:prose-invert max-w-none">
+                                        <p class="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{{ $task->description }}</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Sidebar -->
+                            <div class="lg:col-span-1">
+                                <div class="space-y-6">
+                                    <!-- Task Information -->
+                                    <div>
+                                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">Task Information</h3>
+                                        <dl class="space-y-3">
+                                            <div>
+                                                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Created</dt>
+                                                <dd class="text-sm text-gray-900 dark:text-white">
+                                                    @if($task->creation_date)
+                                                        {{ is_string($task->creation_date) ? \Carbon\Carbon::parse($task->creation_date)->format('F j, Y \a\t g:i A') : $task->creation_date->format('F j, Y \a\t g:i A') }}
+                                                    @else
+                                                        Not available
+                                                    @endif
+                                                </dd>
+                                            </div>
+                                            
+                                            @if($task->approval_date)
+                                            <div>
+                                                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Approved</dt>
+                                                <dd class="text-sm text-gray-900 dark:text-white">
+                                                    {{ is_string($task->approval_date) ? \Carbon\Carbon::parse($task->approval_date)->format('F j, Y \a\t g:i A') : $task->approval_date->format('F j, Y \a\t g:i A') }}
+                                                </dd>
+                                            </div>
+                                            @endif
+                                            
+                                            @if($task->published_date)
+                                            <div>
+                                                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Published</dt>
+                                                <dd class="text-sm text-gray-900 dark:text-white">
+                                                    {{ is_string($task->published_date) ? \Carbon\Carbon::parse($task->published_date)->format('F j, Y \a\t g:i A') : $task->published_date->format('F j, Y \a\t g:i A') }}
+                                                </dd>
+                                            </div>
+                                            @endif
+                                            
+                                            @if($task->due_date)
+                                            <div>
+                                                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Due Date</dt>
+                                                <dd class="text-sm text-gray-900 dark:text-white">
+                                                    {{ is_string($task->due_date) ? \Carbon\Carbon::parse($task->due_date)->format('F j, Y \a\t g:i A') : $task->due_date->format('F j, Y \a\t g:i A') }}
+                                                </dd>
+                                            </div>
+                                            @endif
+                                            
+                                            @if($task->location)
+                                            <div>
+                                                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Location</dt>
+                                                <dd class="text-sm text-gray-900 dark:text-white">{{ $task->location }}</dd>
+                                            </div>
+                                            @endif
+                                            
+                                            @if($task->start_time || $task->end_time)
+                                            <div>
+                                                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Time</dt>
+                                                <dd class="text-sm text-gray-900 dark:text-white">
+                                                    @if($task->start_time && $task->end_time)
+                                                        {{ \Carbon\Carbon::parse($task->start_time)->format('g:i A') }} - {{ \Carbon\Carbon::parse($task->end_time)->format('g:i A') }}
+                                                    @elseif($task->start_time)
+                                                        {{ \Carbon\Carbon::parse($task->start_time)->format('g:i A') }} onwards
+                                                    @else
+                                                        Flexible
+                                                    @endif
+                                                </dd>
+                                            </div>
+                                            @endif
+                                            
+                                            <div>
+                                                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Participants</dt>
+                                                <dd class="text-sm text-gray-900 dark:text-white">
+                                                    @if($task->max_participants !== null)
+                                                        {{ $task->assignments->count() }} / {{ $task->max_participants }}
+                                                    @else
+                                                        {{ $task->assignments->count() }} (unlimited)
+                                                    @endif
+                                                </dd>
+                                            </div>
+                                        </dl>
+                                    </div>
+
+                                    <!-- Participants -->
+                                    <div>
+                                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">
+                                            Participants 
+                                            @if($task->max_participants !== null)
+                                                ({{ $task->assignments->count() }} / {{ $task->max_participants }})
+                                            @else
+                                                ({{ $task->assignments->count() }})
+                                            @endif
+                                        </h3>
+                                        @if($task->assignments->count() > 0)
+                                            <div class="space-y-3 max-h-64 overflow-y-auto">
+                                                @foreach($task->assignments as $assignment)
+                                                    <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                                                        <div class="flex items-center space-x-3">
+                                                            <div class="h-8 w-8 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center">
+                                                                <span class="text-xs font-medium text-gray-700 dark:text-gray-300">
+                                                                    {{ substr($assignment->user->name, 0, 2) }}
+                                                                </span>
+                                                            </div>
+                                                            <div>
+                                                                <p class="text-sm font-medium text-gray-900 dark:text-white">{{ $assignment->user->name }}</p>
+                                                                <p class="text-xs text-gray-500 dark:text-gray-400">{{ $assignment->user->email }}</p>
+                                                            </div>
+                                                        </div>
+                                                        <div class="flex items-center space-x-2">
+                                                            <span class="px-2 py-1 text-xs rounded-full
+                                                                @if($assignment->status === 'assigned') bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200
+                                                                @elseif($assignment->status === 'submitted') bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200
+                                                                @elseif($assignment->status === 'completed') bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200
+                                                                @endif">
+                                                                {{ ucfirst($assignment->status) }}
+                                                            </span>
+                                                            @if(!empty($assignment->progress))
+                                                            <span class="px-2 py-1 text-xs rounded-full
+                                                                @switch($assignment->progress)
+                                                                    @case('accepted') bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200 @break
+                                                                    @case('on_the_way') bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200 @break
+                                                                    @case('working') bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200 @break
+                                                                    @case('done') bg-teal-100 text-teal-800 dark:bg-teal-900 dark:text-teal-200 @break
+                                                                    @case('submitted_proof') bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200 @break
+                                                                    @default bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200
+                                                                @endswitch">
+                                                                {{ ucfirst(str_replace('_',' ', $assignment->progress)) }}
+                                                            </span>
+                                                            @endif
+                                                        </div>
+                                                    </div>
+                                                    @if($assignment->status === 'submitted')
+                                                        <div class="ml-11 mb-3">
+                                                            <a href="{{ route('tasks.creator.show', $assignment) }}" class="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
+                                                                Review Submission →
+                                                            </a>
+                                                        </div>
+                                                    @endif
+                                                @endforeach
+                                            </div>
+                                        @else
+                                            <p class="text-sm text-gray-500 dark:text-gray-400">No users have joined this task yet.</p>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
+            @else
+                <!-- Regular user layout with tabs -->
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden">
+                    <!-- Task Title and Admin Label -->
+                    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h1 class="text-2xl font-bold text-gray-900 dark:text-white">{{ $task->title }}</h1>
+                                <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                                    @php $uploader = $task->assignedUser; @endphp
+                                    <strong>Uploaded by:</strong> {{ $uploader?->name ?? 'Admin' }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
 
-                <!-- Tabs -->
-                <div class="border-b border-gray-200 dark:border-gray-700">
-                    <nav class="flex space-x-8 px-6" aria-label="Tabs">
-                        <button id="details-tab" class="py-4 px-1 border-b-2 border-orange-500 font-medium text-sm text-orange-600 dark:text-orange-400">
-                            Details
-                        </button>
-                        <button id="participants-tab" class="py-4 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300">
-                            Participants
-                        </button>
-                    </nav>
-                </div>
+                    <!-- Tabs -->
+                    <div class="border-b border-gray-200 dark:border-gray-700">
+                        <nav class="flex space-x-8 px-6" aria-label="Tabs">
+                            <button id="details-tab" class="py-4 px-1 border-b-2 border-orange-500 font-medium text-sm text-orange-600 dark:text-orange-400">
+                                Details
+                            </button>
+                            <button id="participants-tab" class="py-4 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300">
+                                Participants
+                            </button>
+                        </nav>
+                    </div>
 
                 <!-- Tab Content -->
                 <div class="px-6 py-6">
@@ -117,10 +315,23 @@
                                     <strong>Created:</strong> {{ is_string($task->creation_date) ? \Carbon\Carbon::parse($task->creation_date)->format('M j, Y') : $task->creation_date->format('M j, Y') }}
                                 </span>
                             </div>
+                            
+                            <div class="flex items-center space-x-2">
+                                <svg class="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                                </svg>
+                                <span class="text-sm text-gray-600 dark:text-gray-400">
+                                    <strong>Participants:</strong> 
+                                    @if($task->max_participants !== null)
+                                        {{ $task->assignments->count() }} / {{ $task->max_participants }}
+                                    @else
+                                        {{ $task->assignments->count() }} (unlimited)
+                                    @endif
+                                </span>
+                            </div>
                         </div>
 
                         <!-- Join Task Button - Only show if user hasn't joined the task and is not the creator -->
-                        @php $isCreator = $task->FK1_userId === Auth::id(); @endphp
                         @if(!$task->isAssignedTo(Auth::id()) && !$isCreator && $task->status === 'published')
                         <div class="mb-6 text-center">
                             @php
@@ -442,7 +653,12 @@
                     <div id="participants-content" class="tab-content hidden">
                         <div class="mb-4">
                             <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">
-                                Participants ({{ $task->assignments->count() }})
+                                Participants 
+                                @if($task->max_participants !== null)
+                                    ({{ $task->assignments->count() }} / {{ $task->max_participants }})
+                                @else
+                                    ({{ $task->assignments->count() }})
+                                @endif
                             </h3>
                             @if($task->assignments->count() > 0)
                                 <div class="space-y-3">
@@ -484,10 +700,11 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            @endif
         </div>
     </div>
 
+    @if(!$showAdminLayout)
     <!-- Tab JavaScript -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -751,4 +968,5 @@
         document.addEventListener('click', function(e) { const modal = document.getElementById('imageModal'); if (e.target === modal) { closeImageModal(); } });
         document.addEventListener('keydown', function(e) { const modal = document.getElementById('imageModal'); if (modal && !modal.classList.contains('hidden')) { if (e.key === 'Escape') closeImageModal(); if (e.key === 'ArrowLeft') previousImage(); if (e.key === 'ArrowRight') nextImage(); } });
     </script>
+    @endif
 </x-app-layout>

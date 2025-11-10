@@ -4,14 +4,17 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\TaskAssignment;
-use App\Models\Task;
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
+use App\Services\NotificationService;
 
 class TaskSubmissionController extends Controller
 {
+    public function __construct(private readonly NotificationService $notificationService)
+    {
+    }
+
     /**
      * Display a listing of task submissions
      */
@@ -63,6 +66,16 @@ class TaskSubmissionController extends Controller
         $user = $submission->user;
         $user->increment('points', $submission->task->points_awarded);
 
+        $this->notificationService->notify(
+            $user,
+            'task_submission_approved',
+            "Your submission for \"{$submission->task->title}\" was approved!",
+            [
+                'url' => route('tasks.show', $submission->task),
+                'description' => 'Points have been added to your balance. Keep up the great work!',
+            ]
+        );
+
         return redirect()->route('admin.task-submissions.index')
             ->with('status', 'Task submission approved successfully. User has been awarded ' . $submission->task->points_awarded . ' points.');
     }
@@ -102,6 +115,16 @@ class TaskSubmissionController extends Controller
         $message = $remainingAttempts > 0 
             ? "Task submission rejected. User has {$remainingAttempts} remaining attempts to resubmit."
             : "Task submission rejected. User has reached the maximum number of attempts (3).";
+
+        $this->notificationService->notify(
+            $submission->user,
+            'task_submission_rejected',
+            "Your submission for \"{$submission->task->title}\" needs more work.",
+            [
+                'url' => route('tasks.show', $submission->task),
+                'description' => "{$request->rejection_reason} {$message}",
+            ]
+        );
 
         return redirect()->route('admin.task-submissions.index')
             ->with('status', $message);

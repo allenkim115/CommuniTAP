@@ -16,41 +16,12 @@ class RewardRedemptionController extends Controller
 
     public function approve(RewardRedemption $redemption)
     {
-        if ($redemption->status !== 'pending') {
-            return back()->with('error', 'Redemption already processed.');
-        }
-
-        $redemption->status = 'approved';
-        $redemption->approval_date = now();
-        $redemption->save();
-
-        return back()->with('status', 'Redemption approved.');
+        return back()->with('status', 'Redemptions are now auto-approved. No manual action required.');
     }
 
     public function reject(RewardRedemption $redemption)
     {
-        if ($redemption->status !== 'pending') {
-            return back()->with('error', 'Redemption already processed.');
-        }
-
-        // Return quantity to reward
-        $reward = $redemption->reward;
-        if ($reward) {
-            $reward->increment('QTY');
-        }
-
-        // Refund points to user
-        $user = $redemption->user;
-        if ($user && $reward) {
-            $user->points += $reward->points_cost;
-            $user->save();
-        }
-
-        $redemption->status = 'rejected';
-        $redemption->approval_date = now();
-        $redemption->save();
-
-        return back()->with('status', 'Redemption rejected and reversed.');
+        return back()->with('error', 'Manual rejection is disabled. Redemptions are fulfilled automatically.');
     }
 }
 

@@ -14,6 +14,10 @@
                         <div class="mb-4 text-red-600">{{ session('error') }}</div>
                     @endif
 
+                    <div class="mb-6 p-4 bg-orange-50 dark:bg-gray-700/40 border border-orange-200 dark:border-gray-600 rounded-lg text-sm text-orange-700 dark:text-orange-300">
+                        Reward redemptions are now fulfilled automatically. This view is provided for tracking purposes only.
+                    </div>
+
                     <div class="overflow-x-auto">
                         <table class="min-w-full text-sm">
                             <thead>
@@ -22,7 +26,7 @@
                                     <th class="py-2">Reward</th>
                                     <th class="py-2">Status</th>
                                     <th class="py-2">Requested</th>
-                                    <th class="py-2">Actions</th>
+                                    <th class="py-2">Coupon / Notes</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -30,20 +34,17 @@
                                     <tr class="border-b dark:border-gray-700">
                                         <td class="py-2">{{ $red->user?->name }}</td>
                                         <td class="py-2">{{ $red->reward?->reward_name }}</td>
-                                        <td class="py-2 capitalize">{{ $red->status }}</td>
+                                        <td class="py-2 capitalize">
+                                            <span class="px-2 py-1 rounded-full text-xs font-semibold {{ $red->status === 'approved' ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-700' }}">
+                                                {{ $red->status }}
+                                            </span>
+                                        </td>
                                         <td class="py-2">{{ optional($red->redemption_date)->format('Y-m-d H:i') }}</td>
                                         <td class="py-2">
-                                            @if($red->status === 'pending')
-                                                <form action="{{ route('admin.redemptions.approve', $red) }}" method="POST" class="inline">
-                                                    @csrf
-                                                    <button class="px-3 py-1 bg-green-600 text-white rounded">Approve</button>
-                                                </form>
-                                                <form action="{{ route('admin.redemptions.reject', $red) }}" method="POST" class="inline">
-                                                    @csrf
-                                                    <button class="px-3 py-1 bg-red-600 text-white rounded">Reject</button>
-                                                </form>
+                                            @if($red->admin_notes)
+                                                <p class="text-sm text-gray-700 dark:text-gray-300">{{ $red->admin_notes }}</p>
                                             @else
-                                                <span class="text-gray-400">No actions</span>
+                                                <span class="text-sm text-gray-400">Auto-generated</span>
                                             @endif
                                         </td>
                                     </tr>
