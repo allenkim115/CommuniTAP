@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\FeedbackController as AdminFeedbackController;
 use App\Http\Controllers\TapNominationController;
 use App\Http\Controllers\IncidentReportController;
 use App\Http\Controllers\Admin\IncidentReportController as AdminIncidentReportController;
+use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\RewardController;
 use App\Http\Controllers\RewardImageController;
 use App\Http\Controllers\DashboardController;
@@ -277,6 +278,7 @@ Route::middleware(['auth', 'user', 'active'])->group(function () {
 // Admin routes
 Route::middleware(['auth', 'admin', 'active'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', [App\Http\Controllers\DashboardController::class, 'adminDashboard'])->name('dashboard');
+    Route::get('/dashboard/chart-details/{chart}', [App\Http\Controllers\DashboardController::class, 'chartDetails'])->name('dashboard.chart-details');
     Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
     Route::get('/users/create', [AdminUserController::class, 'create'])->name('users.create');
     Route::post('/users', [AdminUserController::class, 'store'])->name('users.store');
@@ -305,9 +307,13 @@ Route::middleware(['auth', 'admin', 'active'])->prefix('admin')->name('admin.')-
     Route::get('/feedback', [AdminFeedbackController::class, 'index'])->name('feedback.index');
     Route::get('/feedback/{task}/show', [AdminFeedbackController::class, 'show'])->name('feedback.show');
     
-    Route::get('/reports', function () {
-        return view('admin.reports.index');
-    })->name('reports.index');
+    // Report Generation Routes
+    Route::get('/reports/volunteer', [ReportController::class, 'generateVolunteerReport'])
+        ->name('reports.volunteer');
+    Route::get('/reports/task', [ReportController::class, 'generateTaskReport'])
+        ->name('reports.task');
+    Route::get('/reports/task-chain', [ReportController::class, 'generateTaskChainReport'])
+        ->name('reports.task-chain');
 
     // Newly added simple pages to support admin navigation
     // Admin rewards management
