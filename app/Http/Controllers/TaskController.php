@@ -2,14 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use App\Models\Task;
 use App\Models\User;
 use App\Models\TaskAssignment;
+use App\Services\NotificationService;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class TaskController extends Controller
 {
+    public function __construct(private readonly NotificationService $notificationService)
+    {
+    }
+
     /**
      * Update progress for the authenticated user's assignment on a task
      */
@@ -56,6 +61,19 @@ class TaskController extends Controller
         $assignment->update([
             'progress' => $request->progress,
         ]);
+
+        // Notify task creator about progress update if applicable
+        if (!is_null($task->FK1_userId) && $task->FK1_userId !== $user->userId && $task->assignedUser) {
+            $this->notificationService->notify(
+                $task->assignedUser,
+                'task_progress_updated',
+                "{$user->firstName} updated progress on \"{$task->title}\" to " . str_replace('_', ' ', $request->progress) . ".",
+                [
+                    'url' => route('tasks.show', $task),
+                    'description' => 'Review the task progress and provide guidance if needed.',
+                ]
+            );
+        }
 
         return redirect()->route('tasks.show', $task)->with('status', 'Progress updated.');
     }
@@ -245,6 +263,16 @@ class TaskController extends Controller
         $assignee = $submission->user;
         if ($assignee) {
             $assignee->increment('points', $submission->task->points_awarded);
+
+            $this->notificationService->notify(
+                $assignee,
+                'task_submission_approved',
+                "Your submission for \"{$submission->task->title}\" was approved!",
+                [
+                    'url' => route('tasks.show', $submission->task),
+                    'description' => 'Points have been added to your balance.',
+                ]
+            );
         }
 
         return redirect()->route('tasks.creator.submissions')->with('status', 'Submission approved.');
@@ -277,6 +305,24 @@ class TaskController extends Controller
             'rejection_reason' => $request->rejection_reason,
             'completion_notes' => 'Rejected (Attempt ' . $newRejectionCount . '/3): ' . $request->rejection_reason
         ]);
+
+        $assignee = $submission->user;
+        if ($assignee) {
+            $remainingAttempts = 3 - $newRejectionCount;
+            $description = $remainingAttempts > 0
+                ? "You can resubmit proof. Remaining attempts: {$remainingAttempts}."
+                : 'No more attempts remaining.';
+
+            $this->notificationService->notify(
+                $assignee,
+                'task_submission_rejected',
+                "Your submission for \"{$submission->task->title}\" needs changes.",
+                [
+                    'url' => route('tasks.show', $submission->task),
+                    'description' => "{$request->rejection_reason} {$description}",
+                ]
+            );
+        }
 
         return redirect()->route('tasks.creator.submissions')->with('status', 'Submission rejected.');
     }
@@ -316,7 +362,7 @@ class TaskController extends Controller
 
         $user = Auth::user();
 
-        Task::create([
+        $task = Task::create([
             'FK1_userId' => $user->userId,
             'title' => $request->title,
             'description' => $request->description,
@@ -330,6 +376,20 @@ class TaskController extends Controller
             'location' => $request->location,
             'max_participants' => $request->max_participants,
         ]);
+
+        // Notify admins about a new task proposal pending approval
+        $admins = User::where('role', 'admin')->where('status', 'active')->get(['userId']);
+        if ($admins->isNotEmpty()) {
+            $this->notificationService->notifyMany(
+                $admins,
+                'task_proposal_submitted',
+                "New task proposal submitted: \"{$request->title}\"",
+                [
+                    'url' => route('admin.tasks.show', $task),
+                    'description' => 'Review and approve or reject the proposal.',
+                ]
+            );
+        }
 
         return redirect()->route('tasks.index')->with('status', 'Task proposal submitted');
     }
@@ -360,7 +420,7 @@ class TaskController extends Controller
         // Load necessary relationships
         $task->load(['assignments.user', 'assignedUser']);
 
-        return view('tasks.show', compact('task'));
+        return view('tasks.show', compact('task', 'isCreator'));
     }
 
     /**
@@ -519,6 +579,31 @@ class TaskController extends Controller
             'assigned_at' => now(),
         ]);
 
+        $this->notificationService->notify(
+            $user,
+            'task_assigned',
+            "You're now assigned to \"{$task->title}\".",
+            [
+                'url' => route('tasks.show', $task),
+                'description' => 'Track progress and submit proof when you are done.',
+            ]
+        );
+
+        if ($task->task_type === 'user_uploaded' && $task->FK1_userId) {
+            $creator = $task->assignedUser;
+            if ($creator && $creator->userId !== $user->userId) {
+                $this->notificationService->notify(
+                    $creator,
+                    'task_participant_joined',
+                    "{$user->firstName} {$user->lastName} joined your task \"{$task->title}\".",
+                    [
+                        'url' => route('tasks.show', $task),
+                        'description' => 'Review submissions to award points when the task is done.',
+                    ]
+                );
+            }
+        }
+
         return redirect()->route('tasks.show', $task)->with('status', 'Successfully joined the task.');
     }
 
@@ -565,6 +650,37 @@ class TaskController extends Controller
             'photos' => $photos,
             'completion_notes' => $request->completion_notes
         ]);
+
+        if ($task->task_type === 'user_uploaded' && $task->FK1_userId) {
+            $creator = $task->assignedUser;
+            if ($creator) {
+                $this->notificationService->notify(
+                    $creator,
+                    'task_submission_pending',
+                    "{$user->firstName} {$user->lastName} submitted proof for \"{$task->title}\".",
+                    [
+                        'url' => route('tasks.creator.show', $assignment),
+                        'description' => 'Review the submission and approve or reject it.',
+                    ]
+                );
+            }
+        }
+
+        // Notify admins for tasks that require administrative review
+        if ($task->task_type !== 'user_uploaded') {
+            $admins = User::where('role', 'admin')->where('status', 'active')->get(['userId']);
+            if ($admins->isNotEmpty()) {
+                $this->notificationService->notifyMany(
+                    $admins,
+                    'task_submission_admin_review',
+                    "{$user->firstName} {$user->lastName} submitted proof for \"{$task->title}\".",
+                    [
+                        'url' => route('admin.task-submissions.show', $assignment),
+                        'description' => 'Review the submission and award points if approved.',
+                    ]
+                );
+            }
+        }
 
         return redirect()->route('tasks.show', $task)
             ->with('status', 'Task completion submitted for review');

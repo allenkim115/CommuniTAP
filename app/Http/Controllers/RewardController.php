@@ -4,12 +4,17 @@ namespace App\Http\Controllers;
 
 use App\Models\Reward;
 use App\Models\RewardRedemption;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
 class RewardController extends Controller
 {
+    public function __construct(private readonly NotificationService $notificationService)
+    {
+    }
+
     public function index()
     {
         $rewards = Reward::active()
@@ -49,6 +54,29 @@ class RewardController extends Controller
         // Deduct points immediately (can be reverted if rejected by admin)
         $user->points = max(0, $user->points - $reward->points_cost);
         $user->save();
+
+        $this->notificationService->notify(
+            $user,
+            'reward_redeemed',
+            "You redeemed \"{$reward->reward_name}\".",
+            [
+                'url' => route('rewards.mine'),
+                'description' => "Coupon code: {$couponCode}. Present this to claim your reward.",
+            ]
+        );
+
+        $admins = \App\Models\User::where('role', 'admin')->where('status', 'active')->get(['userId']);
+        if ($admins->isNotEmpty()) {
+            $this->notificationService->notifyMany(
+                $admins,
+                'reward_claim_submitted',
+                "{$user->firstName} {$user->lastName} claimed the reward \"{$reward->reward_name}\".",
+                [
+                    'url' => route('admin.rewards.index'),
+                    'description' => "Coupon code: {$couponCode}. Ensure fulfilment is tracked.",
+                ]
+            );
+        }
 
         return redirect()->route('rewards.mine')->with('status', 'Redemption successful. Your coupon: ' . $couponCode);
     }

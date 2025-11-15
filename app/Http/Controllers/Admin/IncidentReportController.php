@@ -5,11 +5,16 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\UserIncidentReport;
 use App\Models\User;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class IncidentReportController extends Controller
 {
+    public function __construct(private readonly NotificationService $notificationService)
+    {
+    }
+
     /**
      * Display a listing of all incident reports for admin
      */
@@ -115,7 +120,33 @@ class IncidentReportController extends Controller
                 $reportedUser = User::find($incidentReport->FK2_reportedUserId);
                 if ($reportedUser) {
                     $reportedUser->update(['status' => 'suspended']);
+
+                    $this->notificationService->notify(
+                        $reportedUser,
+                        'account_suspension',
+                        'Your account has been suspended following an incident review.',
+                        [
+                            'url' => route('profile.edit'),
+                            'description' => 'Please contact support for more details.',
+                        ]
+                    );
                 }
+            }
+
+            if ($incidentReport->reporter) {
+                $description = $request->moderator_notes
+                    ? "Moderator notes: {$request->moderator_notes}"
+                    : null;
+
+                $this->notificationService->notify(
+                    $incidentReport->reporter,
+                    'incident_report_update',
+                    "Your incident report #{$incidentReport->reportId} is now {$incidentReport->status}.",
+                    [
+                        'url' => route('incident-reports.show', $incidentReport),
+                        'description' => $description,
+                    ]
+                );
             }
 
             return redirect()->route('admin.incident-reports.index')

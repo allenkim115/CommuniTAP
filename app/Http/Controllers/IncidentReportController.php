@@ -5,12 +5,17 @@ namespace App\Http\Controllers;
 use App\Models\UserIncidentReport;
 use App\Models\User;
 use App\Models\Task;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class IncidentReportController extends Controller
 {
+    public function __construct(private readonly NotificationService $notificationService)
+    {
+    }
+
     /**
      * Display a listing of incident reports for regular users (their own reports)
      */
@@ -115,6 +120,19 @@ class IncidentReportController extends Controller
                     $created->evidence = $evidenceText;
                     $created->save();
                 }
+            }
+
+            $admins = User::where('role', 'admin')->where('status', 'active')->get(['userId']);
+            if ($admins->isNotEmpty()) {
+                $this->notificationService->notifyMany(
+                    $admins,
+                    'incident_report_submitted',
+                    Auth::user()->getFullNameAttribute() . ' submitted an incident report.',
+                    [
+                        'url' => route('admin.incident-reports.show', $created),
+                        'description' => 'Review the new report and take appropriate action.',
+                    ]
+                );
             }
 
             return redirect()->route('incident-reports.index')

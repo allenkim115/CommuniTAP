@@ -7,9 +7,14 @@ use Illuminate\Http\Request;
 use App\Models\Task;
 use App\Models\User;
 use App\Models\TaskAssignment;
+use App\Services\NotificationService;
 
 class TaskController extends Controller
 {
+    public function __construct(private readonly NotificationService $notificationService)
+    {
+    }
+
     /**
      * Display a listing of all tasks for admin
      */
@@ -90,7 +95,24 @@ class TaskController extends Controller
             $taskData['published_date'] = now();
         }
 
-        Task::create($taskData);
+        $task = Task::create($taskData);
+
+        // If published immediately, notify all active users about the new task
+        if ($request->publish_immediately) {
+            $activeUsers = User::where('status', 'active')
+                ->where('role', '!=', 'admin')
+                ->when(!is_null($task->FK1_userId), fn ($query) => $query->where('userId', '!=', $task->FK1_userId))
+                ->get(['userId', 'firstName', 'lastName']);
+            $this->notificationService->notifyMany(
+                $activeUsers,
+                'task_published',
+                "New task available: \"{$task->title}\"",
+                [
+                    'url' => route('tasks.show', $task),
+                    'description' => 'Join now while slots are open.',
+                ]
+            );
+        }
 
         return redirect()->route('admin.tasks.index')->with('status', 'Task created successfully');
     }
@@ -211,6 +233,19 @@ class TaskController extends Controller
         }
         // For admin-managed tasks, bring back to approved state; publishing is a separate step
         $task->update(['status' => 'approved']);
+
+        if ($task->task_type === 'user_uploaded' && $task->FK1_userId && $task->assignedUser) {
+            $this->notificationService->notify(
+                $task->assignedUser,
+                'task_proposal_reactivated',
+                "Your task \"{$task->title}\" was reactivated and set to approved.",
+                [
+                    'url' => route('tasks.show', $task),
+                    'description' => 'You can now proceed to request publishing again.',
+                ]
+            );
+        }
+
         return redirect()->back()->with('status', 'Task reactivated to approved status.');
     }
 
@@ -224,6 +259,18 @@ class TaskController extends Controller
             'approval_date' => now(),
         ]);
 
+        if ($task->task_type === 'user_uploaded' && $task->FK1_userId && $task->assignedUser) {
+            $this->notificationService->notify(
+                $task->assignedUser,
+                'task_proposal_approved',
+                "Your task proposal \"{$task->title}\" was approved.",
+                [
+                    'url' => route('tasks.show', $task),
+                    'description' => 'The task is ready to be reviewed for publishing.',
+                ]
+            );
+        }
+
         return redirect()->back()->with('status', 'Task approved successfully.');
     }
 
@@ -235,6 +282,18 @@ class TaskController extends Controller
         $task->update([
             'status' => 'rejected',
         ]);
+
+        if ($task->task_type === 'user_uploaded' && $task->FK1_userId && $task->assignedUser) {
+            $this->notificationService->notify(
+                $task->assignedUser,
+                'task_proposal_rejected',
+                "Your task proposal \"{$task->title}\" was rejected.",
+                [
+                    'url' => route('tasks.my-uploads'),
+                    'description' => 'Review admin feedback and resubmit if needed.',
+                ]
+            );
+        }
 
         return redirect()->back()->with('status', 'Task rejected successfully.');
     }
@@ -248,6 +307,33 @@ class TaskController extends Controller
             'status' => 'published',
             'published_date' => now(),
         ]);
+
+        if ($task->task_type === 'user_uploaded' && $task->FK1_userId && $task->assignedUser) {
+            $this->notificationService->notify(
+                $task->assignedUser,
+                'task_proposal_published',
+                "Your task \"{$task->title}\" is live!",
+                [
+                    'url' => route('tasks.show', $task),
+                    'description' => 'Participants can now join. Monitor submissions regularly.',
+                ]
+            );
+        }
+
+        // Notify all active users that a new task is available to join
+        $activeUsers = User::where('status', 'active')
+            ->where('role', '!=', 'admin')
+            ->when(!is_null($task->FK1_userId), fn ($query) => $query->where('userId', '!=', $task->FK1_userId))
+            ->get(['userId', 'firstName', 'lastName']);
+        $this->notificationService->notifyMany(
+            $activeUsers,
+            'task_published',
+            "New task available: \"{$task->title}\"",
+            [
+                'url' => route('tasks.show', $task),
+                'description' => 'Join now while slots are open.',
+            ]
+        );
 
         return redirect()->back()->with('status', 'Task published successfully.');
     }
@@ -280,6 +366,18 @@ class TaskController extends Controller
 
         // Award points to the user
         $assignment->user->increment('points', $task->points_awarded);
+
+        if ($assignment->user) {
+            $this->notificationService->notify(
+                $assignment->user,
+                'task_assignment_completed',
+                "Great job! \"{$task->title}\" was verified by an admin.",
+                [
+                    'url' => route('tasks.show', $task),
+                    'description' => 'Points have been added to your balance.',
+                ]
+            );
+        }
 
         return redirect()->back()->with('status', 'Task assignment completed and points awarded.');
     }

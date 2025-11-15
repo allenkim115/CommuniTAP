@@ -6,11 +6,16 @@ use App\Models\Task;
 use App\Models\TaskAssignment;
 use App\Models\TapNomination;
 use App\Models\User;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class TapNominationController extends Controller
 {
+    public function __construct(private readonly NotificationService $notificationService)
+    {
+    }
+
     /**
      * Show the nomination form for daily tasks
      */
@@ -184,6 +189,18 @@ class TapNominationController extends Controller
             // Award 1 point to the nominator for using the Tap & Pass system
             $user->increment('points', 1);
 
+            if ($nomination->nominee) {
+                $this->notificationService->notify(
+                    $nomination->nominee,
+                    'tap_nomination_received',
+                    "{$user->firstName} nominated you for \"{$task->title}\".",
+                    [
+                        'url' => route('tap-nominations.index'),
+                        'description' => 'Accept the nomination to join the task and earn extra points.',
+                    ]
+                );
+            }
+
             // Debug: Verify the nomination was created and can be retrieved
             $createdNomination = TapNomination::find($nomination->nominationId);
             $nomineeNominations = TapNomination::where('FK3_nomineeId', $request->nominee_id)->get();
@@ -259,6 +276,18 @@ class TapNominationController extends Controller
         // Award 1 point to the nominee for accepting the nomination
         $user->increment('points', 1);
 
+        if ($nomination->nominator) {
+            $this->notificationService->notify(
+                $nomination->nominator,
+                'tap_nomination_accepted',
+                "{$user->firstName} accepted your nomination for \"{$task->title}\".",
+                [
+                    'url' => route('tap-nominations.index'),
+                    'description' => 'Keep cheering them on!',
+                ]
+            );
+        }
+
         return redirect()->route('tasks.index')->with('status', 'Nomination accepted! You have been assigned to the task and earned 1 point.');
     }
 
@@ -281,6 +310,18 @@ class TapNominationController extends Controller
 
         // Update nomination status
         $nomination->update(['status' => 'declined']);
+
+        if ($nomination->nominator) {
+            $this->notificationService->notify(
+                $nomination->nominator,
+                'tap_nomination_declined',
+                "{$user->firstName} declined your nomination for \"{$nomination->task->title}\".",
+                [
+                    'url' => route('tap-nominations.index'),
+                    'description' => 'You can nominate another teammate for this task.',
+                ]
+            );
+        }
 
         return redirect()->route('tap-nominations.index')->with('status', 'Nomination declined.');
     }
