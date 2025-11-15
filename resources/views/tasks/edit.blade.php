@@ -91,7 +91,7 @@
                             </label>
                             <input type="date" name="due_date" id="due_date" value="{{ old('due_date', $task->due_date ? (is_string($task->due_date) ? \Carbon\Carbon::parse($task->due_date)->format('Y-m-d') : $task->due_date->format('Y-m-d')) : '') }}" 
                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white" 
-                                   min="{{ date('Y-m-d', strtotime('+1 day')) }}">
+                                   min="{{ date('Y-m-d') }}">
                             @error('due_date')
                                 <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                             @enderror

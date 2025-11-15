@@ -58,7 +58,7 @@ class TaskController extends Controller
             'description' => 'required|string',
             'task_type' => 'required|in:daily,one_time',
             'points_awarded' => 'required|integer|min:1',
-            'due_date' => 'required|date|after:today',
+            'due_date' => 'required|date|after_or_equal:today',
             'start_time' => 'required|date_format:H:i',
             'end_time' => 'required|date_format:H:i',
             'location' => 'required|string|max:255',
@@ -71,6 +71,28 @@ class TaskController extends Controller
             if (strtotime($request->end_time) <= strtotime($request->start_time)) {
                 return redirect()->back()
                     ->withErrors(['end_time' => 'The end time must be after the start time.'])
+                    ->withInput();
+            }
+        }
+
+        // If due_date is today, ensure times are in the future
+        $dueDate = \Carbon\Carbon::parse($request->due_date);
+        $now = now();
+        
+        if ($dueDate->isToday() && $request->start_time && $request->end_time) {
+            $currentTime = $now->format('H:i');
+            
+            // Check if start_time is in the past
+            if (strtotime($request->start_time) <= strtotime($currentTime)) {
+                return redirect()->back()
+                    ->withErrors(['start_time' => 'The start time must be in the future when the due date is today.'])
+                    ->withInput();
+            }
+            
+            // Check if end_time is in the past
+            if (strtotime($request->end_time) <= strtotime($currentTime)) {
+                return redirect()->back()
+                    ->withErrors(['end_time' => 'The end time must be in the future when the due date is today.'])
                     ->withInput();
             }
         }
@@ -163,7 +185,7 @@ class TaskController extends Controller
             'title' => 'required|string|max:100',
             'description' => 'required|string',
             'points_awarded' => 'required|integer|min:1',
-            'due_date' => 'required|date|after:today',
+            'due_date' => 'required|date|after_or_equal:today',
             'start_time' => 'required|date_format:H:i',
             'end_time' => 'required|date_format:H:i',
             'location' => 'required|string|max:255',
@@ -181,6 +203,28 @@ class TaskController extends Controller
             if (strtotime($request->end_time) <= strtotime($request->start_time)) {
                 return redirect()->back()
                     ->withErrors(['end_time' => 'The end time must be after the start time.'])
+                    ->withInput();
+            }
+        }
+
+        // If due_date is today, ensure times are in the future
+        $dueDate = \Carbon\Carbon::parse($request->due_date);
+        $now = now();
+        
+        if ($dueDate->isToday() && $request->start_time && $request->end_time) {
+            $currentTime = $now->format('H:i');
+            
+            // Check if start_time is in the past
+            if (strtotime($request->start_time) <= strtotime($currentTime)) {
+                return redirect()->back()
+                    ->withErrors(['start_time' => 'The start time must be in the future when the due date is today.'])
+                    ->withInput();
+            }
+            
+            // Check if end_time is in the past
+            if (strtotime($request->end_time) <= strtotime($currentTime)) {
+                return redirect()->back()
+                    ->withErrors(['end_time' => 'The end time must be in the future when the due date is today.'])
                     ->withInput();
             }
         }

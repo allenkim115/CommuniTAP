@@ -105,7 +105,17 @@
                                             <div>
                                                 <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Due Date</dt>
                                                 <dd class="text-sm text-gray-900 dark:text-white">
-                                                    {{ is_string($task->due_date) ? \Carbon\Carbon::parse($task->due_date)->format('F j, Y \a\t g:i A') : $task->due_date->format('F j, Y \a\t g:i A') }}
+                                                    @php
+                                                        $dueDate = is_string($task->due_date) ? \Carbon\Carbon::parse($task->due_date) : $task->due_date;
+                                                        if ($task->end_time) {
+                                                            // Combine due_date with end_time
+                                                            $deadline = \Carbon\Carbon::parse($dueDate->toDateString() . ' ' . $task->end_time);
+                                                            echo $deadline->format('F j, Y \a\t g:i A');
+                                                        } else {
+                                                            // Use due_date directly
+                                                            echo $dueDate->format('F j, Y \a\t g:i A');
+                                                        }
+                                                    @endphp
                                                 </dd>
                                             </div>
                                             @endif

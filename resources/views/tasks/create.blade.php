@@ -99,8 +99,8 @@
                                 </label>
                                 <input type="date" name="due_date" id="due_date" value="{{ old('due_date') }}"
                                     class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
-                                    min="{{ date('Y-m-d', strtotime('+1 day')) }}" required>
-                                <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">At least one day from today.</p>
+                                    min="{{ date('Y-m-d') }}" required>
+                                <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Due date must be today or later.</p>
                             </div>
 
                             <!-- Start & End Time -->
