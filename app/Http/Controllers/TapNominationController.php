@@ -235,6 +235,21 @@ class TapNominationController extends Controller
     }
 
     /**
+     * Show nominations made by the current user
+     */
+    public function myNominations()
+    {
+        $user = Auth::user();
+        
+        $nominations = $user->nominationsMade()
+            ->with(['task', 'nominee'])
+            ->orderBy('nomination_date', 'desc')
+            ->paginate(10);
+
+        return view('tap-nominations.my-nominations', compact('nominations'));
+    }
+
+    /**
      * Accept a nomination
      */
     public function accept(TapNomination $nomination)

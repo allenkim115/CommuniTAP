@@ -83,6 +83,7 @@ Route::middleware(['auth', 'user', 'active'])->group(function () {
     Route::get('/tap-nominations/create/{task}', [TapNominationController::class, 'create'])->name('tap-nominations.create');
     Route::post('/tap-nominations', [TapNominationController::class, 'store'])->name('tap-nominations.store');
     Route::get('/tap-nominations', [TapNominationController::class, 'index'])->name('tap-nominations.index');
+    Route::get('/tap-nominations/my-nominations', [TapNominationController::class, 'myNominations'])->name('tap-nominations.my-nominations');
     Route::post('/tap-nominations/{nomination}/accept', [TapNominationController::class, 'accept'])->name('tap-nominations.accept');
     Route::post('/tap-nominations/{nomination}/decline', [TapNominationController::class, 'decline'])->name('tap-nominations.decline');
     
