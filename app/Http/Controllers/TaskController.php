@@ -86,9 +86,10 @@ class TaskController extends Controller
         $filter = $request->get('filter', 'available'); // Default to available tasks
         
         // Get tasks assigned to the user through task_assignments table with pivot data
-        // Exclude uncompleted tasks (they are removed from assigned tasks)
+        // Exclude uncompleted tasks and inactive tasks
         $userTasks = $user->assignedTasks()
             ->wherePivot('status', '!=', 'uncompleted')
+            ->where('tasks.status', '!=', 'inactive') // Exclude inactive/deactivated tasks (specify table to avoid ambiguity)
             ->withPivot('status', 'assigned_at', 'submitted_at', 'completed_at', 'photos', 'completion_notes', 'rejection_count', 'rejection_reason')
             ->with(['assignments.user', 'assignedUser'])
             ->orderBy('created_at', 'desc')
@@ -104,7 +105,10 @@ class TaskController extends Controller
         });
             
         // Get available tasks that user can join (published tasks) that are not expired
-        $availableTasks = Task::where('status', 'published')->notExpired()
+        // Published tasks cannot be inactive, but we exclude inactive for safety
+        $availableTasks = Task::where('tasks.status', 'published')
+            ->where('tasks.status', '!=', 'inactive') // Exclude inactive/deactivated tasks
+            ->notExpired()
             ->whereDoesntHave('assignments', function($query) use ($user) {
                 $query->where('userId', $user->userId);
             })
@@ -163,8 +167,10 @@ class TaskController extends Controller
         $search = trim((string) $request->get('q', ''));
 
         // Base query for this user's uploaded tasks
+        // Exclude inactive tasks (they should be shown as draft/cancelled instead)
         $query = Task::where('task_type', 'user_uploaded')
             ->where('FK1_userId', $user->userId)
+            ->where('status', '!=', 'inactive') // Exclude inactive tasks
             ->with(['assignments.user', 'assignedUser']);
 
         // Apply status filter
@@ -188,8 +194,10 @@ class TaskController extends Controller
         $uploads = $query->orderByDesc('created_at')->get();
 
         // Stats based on all tasks (ignoring current filters), used for tiles
+        // Exclude inactive tasks
         $allForStats = Task::where('task_type', 'user_uploaded')
             ->where('FK1_userId', $user->userId)
+            ->where('status', '!=', 'inactive')
             ->get();
 
         $stats = [
@@ -372,14 +380,14 @@ class TaskController extends Controller
             // Check if start_time is in the past
             if (strtotime($request->start_time) <= strtotime($currentTime)) {
                 return redirect()->back()
-                    ->withErrors(['start_time' => 'The start time must be in the future when the due date is today.'])
+                    ->withErrors(['start_time' => 'The start time cannot be in the past. Please select a time later than ' . $currentTime . '.'])
                     ->withInput();
             }
             
             // Check if end_time is in the past
             if (strtotime($request->end_time) <= strtotime($currentTime)) {
                 return redirect()->back()
-                    ->withErrors(['end_time' => 'The end time must be in the future when the due date is today.'])
+                    ->withErrors(['end_time' => 'The end time cannot be in the past. Please select a time later than ' . $currentTime . '.'])
                     ->withInput();
             }
         }
@@ -415,7 +423,7 @@ class TaskController extends Controller
             );
         }
 
-        return redirect()->route('tasks.index')->with('status', 'Task proposal submitted');
+        return redirect()->route('tasks.my-uploads')->with('status', 'Task proposal submitted');
     }
 
     /**
@@ -425,16 +433,25 @@ class TaskController extends Controller
     {
         $user = Auth::user();
         
+        // Block access to inactive/deactivated tasks for regular users (even if they joined)
+        // Only admins and task creators can view inactive tasks
+        if ($task->status === 'inactive' && !$user->isAdmin()) {
+            $isCreator = !is_null($task->FK1_userId) && $task->FK1_userId === $user->userId;
+            if (!$isCreator) {
+                abort(404, 'Task not found or has been deactivated.');
+            }
+        }
+        
         // Check if user can view this task
         // Users can view:
         // - tasks they created (user-uploaded), regardless of status
-        // - tasks they're assigned to
+        // - tasks they're assigned to (but not if inactive)
         // - published tasks
         // - admins can view all
         $isCreator = !is_null($task->FK1_userId) && $task->FK1_userId === $user->userId;
         $canView = $user->isAdmin() || 
                    $isCreator ||
-                   $task->isAssignedTo($user->userId) || 
+                   ($task->isAssignedTo($user->userId) && $task->status !== 'inactive') || 
                    $task->status === 'published';
         
         if (!$canView) {
@@ -457,9 +474,10 @@ class TaskController extends Controller
             abort(403, 'You can only edit your own user-uploaded tasks.');
         }
 
-        // Don't allow editing if task is already approved/published/completed/inactive
-        if (in_array($task->status, ['approved', 'published', 'completed', 'inactive'])) {
-            return redirect()->back()->with('error', 'Cannot edit approved, published, completed, or inactive tasks.');
+        // Don't allow editing if task is already approved/published/completed
+        // Allow editing for pending, rejected, and draft (cancelled) tasks
+        if (in_array($task->status, ['approved', 'published', 'completed'])) {
+            return redirect()->back()->with('error', 'Cannot edit approved, published, or completed tasks.');
         }
 
         return view('tasks.edit', compact('task'));
@@ -475,22 +493,50 @@ class TaskController extends Controller
             abort(403, 'You can only edit your own user-uploaded tasks.');
         }
 
-        // Don't allow editing if task is already approved/published/completed/inactive
-        if (in_array($task->status, ['approved', 'published', 'completed', 'inactive'])) {
-            return redirect()->back()->with('error', 'Cannot edit approved, published, completed, or inactive tasks.');
+        // Don't allow editing if task is already approved/published/completed
+        // Allow editing for pending, rejected, and draft (cancelled) tasks
+        if (in_array($task->status, ['approved', 'published', 'completed'])) {
+            return redirect()->back()->with('error', 'Cannot edit approved, published, or completed tasks.');
         }
 
-        // Normalize 12-hour time inputs (e.g., "10:30 am") to 24-hour H:i before validation
+        // Normalize time inputs to 24-hour H:i format before validation
         foreach (['start_time', 'end_time'] as $timeField) {
             $value = $request->input($timeField);
-            if (is_string($value) && trim($value) !== '') {
-                $trimmed = trim($value);
-                if (preg_match('/\b(am|pm)\b/i', $trimmed)) {
+            
+            // Handle empty values - set to null
+            if (empty($value) || trim($value) === '') {
+                $request->merge([$timeField => null]);
+                continue;
+            }
+            
+            $trimmed = trim($value);
+            
+            // If already in H:i format (from type="time" input), use as is
+            if (preg_match('/^\d{2}:\d{2}$/', $trimmed)) {
+                // Already in correct format, keep it
+                continue;
+            }
+            
+            // Try to parse 12-hour format with AM/PM
+            if (preg_match('/\b(am|pm)\b/i', $trimmed)) {
+                try {
+                    $normalized = \Carbon\Carbon::createFromFormat('g:i a', strtolower($trimmed))->format('H:i');
+                    $request->merge([$timeField => $normalized]);
+                } catch (\Exception $e) {
+                    // Fall through to validator which will surface a helpful message
+                }
+            } else {
+                // Try to parse as H:i:s and convert to H:i
+                try {
+                    $parsed = \Carbon\Carbon::createFromFormat('H:i:s', $trimmed);
+                    $request->merge([$timeField => $parsed->format('H:i')]);
+                } catch (\Exception $e) {
+                    // Try H:i format
                     try {
-                        $normalized = \Carbon\Carbon::createFromFormat('g:i a', strtolower($trimmed))->format('H:i');
-                        $request->merge([$timeField => $normalized]);
-                    } catch (\Exception $e) {
-                        // Fall through to validator which will surface a helpful message
+                        $parsed = \Carbon\Carbon::createFromFormat('H:i', $trimmed);
+                        $request->merge([$timeField => $parsed->format('H:i')]);
+                    } catch (\Exception $e2) {
+                        // Fall through to validator
                     }
                 }
             }
@@ -526,14 +572,14 @@ class TaskController extends Controller
                 // Check if start_time is in the past
                 if (strtotime($request->start_time) <= strtotime($currentTime)) {
                     return redirect()->back()
-                        ->withErrors(['start_time' => 'The start time must be in the future when the due date is today.'])
+                        ->withErrors(['start_time' => 'The start time cannot be in the past. Please select a time later than ' . $currentTime . '.'])
                         ->withInput();
                 }
                 
                 // Check if end_time is in the past
                 if (strtotime($request->end_time) <= strtotime($currentTime)) {
                     return redirect()->back()
-                        ->withErrors(['end_time' => 'The end time must be in the future when the due date is today.'])
+                        ->withErrors(['end_time' => 'The end time cannot be in the past. Please select a time later than ' . $currentTime . '.'])
                         ->withInput();
                 }
             }
@@ -554,23 +600,24 @@ class TaskController extends Controller
     }
 
     /**
-     * Deactivate the specified task instead of deleting
+     * Cancel the task proposal (removes from approval queue, allows editing and resubmission)
      */
     public function destroy(Task $task)
     {
-        // Only allow deactivation of user-uploaded tasks by the creator
+        // Only allow canceling user-uploaded tasks by the creator
         if ($task->FK1_userId !== Auth::id() || $task->task_type !== 'user_uploaded') {
-            abort(403, 'You can only deactivate your own user-uploaded tasks.');
+            abort(403, 'You can only cancel your own user-uploaded tasks.');
         }
 
-        // Don't allow deactivation if task is already approved/published/completed
+        // Don't allow canceling if task is already approved/published/completed
         if (in_array($task->status, ['approved', 'published', 'completed'])) {
-            return redirect()->back()->with('error', 'Cannot deactivate approved, published, or completed tasks.');
+            return redirect()->back()->with('error', 'Cannot cancel approved, published, or completed tasks.');
         }
 
-        $task->update(['status' => 'inactive']);
+        // Set to 'draft' status to remove from approval queue but keep it editable
+        $task->update(['status' => 'draft']);
 
-        return redirect()->route('tasks.index')->with('status', 'Task deactivated successfully.');
+        return redirect()->route('tasks.my-uploads')->with('status', 'Task proposal cancelled. You can edit and resubmit it.');
     }
 
     /**
@@ -599,6 +646,10 @@ class TaskController extends Controller
         $user = Auth::user();
         
         // Check if task is available for joining
+        // Block inactive/deactivated tasks
+        if ($task->status === 'inactive') {
+            return redirect()->back()->with('error', 'This task has been deactivated and is no longer available.');
+        }
         if ($task->status !== 'published') {
             return redirect()->back()->with('error', 'This task is not available for joining.');
         }

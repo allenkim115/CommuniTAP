@@ -110,17 +110,23 @@
                                         Start Time <span class="text-red-500">*</span>
                                     </label>
                                     <input type="time" name="start_time" id="start_time" value="{{ old('start_time') }}"
-                                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
+                                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white @error('start_time') border-red-500 @enderror"
                                         required>
+                                    @error('start_time')
+                                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                                    @enderror
                                 </div>
                                 <div>
                                     <label for="end_time" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                         End Time <span class="text-red-500">*</span>
                                     </label>
                                     <input type="time" name="end_time" id="end_time" value="{{ old('end_time') }}"
-                                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
+                                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white @error('end_time') border-red-500 @enderror"
                                         required>
                                     <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Ensure end time is after start time.</p>
+                                    @error('end_time')
+                                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                                    @enderror
                                 </div>
                             </div>
 

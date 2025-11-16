@@ -90,7 +90,7 @@
                                     <label for="start_time" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                         Start Time (Optional)
                                     </label>
-                                    <input type="time" name="start_time" id="start_time" value="{{ old('start_time', $task->start_time) }}" 
+                                    <input type="time" name="start_time" id="start_time" value="{{ old('start_time', $task->start_time ? (\Carbon\Carbon::parse($task->start_time)->format('H:i')) : '') }}" 
                                            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
                                     @error('start_time')
                                         <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
@@ -102,7 +102,7 @@
                                     <label for="end_time" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                         End Time (Optional)
                                     </label>
-                                    <input type="time" name="end_time" id="end_time" value="{{ old('end_time', $task->end_time) }}" 
+                                    <input type="time" name="end_time" id="end_time" value="{{ old('end_time', $task->end_time ? (\Carbon\Carbon::parse($task->end_time)->format('H:i')) : '') }}" 
                                            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
                                     @error('end_time')
                                         <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
@@ -124,29 +124,20 @@
                             </div>
                         </div>
 
-                        <!-- Status Management -->
+                        <!-- Current Status (Read-only) -->
                         <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
-                            <h4 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Status Management</h4>
+                            <h4 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Current Status</h4>
                             
-                            <!-- Status -->
+                            <!-- Status Display -->
                             <div>
-                                <label for="status" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                    Task Status <span class="text-red-500">*</span>
+                                <label for="current_status" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    Task Status
                                 </label>
-                                <select name="status" id="status" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white" required>
-                                    <option value="pending" {{ old('status', $task->status) === 'pending' ? 'selected' : '' }}>Pending</option>
-                                    <option value="approved" {{ old('status', $task->status) === 'approved' ? 'selected' : '' }}>Approved</option>
-                                    <option value="published" {{ old('status', $task->status) === 'published' ? 'selected' : '' }}>Published</option>
-                                    <option value="assigned" {{ old('status', $task->status) === 'assigned' ? 'selected' : '' }}>Assigned (User Joined)</option>
-                                    <option value="submitted" {{ old('status', $task->status) === 'submitted' ? 'selected' : '' }}>Submitted</option>
-                                    <option value="completed" {{ old('status', $task->status) === 'completed' ? 'selected' : '' }}>Completed</option>
-                                    <option value="rejected" {{ old('status', $task->status) === 'rejected' ? 'selected' : '' }}>Rejected</option>
-                                </select>
-                                @error('status')
-                                    <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
-                                @enderror
+                                <input type="text" value="{{ ucfirst($task->status) }}" 
+                                       class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-gray-100 dark:bg-gray-600 text-gray-500 dark:text-gray-400" 
+                                       readonly>
                                 <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                                    Published tasks are available for users to join. Assigned status means a user has joined the task.
+                                    Task status is managed through specific actions (Approve, Reject, Publish, etc.) on the task details page.
                                 </p>
                             </div>
                         </div>

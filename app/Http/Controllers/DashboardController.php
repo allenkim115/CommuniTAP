@@ -986,9 +986,16 @@ class DashboardController extends Controller
     {
         $user = Auth::user();
 
-        $userTasks = $user->assignedTasks()->get();
-        $ongoingTasks = $user->ongoingTasks()->get();
-        $completedTasks = $user->completedTasks()->get();
+        // Exclude inactive/deactivated tasks from all queries
+        $userTasks = $user->assignedTasks()
+            ->where('tasks.status', '!=', 'inactive')
+            ->get();
+        $ongoingTasks = $user->ongoingTasks()
+            ->where('tasks.status', '!=', 'inactive')
+            ->get();
+        $completedTasks = $user->completedTasks()
+            ->where('tasks.status', '!=', 'inactive')
+            ->get();
 
         $ongoingTasksCount = $ongoingTasks->count();
         $completedTasksCount = $completedTasks->count();
@@ -1006,7 +1013,9 @@ class DashboardController extends Controller
     {
         $user = Auth::user();
         $userPoints = $user->points;
-        $completedTasksCount = $user->completedTasks()->count();
+        $completedTasksCount = $user->completedTasks()
+            ->where('tasks.status', '!=', 'inactive')
+            ->count();
         $claimedRewardsCount = 0;
         
         // Preserve filter inputs for the view
@@ -1015,6 +1024,7 @@ class DashboardController extends Controller
         $taskType = $request->get('task_type', 'all');
 
         $query = $user->completedTasks()
+            ->where('tasks.status', '!=', 'inactive') // Exclude inactive/deactivated tasks
             ->withPivot('status', 'assigned_at', 'submitted_at', 'completed_at', 'photos', 'completion_notes')
             ->orderBy('task_assignments.completed_at', 'desc');
 

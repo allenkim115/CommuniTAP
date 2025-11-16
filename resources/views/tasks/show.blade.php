@@ -432,7 +432,11 @@
                                             </svg>
                                             <h3 class="text-lg font-semibold text-yellow-800 dark:text-yellow-200 mb-2">Pending Approval</h3>
                                             <p class="text-sm text-yellow-700 dark:text-yellow-300 mb-4">
-                                                Your task completion has been submitted and is waiting for admin approval.
+                                                @if($task->task_type === 'user_uploaded')
+                                                    Your task completion has been submitted and is waiting for the task creator's approval.
+                                                @else
+                                                    Your task completion has been submitted and is waiting for admin approval.
+                                                @endif
                                             </p>
                                             @if($userAssignment->submitted_at)
                                                 <p class="text-xs text-yellow-600 dark:text-yellow-400">

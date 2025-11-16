@@ -22,13 +22,31 @@ class TaskController extends Controller
     {
         // Auto-complete expired tasks before listing
         \App\Models\Task::completeExpiredTasks();
+        
+        // Auto-publish any approved user-uploaded tasks (for tasks approved before the auto-publish feature)
+        Task::where('task_type', 'user_uploaded')
+            ->where('status', 'approved')
+            ->whereNull('published_date')
+            ->update([
+                'status' => 'published',
+                'published_date' => now(),
+            ]);
+        
+        // Auto-publish any approved tasks that have a published_date (should be published)
+        // This handles tasks that were reactivated but status wasn't updated correctly
+        Task::where('status', 'approved')
+            ->whereNotNull('published_date')
+            ->update([
+                'status' => 'published',
+            ]);
 
         $tasks = Task::with(['assignments.user', 'assignedUser'])
+            ->whereNotIn('status', ['draft']) // Exclude cancelled user proposals, but show inactive tasks
             ->orderBy('created_at', 'desc')
             ->paginate(15);
             
         $taskStats = [
-            'total' => Task::count(),
+            'total' => Task::whereNotIn('status', ['draft'])->count(),
             'pending' => Task::where('status', 'pending')->count(),
             'approved' => Task::where('status', 'approved')->count(),
             'published' => Task::where('status', 'published')->count(),
@@ -181,6 +199,50 @@ class TaskController extends Controller
         if ($task->status === 'published') {
             return redirect()->route('admin.tasks.show', $task)->with('error', 'Published tasks cannot be updated.');
         }
+        
+        // Normalize time inputs to 24-hour H:i format before validation
+        foreach (['start_time', 'end_time'] as $timeField) {
+            $value = $request->input($timeField);
+            
+            // Handle empty values - set to null
+            if (empty($value) || trim($value) === '') {
+                $request->merge([$timeField => null]);
+                continue;
+            }
+            
+            $trimmed = trim($value);
+            
+            // If already in H:i format (from type="time" input), use as is
+            if (preg_match('/^\d{2}:\d{2}$/', $trimmed)) {
+                // Already in correct format, keep it
+                continue;
+            }
+            
+            // Try to parse 12-hour format with AM/PM
+            if (preg_match('/\b(am|pm)\b/i', $trimmed)) {
+                try {
+                    $normalized = \Carbon\Carbon::createFromFormat('g:i a', strtolower($trimmed))->format('H:i');
+                    $request->merge([$timeField => $normalized]);
+                } catch (\Exception $e) {
+                    // Fall through to validator which will surface a helpful message
+                }
+            } else {
+                // Try to parse as H:i:s and convert to H:i
+                try {
+                    $parsed = \Carbon\Carbon::createFromFormat('H:i:s', $trimmed);
+                    $request->merge([$timeField => $parsed->format('H:i')]);
+                } catch (\Exception $e) {
+                    // Try H:i format
+                    try {
+                        $parsed = \Carbon\Carbon::createFromFormat('H:i', $trimmed);
+                        $request->merge([$timeField => $parsed->format('H:i')]);
+                    } catch (\Exception $e2) {
+                        // Fall through to validator
+                    }
+                }
+            }
+        }
+        
         $request->validate([
             'title' => 'required|string|max:100',
             'description' => 'required|string',
@@ -190,7 +252,7 @@ class TaskController extends Controller
             'end_time' => 'required|date_format:H:i',
             'location' => 'required|string|max:255',
             'max_participants' => 'nullable|integer|min:1',
-            'status' => 'required|in:pending,approved,published,assigned,submitted,completed,inactive',
+            // Status is not editable through the form - it's managed through specific actions
         ]);
 
         // Do not allow updating completed tasks
@@ -238,13 +300,8 @@ class TaskController extends Controller
             'end_time' => $request->end_time,
             'location' => $request->location,
             'max_participants' => $request->max_participants,
-            'status' => $request->status,
+            // Status is not updated here - it's managed through specific actions (approve, reject, publish, etc.)
         ]);
-
-        // Set published date if status is published and not already set
-        if ($request->status === 'published' && !$task->published_date) {
-            $task->update(['published_date' => now()]);
-        }
 
         return redirect()->route('admin.tasks.index')->with('status', 'Task updated successfully.');
     }
@@ -275,47 +332,102 @@ class TaskController extends Controller
         if ($task->status !== 'inactive') {
             return redirect()->back()->with('error', 'Only deactivated tasks can be reactivated.');
         }
-        // For admin-managed tasks, bring back to approved state; publishing is a separate step
-        $task->update(['status' => 'approved']);
+        
+        // Automatically publish reactivated tasks
+        $task->update([
+            'status' => 'published',
+            'published_date' => now(),
+        ]);
+        
+        // Refresh the model to ensure status is updated
+        $task->refresh();
 
+        // Notify task creator if it's a user-uploaded task
         if ($task->task_type === 'user_uploaded' && $task->FK1_userId && $task->assignedUser) {
             $this->notificationService->notify(
                 $task->assignedUser,
                 'task_proposal_reactivated',
-                "Your task \"{$task->title}\" was reactivated and set to approved.",
+                "Your task \"{$task->title}\" was reactivated and is now live!",
                 [
                     'url' => route('tasks.show', $task),
-                    'description' => 'You can now proceed to request publishing again.',
+                    'description' => 'The task is available for users to join again.',
                 ]
             );
         }
 
-        return redirect()->back()->with('status', 'Task reactivated to approved status.');
+        // Notify all active users that a reactivated task is available
+        $activeUsers = User::where('status', 'active')
+            ->where('role', '!=', 'admin')
+            ->when(!is_null($task->FK1_userId), fn ($query) => $query->where('userId', '!=', $task->FK1_userId))
+            ->get(['userId', 'firstName', 'lastName']);
+        $this->notificationService->notifyMany(
+            $activeUsers,
+            'task_reactivated',
+            "Task \"{$task->title}\" is available again!",
+            [
+                'url' => route('tasks.show', $task),
+                'description' => 'Join now while slots are open.',
+            ]
+        );
+
+        return redirect()->back()->with('status', 'Task reactivated and published successfully.');
     }
 
     /**
      * Approve a pending task
+     * For user-uploaded tasks (proposals), automatically publish them
      */
     public function approve(Task $task)
     {
-        $task->update([
-            'status' => 'approved',
-            'approval_date' => now(),
-        ]);
+        // For user-uploaded proposals, approve and publish automatically
+        if ($task->task_type === 'user_uploaded') {
+            $task->update([
+                'status' => 'published',
+                'approval_date' => now(),
+                'published_date' => now(),
+            ]);
+            
+            // Refresh the model to ensure status is updated
+            $task->refresh();
 
-        if ($task->task_type === 'user_uploaded' && $task->FK1_userId && $task->assignedUser) {
-            $this->notificationService->notify(
-                $task->assignedUser,
-                'task_proposal_approved',
-                "Your task proposal \"{$task->title}\" was approved.",
+            // Notify the task creator
+            if ($task->FK1_userId && $task->assignedUser) {
+                $this->notificationService->notify(
+                    $task->assignedUser,
+                    'task_proposal_published',
+                    "Your task proposal \"{$task->title}\" was approved and is now live!",
+                    [
+                        'url' => route('tasks.show', $task),
+                        'description' => 'Participants can now join. Monitor submissions regularly.',
+                    ]
+                );
+            }
+
+            // Notify all active users that a new task is available to join
+            $activeUsers = User::where('status', 'active')
+                ->where('role', '!=', 'admin')
+                ->when(!is_null($task->FK1_userId), fn ($query) => $query->where('userId', '!=', $task->FK1_userId))
+                ->get(['userId', 'firstName', 'lastName']);
+            $this->notificationService->notifyMany(
+                $activeUsers,
+                'new_task_available',
+                "New task available: \"{$task->title}\"",
                 [
                     'url' => route('tasks.show', $task),
-                    'description' => 'The task is ready to be reviewed for publishing.',
+                    'description' => 'Join now to earn points!',
                 ]
             );
-        }
 
-        return redirect()->back()->with('status', 'Task approved successfully.');
+            return redirect()->back()->with('status', 'Task proposal approved and published successfully.');
+        } else {
+            // For admin-created tasks, just approve (publishing is a separate step)
+            $task->update([
+                'status' => 'approved',
+                'approval_date' => now(),
+            ]);
+
+            return redirect()->back()->with('status', 'Task approved successfully.');
+        }
     }
 
     /**
@@ -440,6 +552,12 @@ class TaskController extends Controller
         
         $query = Task::with(['assignments.user', 'assignedUser']);
         
+        // Exclude cancelled user proposals (draft) unless specifically filtering for them
+        // Inactive tasks should still be visible
+        if (!$status || $status !== 'draft') {
+            $query->whereNotIn('status', ['draft']);
+        }
+        
         if ($status && $status !== 'all') {
             $query->where('status', $status);
         }
@@ -456,7 +574,7 @@ class TaskController extends Controller
         $tasks = $query->orderBy('created_at', 'desc')->paginate(15)->appends($request->query());
         
         $taskStats = [
-            'total' => Task::count(),
+            'total' => Task::whereNotIn('status', ['draft'])->count(),
             'pending' => Task::where('status', 'pending')->count(),
             'approved' => Task::where('status', 'approved')->count(),
             'published' => Task::where('status', 'published')->count(),
