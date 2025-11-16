@@ -5,8 +5,17 @@
                 {{ __('Task Submissions') }}
             </h2>
             
-            <div class="text-sm text-gray-600 dark:text-gray-400">
-                {{ $submissions->total() }} pending submissions
+            <div class="flex items-center gap-4">
+                <a href="{{ route('admin.task-submissions.history') }}" 
+                   class="inline-flex items-center px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium rounded-md">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    View History
+                </a>
+                <div class="text-sm text-gray-600 dark:text-gray-400">
+                    {{ $submissions->total() }} pending submissions
+                </div>
             </div>
         </div>
     </x-slot>

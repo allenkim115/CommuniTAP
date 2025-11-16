@@ -171,52 +171,82 @@
                         <div class="p-6">
                             <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Review Actions</h3>
                             
-                            <!-- Approve Form -->
-                            <form action="{{ route('admin.task-submissions.approve', $submission) }}" method="POST" class="mb-4">
-                                @csrf
-                                <div class="mb-4">
-                                    <label for="admin_notes" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                        Admin Notes (Optional)
-                                    </label>
-                                    <textarea 
-                                        id="admin_notes" 
-                                        name="admin_notes" 
-                                        rows="3" 
-                                        class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 dark:bg-gray-700 dark:text-white"
-                                        placeholder="Add notes about this approval..."></textarea>
-                                </div>
-                                <button type="submit" 
-                                        class="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
-                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                                    </svg>
-                                    Approve Submission
-                                </button>
-                            </form>
+                            @php
+                                $isClosed = $submission->status === 'completed' || $submission->rejection_count >= 3;
+                            @endphp
 
-                            <!-- Reject Form -->
-                            <form action="{{ route('admin.task-submissions.reject', $submission) }}" method="POST">
-                                @csrf
-                                <div class="mb-4">
-                                    <label for="rejection_reason" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                        Rejection Reason <span class="text-red-500">*</span>
-                                    </label>
-                                    <textarea 
-                                        id="rejection_reason" 
-                                        name="rejection_reason" 
-                                        rows="3" 
-                                        required
-                                        class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 dark:bg-gray-700 dark:text-white"
-                                        placeholder="Explain why this submission is being rejected..."></textarea>
+                            @if($isClosed)
+                                <div class="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg border border-gray-300 dark:border-gray-600">
+                                    @if($submission->status === 'completed')
+                                        <div class="flex items-center text-green-600 dark:text-green-400 mb-2">
+                                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                            </svg>
+                                            <span class="font-medium">Submission Approved</span>
+                                        </div>
+                                        <p class="text-sm text-gray-600 dark:text-gray-300">
+                                            This submission has been approved and is closed. No further actions can be taken.
+                                        </p>
+                                    @elseif($submission->rejection_count >= 3)
+                                        <div class="flex items-center text-red-600 dark:text-red-400 mb-2">
+                                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                            </svg>
+                                            <span class="font-medium">Submission Closed</span>
+                                        </div>
+                                        <p class="text-sm text-gray-600 dark:text-gray-300">
+                                            This submission has reached the maximum number of rejection attempts (3) and is closed. No further actions can be taken.
+                                        </p>
+                                    @endif
                                 </div>
-                                <button type="submit" 
-                                        class="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
-                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                                    </svg>
-                                    Reject Submission
-                                </button>
-                            </form>
+                            @else
+                                <!-- Approve Form -->
+                                <form action="{{ route('admin.task-submissions.approve', $submission) }}" method="POST" class="mb-4">
+                                    @csrf
+                                    <div class="mb-4">
+                                        <label for="admin_notes" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                            Admin Notes (Optional)
+                                        </label>
+                                        <textarea 
+                                            id="admin_notes" 
+                                            name="admin_notes" 
+                                            rows="3" 
+                                            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 dark:bg-gray-700 dark:text-white"
+                                            placeholder="Add notes about this approval..."></textarea>
+                                    </div>
+                                    <button type="submit" 
+                                            class="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                        </svg>
+                                        Approve Submission
+                                    </button>
+                                </form>
+
+                                <!-- Reject Form -->
+                                <form action="{{ route('admin.task-submissions.reject', $submission) }}" method="POST">
+                                    @csrf
+                                    <div class="mb-4">
+                                        <label for="rejection_reason" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                            Rejection Reason <span class="text-red-500">*</span>
+                                        </label>
+                                        <textarea 
+                                            id="rejection_reason" 
+                                            name="rejection_reason" 
+                                            rows="3" 
+                                            required
+                                            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 dark:bg-gray-700 dark:text-white"
+                                            placeholder="Explain why this submission is being rejected..."></textarea>
+                                    </div>
+                                    <button type="submit" 
+                                            class="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                        </svg>
+                                        Reject Submission
+                                    </button>
+                                </form>
+                            @endif
                         </div>
                     </div>
                 </div>

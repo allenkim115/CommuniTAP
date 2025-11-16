@@ -222,8 +222,13 @@ class TaskController extends Controller
     public function creatorSubmissions(Request $request)
     {
         $user = Auth::user();
+        // Exclude closed submissions (completed or 3+ rejections)
         $submissions = TaskAssignment::with(['task', 'user'])
             ->where('status', 'submitted')
+            ->where(function ($q) {
+                $q->where('rejection_count', '<', 3)
+                  ->orWhereNull('rejection_count');
+            })
             ->whereHas('task', function ($q) use ($user) {
                 $q->where('task_type', 'user_uploaded')
                   ->where('FK1_userId', $user->userId);
@@ -257,6 +262,16 @@ class TaskController extends Controller
         $task = $submission->task;
         if (!$task || $task->task_type !== 'user_uploaded' || $task->FK1_userId !== $user->userId) {
             abort(403, 'You can only approve submissions for your user-uploaded tasks.');
+        }
+
+        // Prevent approving already completed submissions
+        if ($submission->status === 'completed') {
+            return redirect()->back()->with('error', 'This submission has already been approved and is closed.');
+        }
+
+        // Prevent approving submissions that have reached maximum rejection attempts
+        if ($submission->rejection_count >= 3) {
+            return redirect()->back()->with('error', 'This submission has reached the maximum number of rejection attempts (3) and is closed.');
         }
 
         $request->validate([
@@ -314,14 +329,23 @@ class TaskController extends Controller
             'rejection_reason' => 'required|string|max:1000'
         ]);
 
+        // Prevent rejecting already completed submissions
+        if ($submission->status === 'completed') {
+            return redirect()->back()->with('error', 'This submission has already been approved and is closed.');
+        }
+
         if ($submission->rejection_count >= 3) {
             return redirect()->back()->with('error', 'Maximum rejection attempts reached.');
         }
 
         $newRejectionCount = $submission->rejection_count + 1;
+        
+        // If this is the 3rd rejection, mark as uncompleted (closed) instead of assigned
+        $newStatus = $newRejectionCount >= 3 ? 'uncompleted' : 'assigned';
+        
         $submission->update([
-            'status' => 'assigned',
-            'submitted_at' => null,
+            'status' => $newStatus, // Set to uncompleted if 3rd rejection, otherwise assigned so user can resubmit
+            'submitted_at' => $newRejectionCount >= 3 ? $submission->submitted_at : null, // Keep submitted_at if closing
             'rejection_count' => $newRejectionCount,
             'rejection_reason' => $request->rejection_reason,
             'completion_notes' => 'Rejected (Attempt ' . $newRejectionCount . '/3): ' . $request->rejection_reason

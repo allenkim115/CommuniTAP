@@ -307,6 +307,7 @@ Route::middleware(['auth', 'admin', 'active'])->prefix('admin')->name('admin.')-
     
     // Task submission verification routes
     Route::get('/task-submissions', [TaskSubmissionController::class, 'index'])->name('task-submissions.index');
+    Route::get('/task-submissions/history', [TaskSubmissionController::class, 'history'])->name('task-submissions.history');
     Route::get('/task-submissions/{submission}', [TaskSubmissionController::class, 'show'])->name('task-submissions.show');
     Route::post('/task-submissions/{submission}/approve', [TaskSubmissionController::class, 'approve'])->name('task-submissions.approve');
     Route::post('/task-submissions/{submission}/reject', [TaskSubmissionController::class, 'reject'])->name('task-submissions.reject');
