@@ -62,6 +62,12 @@ class TaskSubmissionController extends Controller
             'completion_notes' => $request->admin_notes ?? 'Approved by admin'
         ]);
 
+        // Refresh the task relationship to get updated assignments
+        $task->refresh();
+
+        // Check if all participants have completed and auto-complete the task if so
+        $taskMarkedCompleted = $task->markAsCompletedIfAllParticipantsDone();
+
         // Award points to user
         $user = $submission->user;
         $user->increment('points', $submission->task->points_awarded);
@@ -76,8 +82,13 @@ class TaskSubmissionController extends Controller
             ]
         );
 
+        $statusMessage = 'Task submission approved successfully. User has been awarded ' . $submission->task->points_awarded . ' points.';
+        if ($taskMarkedCompleted) {
+            $statusMessage .= ' Task automatically marked as completed since all participants have finished.';
+        }
+
         return redirect()->route('admin.task-submissions.index')
-            ->with('status', 'Task submission approved successfully. User has been awarded ' . $submission->task->points_awarded . ' points.');
+            ->with('status', $statusMessage);
     }
 
     /**

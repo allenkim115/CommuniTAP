@@ -272,4 +272,43 @@ class Task extends Model
     {
         return $this->task_type === 'daily';
     }
+
+    /**
+     * Check if all participants have completed their assignments
+     */
+    public function areAllParticipantsCompleted(): bool
+    {
+        $totalAssignments = $this->assignments()->count();
+        
+        // If there are no assignments, return false
+        if ($totalAssignments === 0) {
+            return false;
+        }
+        
+        // Check if all assignments are completed
+        $completedAssignments = $this->assignments()->where('status', 'completed')->count();
+        
+        return $completedAssignments === $totalAssignments;
+    }
+
+    /**
+     * Automatically mark task as completed if all participants have completed their assignments
+     * This can happen even before the due date
+     */
+    public function markAsCompletedIfAllParticipantsDone(): bool
+    {
+        // Only mark as completed if task is not already completed and not inactive
+        if ($this->status === 'completed' || $this->status === 'inactive') {
+            return false;
+        }
+        
+        // Check if all participants have completed
+        if ($this->areAllParticipantsCompleted()) {
+            $this->status = 'completed';
+            $this->save();
+            return true;
+        }
+        
+        return false;
+    }
 }

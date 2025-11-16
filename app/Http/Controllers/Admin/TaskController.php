@@ -520,6 +520,12 @@ class TaskController extends Controller
             'completed_at' => now(),
         ]);
 
+        // Refresh the task to get updated assignments
+        $task->refresh();
+
+        // Check if all participants have completed and auto-complete the task if so
+        $taskMarkedCompleted = $task->markAsCompletedIfAllParticipantsDone();
+
         // Award points to the user
         $assignment->user->increment('points', $task->points_awarded);
 
@@ -535,7 +541,12 @@ class TaskController extends Controller
             );
         }
 
-        return redirect()->back()->with('status', 'Task assignment completed and points awarded.');
+        $statusMessage = 'Task assignment completed and points awarded.';
+        if ($taskMarkedCompleted) {
+            $statusMessage .= ' Task automatically marked as completed since all participants have finished.';
+        }
+
+        return redirect()->back()->with('status', $statusMessage);
     }
 
     /**

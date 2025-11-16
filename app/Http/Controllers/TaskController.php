@@ -269,6 +269,12 @@ class TaskController extends Controller
             'completion_notes' => $request->notes ?? 'Approved by creator'
         ]);
 
+        // Refresh the task relationship to get updated assignments
+        $task->refresh();
+
+        // Check if all participants have completed and auto-complete the task if so
+        $taskMarkedCompleted = $task->markAsCompletedIfAllParticipantsDone();
+
         // Award points to the assignee
         $assignee = $submission->user;
         if ($assignee) {
@@ -285,7 +291,12 @@ class TaskController extends Controller
             );
         }
 
-        return redirect()->route('tasks.creator.submissions')->with('status', 'Submission approved.');
+        $statusMessage = 'Submission approved.';
+        if ($taskMarkedCompleted) {
+            $statusMessage .= ' Task automatically marked as completed since all participants have finished.';
+        }
+
+        return redirect()->route('tasks.creator.submissions')->with('status', $statusMessage);
     }
 
     /**
