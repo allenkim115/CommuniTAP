@@ -62,9 +62,17 @@ class TaskSubmissionController extends Controller
             'completion_notes' => $request->admin_notes ?? 'Approved by admin'
         ]);
 
-        // Award points to user
+        // Award points to user (respecting points cap)
         $user = $submission->user;
-        $user->increment('points', $submission->task->points_awarded);
+        $pointsResult = $user->addPoints($submission->task->points_awarded);
+        
+        $pointsMessage = $pointsResult['added'] > 0 
+            ? "{$pointsResult['added']} points have been added to your balance."
+            : 'You have reached the points cap (500 points). No points were added.';
+        
+        if ($pointsResult['capped'] && $pointsResult['added'] > 0) {
+            $pointsMessage .= " You reached the maximum points limit, so only {$pointsResult['added']} of {$submission->task->points_awarded} points were added.";
+        }
 
         $this->notificationService->notify(
             $user,
@@ -72,12 +80,16 @@ class TaskSubmissionController extends Controller
             "Your submission for \"{$submission->task->title}\" was approved!",
             [
                 'url' => route('tasks.show', $submission->task),
-                'description' => 'Points have been added to your balance. Keep up the great work!',
+                'description' => $pointsMessage,
             ]
         );
 
+        $statusMessage = $pointsResult['added'] > 0
+            ? "Task submission approved successfully. User has been awarded {$pointsResult['added']} points."
+            : "Task submission approved successfully. User has reached the points cap (500 points), so no points were added.";
+
         return redirect()->route('admin.task-submissions.index')
-            ->with('status', 'Task submission approved successfully. User has been awarded ' . $submission->task->points_awarded . ' points.');
+            ->with('status', $statusMessage);
     }
 
     /**
