@@ -186,8 +186,8 @@ class TapNominationController extends Controller
                 'status' => 'pending'
             ]);
 
-            // Award 1 point to the nominator for using the Tap & Pass system
-            $user->increment('points', 1);
+            // Award 1 point to the nominator for using the Tap & Pass system (respecting points cap)
+            $user->addPoints(1);
 
             if ($nomination->nominee) {
                 $this->notificationService->notify(
@@ -273,8 +273,8 @@ class TapNominationController extends Controller
         // Update nomination status
         $nomination->update(['status' => 'accepted']);
 
-        // Award 1 point to the nominee for accepting the nomination
-        $user->increment('points', 1);
+        // Award 1 point to the nominee for accepting the nomination (respecting points cap)
+        $user->addPoints(1);
 
         if ($nomination->nominator) {
             $this->notificationService->notify(

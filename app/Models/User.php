@@ -15,6 +15,11 @@ class User extends Authenticatable
     use HasFactory, Notifiable;
 
     /**
+     * Maximum points a user can have
+     */
+    public const POINTS_CAP = 500;
+
+    /**
      * The primary key for the model.
      *
      * @var string
@@ -231,5 +236,51 @@ class User extends Authenticatable
     public function latestNotifications(int $limit = 5): Collection
     {
         return $this->systemNotifications()->limit($limit)->get();
+    }
+
+    /**
+     * Add points to user, respecting the points cap.
+     * Returns an array with 'added' (points actually added) and 'capped' (boolean).
+     *
+     * @param  int  $points
+     * @return array{added: int, capped: bool}
+     */
+    public function addPoints(int $points): array
+    {
+        if ($points <= 0) {
+            return ['added' => 0, 'capped' => false];
+        }
+
+        $currentPoints = $this->points;
+        $maxAllowed = self::POINTS_CAP;
+        
+        // If already at or above cap, no points can be added
+        if ($currentPoints >= $maxAllowed) {
+            return ['added' => 0, 'capped' => true];
+        }
+
+        // Calculate how many points can actually be added
+        $pointsToAdd = min($points, $maxAllowed - $currentPoints);
+        
+        // Add the points
+        $this->increment('points', $pointsToAdd);
+        
+        // Return info about whether it was capped
+        $wasCapped = $pointsToAdd < $points;
+        
+        return [
+            'added' => $pointsToAdd,
+            'capped' => $wasCapped
+        ];
+    }
+
+    /**
+     * Check if user has reached the points cap
+     *
+     * @return bool
+     */
+    public function hasReachedPointsCap(): bool
+    {
+        return $this->points >= self::POINTS_CAP;
     }
 }

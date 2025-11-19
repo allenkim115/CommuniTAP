@@ -8,6 +8,7 @@ use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use Carbon\Carbon;
 
 class RewardController extends Controller
 {
@@ -34,6 +35,25 @@ class RewardController extends Controller
 
         if ($user->points < $reward->points_cost) {
             return back()->with('error', 'Not enough points to redeem.');
+        }
+
+        // Check if user has already redeemed this specific reward today
+        $alreadyRedeemedToday = RewardRedemption::where('FK2_userId', $user->userId)
+            ->where('FK1_rewardId', $reward->rewardId)
+            ->whereDate('redemption_date', Carbon::today())
+            ->exists();
+
+        if ($alreadyRedeemedToday) {
+            return back()->with('error', 'You have already redeemed this reward today. Please try again tomorrow or choose a different reward.');
+        }
+
+        // Check daily redemption limit (2 rewards per day)
+        $todayRedemptions = RewardRedemption::where('FK2_userId', $user->userId)
+            ->whereDate('redemption_date', Carbon::today())
+            ->count();
+
+        if ($todayRedemptions >= 2) {
+            return back()->with('error', 'You have reached the daily redemption limit of 2 rewards. Please try again tomorrow.');
         }
 
         // Generate a coupon code and auto-approve the redemption

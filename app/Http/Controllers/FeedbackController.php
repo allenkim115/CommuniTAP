@@ -85,11 +85,15 @@ class FeedbackController extends Controller
             'feedback_date' => now(),
         ]);
         
-        // Award points for submitting feedback
-        $user->increment('points', 1);
+        // Award points for submitting feedback (respecting points cap)
+        $pointsResult = $user->addPoints(1);
+        
+        $successMessage = $pointsResult['added'] > 0
+            ? 'Feedback submitted successfully! You earned 1 point.'
+            : 'Feedback submitted successfully! However, you have reached the points cap (500 points), so no points were added.';
         
         return redirect()->route('tasks.show', $task)
-            ->with('success', 'Feedback submitted successfully! You earned 1 point.');
+            ->with('success', $successMessage);
     }
     
     /**
