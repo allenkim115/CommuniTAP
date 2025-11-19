@@ -520,14 +520,16 @@ class TaskController extends Controller
             'completed_at' => now(),
         ]);
 
-        // Refresh the task to get updated assignments
-        $task->refresh();
-
-        // Check if all participants have completed and auto-complete the task if so
-        $taskMarkedCompleted = $task->markAsCompletedIfAllParticipantsDone();
-
-        // Award points to the user
-        $assignment->user->increment('points', $task->points_awarded);
+        // Award points to the user (respecting points cap)
+        $pointsResult = $assignment->user->addPoints($task->points_awarded);
+        
+        $pointsMessage = $pointsResult['added'] > 0 
+            ? "{$pointsResult['added']} points have been added to your balance."
+            : 'You have reached the points cap (500 points). No points were added.';
+        
+        if ($pointsResult['capped'] && $pointsResult['added'] > 0) {
+            $pointsMessage .= " You reached the maximum points limit, so only {$pointsResult['added']} of {$task->points_awarded} points were added.";
+        }
 
         if ($assignment->user) {
             $this->notificationService->notify(
@@ -536,15 +538,14 @@ class TaskController extends Controller
                 "Great job! \"{$task->title}\" was verified by an admin.",
                 [
                     'url' => route('tasks.show', $task),
-                    'description' => 'Points have been added to your balance.',
+                    'description' => $pointsMessage,
                 ]
             );
         }
 
-        $statusMessage = 'Task assignment completed and points awarded.';
-        if ($taskMarkedCompleted) {
-            $statusMessage .= ' Task automatically marked as completed since all participants have finished.';
-        }
+        $statusMessage = $pointsResult['added'] > 0
+            ? "Task assignment completed. {$pointsResult['added']} points awarded."
+            : "Task assignment completed. User has reached the points cap (500 points), so no points were added.";
 
         return redirect()->back()->with('status', $statusMessage);
     }

@@ -284,16 +284,18 @@ class TaskController extends Controller
             'completion_notes' => $request->notes ?? 'Approved by creator'
         ]);
 
-        // Refresh the task relationship to get updated assignments
-        $task->refresh();
-
-        // Check if all participants have completed and auto-complete the task if so
-        $taskMarkedCompleted = $task->markAsCompletedIfAllParticipantsDone();
-
-        // Award points to the assignee
+        // Award points to the assignee (respecting points cap)
         $assignee = $submission->user;
         if ($assignee) {
-            $assignee->increment('points', $submission->task->points_awarded);
+            $pointsResult = $assignee->addPoints($submission->task->points_awarded);
+            
+            $pointsMessage = $pointsResult['added'] > 0 
+                ? "{$pointsResult['added']} points have been added to your balance."
+                : 'You have reached the points cap (500 points). No points were added.';
+            
+            if ($pointsResult['capped'] && $pointsResult['added'] > 0) {
+                $pointsMessage .= " You reached the maximum points limit, so only {$pointsResult['added']} of {$submission->task->points_awarded} points were added.";
+            }
 
             $this->notificationService->notify(
                 $assignee,
@@ -301,7 +303,7 @@ class TaskController extends Controller
                 "Your submission for \"{$submission->task->title}\" was approved!",
                 [
                     'url' => route('tasks.show', $submission->task),
-                    'description' => 'Points have been added to your balance.',
+                    'description' => $pointsMessage,
                 ]
             );
         }
