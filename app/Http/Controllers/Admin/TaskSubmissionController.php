@@ -21,8 +21,13 @@ class TaskSubmissionController extends Controller
     public function index()
     {
         // Exclude user-uploaded tasks; those are approved/rejected by the creator
+        // Also exclude closed submissions (completed or 3+ rejections)
         $submissions = TaskAssignment::with(['task', 'user'])
             ->where('status', 'submitted')
+            ->where(function ($q) {
+                $q->where('rejection_count', '<', 3)
+                  ->orWhereNull('rejection_count');
+            })
             ->whereHas('task', function ($q) {
                 $q->where('task_type', '!=', 'user_uploaded');
             })
@@ -52,6 +57,17 @@ class TaskSubmissionController extends Controller
         if ($task && $task->task_type === 'user_uploaded' && !is_null($task->FK1_userId)) {
             return redirect()->back()->with('error', 'Only the task creator can approve user-uploaded task submissions.');
         }
+
+        // Prevent approving already completed submissions
+        if ($submission->status === 'completed') {
+            return redirect()->back()->with('error', 'This submission has already been approved and is closed.');
+        }
+
+        // Prevent approving submissions that have reached maximum rejection attempts
+        if ($submission->rejection_count >= 3) {
+            return redirect()->back()->with('error', 'This submission has reached the maximum number of rejection attempts (3) and is closed.');
+        }
+
         $request->validate([
             'admin_notes' => 'nullable|string|max:1000'
         ]);
@@ -106,6 +122,11 @@ class TaskSubmissionController extends Controller
             'rejection_reason' => 'required|string|max:1000'
         ]);
 
+        // Prevent rejecting already completed submissions
+        if ($submission->status === 'completed') {
+            return redirect()->back()->with('error', 'This submission has already been approved and is closed.');
+        }
+
         // Check if user has exceeded maximum rejection attempts (3)
         if ($submission->rejection_count >= 3) {
             return redirect()->back()
@@ -115,9 +136,12 @@ class TaskSubmissionController extends Controller
         // Increment rejection count
         $newRejectionCount = $submission->rejection_count + 1;
         
+        // If this is the 3rd rejection, mark as uncompleted (closed) instead of assigned
+        $newStatus = $newRejectionCount >= 3 ? 'uncompleted' : 'assigned';
+        
         $submission->update([
-            'status' => 'assigned', // Reset to assigned so user can resubmit
-            'submitted_at' => null,
+            'status' => $newStatus, // Set to uncompleted if 3rd rejection, otherwise assigned so user can resubmit
+            'submitted_at' => $newRejectionCount >= 3 ? $submission->submitted_at : null, // Keep submitted_at if closing
             'rejection_count' => $newRejectionCount,
             'rejection_reason' => $request->rejection_reason,
             'completion_notes' => 'Rejected (Attempt ' . $newRejectionCount . '/3): ' . $request->rejection_reason
@@ -140,6 +164,63 @@ class TaskSubmissionController extends Controller
 
         return redirect()->route('admin.task-submissions.index')
             ->with('status', $message);
+    }
+
+    /**
+     * Display history of completed and rejected submissions
+     */
+    public function history(Request $request)
+    {
+        $type = $request->get('type', 'completed'); // 'completed' or 'rejected'
+        
+        // Exclude user-uploaded tasks; those are approved/rejected by the creator
+        $query = TaskAssignment::with(['task', 'user'])
+            ->whereHas('task', function ($q) {
+                $q->where('task_type', '!=', 'user_uploaded');
+            });
+
+        if ($type === 'completed') {
+            $submissions = $query->where('status', 'completed')
+                ->orderBy('completed_at', 'desc')
+                ->paginate(15);
+        } else {
+            // Rejected submissions: status is 'uncompleted' with 3+ rejections, or 'assigned' with rejection_count >= 3
+            $submissions = $query->where(function ($q) {
+                    $q->where(function ($q2) {
+                        $q2->where('status', 'uncompleted')
+                           ->where('rejection_count', '>=', 3);
+                    })->orWhere(function ($q2) {
+                        $q2->where('status', 'assigned')
+                           ->where('rejection_count', '>=', 3);
+                    });
+                })
+                ->whereNotNull('rejection_reason')
+                ->orderBy('updated_at', 'desc')
+                ->paginate(15);
+        }
+
+        // Get statistics
+        $stats = [
+            'total_completed' => TaskAssignment::where('status', 'completed')
+                ->whereHas('task', function ($q) {
+                    $q->where('task_type', '!=', 'user_uploaded');
+                })->count(),
+            'total_rejected' => TaskAssignment::where(function ($q) {
+                    $q->where(function ($q2) {
+                        $q2->where('status', 'uncompleted')
+                           ->where('rejection_count', '>=', 3);
+                    })->orWhere(function ($q2) {
+                        $q2->where('status', 'assigned')
+                           ->where('rejection_count', '>=', 3);
+                    });
+                })
+                ->whereNotNull('rejection_reason')
+                ->whereHas('task', function ($q) {
+                    $q->where('task_type', '!=', 'user_uploaded');
+                })->count(),
+        ];
+
+        return view('admin.task-submissions.history', compact('submissions', 'type', 'stats'));
     }
 
     /**

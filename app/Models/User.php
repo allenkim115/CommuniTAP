@@ -141,10 +141,19 @@ class User extends Authenticatable
 
     /**
      * Get tasks where user is assigned and status is ongoing (assigned or submitted)
+     * Excludes uncompleted tasks
      */
     public function ongoingTasks()
     {
         return $this->assignedTasks()->wherePivotIn('status', ['assigned', 'submitted']);
+    }
+
+    /**
+     * Get uncompleted tasks for this user
+     */
+    public function uncompletedTasks()
+    {
+        return $this->assignedTasks()->wherePivot('status', 'uncompleted');
     }
 
     /**

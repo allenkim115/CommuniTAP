@@ -105,7 +105,17 @@
                                             <div>
                                                 <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Due Date</dt>
                                                 <dd class="text-sm text-gray-900 dark:text-white">
-                                                    {{ is_string($task->due_date) ? \Carbon\Carbon::parse($task->due_date)->format('F j, Y \a\t g:i A') : $task->due_date->format('F j, Y \a\t g:i A') }}
+                                                    @php
+                                                        $dueDate = is_string($task->due_date) ? \Carbon\Carbon::parse($task->due_date) : $task->due_date;
+                                                        if ($task->end_time) {
+                                                            // Combine due_date with end_time
+                                                            $deadline = \Carbon\Carbon::parse($dueDate->toDateString() . ' ' . $task->end_time);
+                                                            echo $deadline->format('F j, Y \a\t g:i A');
+                                                        } else {
+                                                            // Use due_date directly
+                                                            echo $dueDate->format('F j, Y \a\t g:i A');
+                                                        }
+                                                    @endphp
                                                 </dd>
                                             </div>
                                             @endif
@@ -422,7 +432,11 @@
                                             </svg>
                                             <h3 class="text-lg font-semibold text-yellow-800 dark:text-yellow-200 mb-2">Pending Approval</h3>
                                             <p class="text-sm text-yellow-700 dark:text-yellow-300 mb-4">
-                                                Your task completion has been submitted and is waiting for admin approval.
+                                                @if($task->task_type === 'user_uploaded')
+                                                    Your task completion has been submitted and is waiting for the task creator's approval.
+                                                @else
+                                                    Your task completion has been submitted and is waiting for admin approval.
+                                                @endif
                                             </p>
                                             @if($userAssignment->submitted_at)
                                                 <p class="text-xs text-yellow-600 dark:text-yellow-400">

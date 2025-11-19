@@ -94,22 +94,53 @@
                     <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                         <div class="p-6">
                             <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Review Actions</h3>
-                            <form action="{{ route('tasks.creator.approve', $submission) }}" method="POST" class="mb-4" onsubmit="return confirm('Approve this submission?');">
-                                @csrf
-                                <div class="mb-4">
-                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Notes (optional)</label>
-                                    <textarea name="notes" rows="3" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm dark:bg-gray-700 dark:text-white"></textarea>
+                            
+                            @php
+                                $isClosed = $submission->status === 'completed' || $submission->rejection_count >= 3;
+                            @endphp
+
+                            @if($isClosed)
+                                <div class="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg border border-gray-300 dark:border-gray-600">
+                                    @if($submission->status === 'completed')
+                                        <div class="flex items-center text-green-600 dark:text-green-400 mb-2">
+                                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                            </svg>
+                                            <span class="font-medium">Submission Approved</span>
+                                        </div>
+                                        <p class="text-sm text-gray-600 dark:text-gray-300">
+                                            This submission has been approved and is closed. No further actions can be taken.
+                                        </p>
+                                    @elseif($submission->rejection_count >= 3)
+                                        <div class="flex items-center text-red-600 dark:text-red-400 mb-2">
+                                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                            </svg>
+                                            <span class="font-medium">Submission Closed</span>
+                                        </div>
+                                        <p class="text-sm text-gray-600 dark:text-gray-300">
+                                            This submission has reached the maximum number of rejection attempts (3) and is closed. No further actions can be taken.
+                                        </p>
+                                    @endif
                                 </div>
-                                <button type="submit" class="w-full px-4 py-2 rounded bg-green-600 hover:bg-green-700 text-white">Approve Submission</button>
-                            </form>
-                            <form action="{{ route('tasks.creator.reject', $submission) }}" method="POST" onsubmit="return confirm('Reject this submission?');">
-                                @csrf
-                                <div class="mb-4">
-                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Rejection Reason *</label>
-                                    <textarea name="rejection_reason" required rows="3" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm dark:bg-gray-700 dark:text-white"></textarea>
-                                </div>
-                                <button type="submit" class="w-full px-4 py-2 rounded bg-red-600 hover:bg-red-700 text-white">Reject Submission</button>
-                            </form>
+                            @else
+                                <form action="{{ route('tasks.creator.approve', $submission) }}" method="POST" class="mb-4" onsubmit="return confirm('Approve this submission?');">
+                                    @csrf
+                                    <div class="mb-4">
+                                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Notes (optional)</label>
+                                        <textarea name="notes" rows="3" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm dark:bg-gray-700 dark:text-white"></textarea>
+                                    </div>
+                                    <button type="submit" class="w-full px-4 py-2 rounded bg-green-600 hover:bg-green-700 text-white">Approve Submission</button>
+                                </form>
+                                <form action="{{ route('tasks.creator.reject', $submission) }}" method="POST" onsubmit="return confirm('Reject this submission?');">
+                                    @csrf
+                                    <div class="mb-4">
+                                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Rejection Reason *</label>
+                                        <textarea name="rejection_reason" required rows="3" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm dark:bg-gray-700 dark:text-white"></textarea>
+                                    </div>
+                                    <button type="submit" class="w-full px-4 py-2 rounded bg-red-600 hover:bg-red-700 text-white">Reject Submission</button>
+                                </form>
+                            @endif
                         </div>
                     </div>
                 </div>

@@ -68,12 +68,12 @@
                             @endphp
                             <span class="px-2 py-1 text-xs font-medium rounded-full
                                 @class([
-                                    'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200' => $task->status === 'pending',
+                                    'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200' => $task->status === 'pending' || $task->status === 'draft' || $task->status === 'inactive',
                                     'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' => $isLive || $task->status === 'completed',
                                     'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' => $task->status === 'rejected',
                                 ])
                             ">
-                                {{ $isLive ? 'Live' : ucfirst($task->status) }}
+                                {{ $isLive ? 'Live' : ($task->status === 'draft' || $task->status === 'inactive' ? 'Cancelled' : ucfirst($task->status)) }}
                             </span>
                         </div>
 
@@ -95,14 +95,16 @@
                         <div class="flex justify-between items-center">
                             <a href="{{ route('tasks.show', $task) }}" class="text-orange-600 hover:text-orange-700 text-sm font-medium">View</a>
                             <div class="flex items-center space-x-2">
-                                @php $canEdit = in_array($task->status, ['pending','rejected']); @endphp
+                                @php $canEdit = in_array($task->status, ['pending','rejected','draft','inactive']); @endphp
                                 @if($canEdit)
                                     <a href="{{ route('tasks.edit', $task) }}" class="px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white text-xs rounded">Edit</a>
-                                    <form action="{{ route('tasks.destroy', $task) }}" method="POST" onsubmit="return confirm('Deactivate this task?')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="px-3 py-1 bg-red-500 hover:bg-red-600 text-white text-xs rounded">Deactivate</button>
-                                    </form>
+                                    @if(!in_array($task->status, ['draft', 'inactive']))
+                                        <form action="{{ route('tasks.destroy', $task) }}" method="POST" onsubmit="return confirm('Cancel this task proposal?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="px-3 py-1 bg-red-500 hover:bg-red-600 text-white text-xs rounded">Cancel</button>
+                                        </form>
+                                    @endif
                                 @else
                                     <button class="px-3 py-1 bg-gray-300 text-gray-600 text-xs rounded cursor-not-allowed" title="Editing disabled after approval" disabled>Locked</button>
                                 @endif

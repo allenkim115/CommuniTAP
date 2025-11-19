@@ -263,7 +263,8 @@
                                                 <button type="submit" class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300" 
                                                         onclick="return confirm('Are you sure you want to reject this task?')">Reject</button>
                                             </form>
-                                        @elseif($task->status === 'approved')
+                                        @elseif($task->status === 'approved' && $task->task_type !== 'user_uploaded')
+                                            {{-- Only show Publish for admin-created tasks; user-uploaded proposals are auto-published on approval --}}
                                             <form action="{{ route('admin.tasks.publish', $task) }}" method="POST" class="inline">
                                                 @csrf
                                                 <button type="submit" class="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300">Publish</button>
@@ -275,18 +276,21 @@
                                             </form>
                                         @endif
                                         
-                                        @if($task->status !== 'completed' && $task->status !== 'inactive')
-                                            <form action="{{ route('admin.tasks.destroy', $task) }}" method="POST" class="inline">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300" 
-                                                        onclick="return confirm('Are you sure you want to deactivate this task?')">Deactivate</button>
-                                            </form>
-                                        @elseif($task->status === 'inactive')
-                                            <form action="{{ route('admin.tasks.reactivate', $task) }}" method="POST" class="inline">
-                                                @csrf
-                                                <button type="submit" class="text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300">Reactivate</button>
-                                            </form>
+                                        {{-- Only show deactivate/reactivate for non-user-uploaded tasks (admin-created tasks) --}}
+                                        @if($task->task_type !== 'user_uploaded')
+                                            @if($task->status !== 'completed' && $task->status !== 'inactive')
+                                                <form action="{{ route('admin.tasks.destroy', $task) }}" method="POST" class="inline">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300" 
+                                                            onclick="return confirm('Are you sure you want to deactivate this task?')">Deactivate</button>
+                                                </form>
+                                            @elseif($task->status === 'inactive')
+                                                <form action="{{ route('admin.tasks.reactivate', $task) }}" method="POST" class="inline">
+                                                    @csrf
+                                                    <button type="submit" class="text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300">Reactivate</button>
+                                                </form>
+                                            @endif
                                         @endif
                                     </div>
                                     </td>
