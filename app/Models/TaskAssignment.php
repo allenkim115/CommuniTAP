@@ -19,6 +19,7 @@ class TaskAssignment extends Model
         'assigned_at',
         'submitted_at',
         'completed_at',
+        'reminder_sent_at',
         'photos',
         'completion_notes',
         'rejection_count',
@@ -29,6 +30,7 @@ class TaskAssignment extends Model
         'assigned_at' => 'datetime',
         'submitted_at' => 'datetime',
         'completed_at' => 'datetime',
+        'reminder_sent_at' => 'datetime',
         'photos' => 'array',
     ];
 
@@ -86,5 +88,13 @@ class TaskAssignment extends Model
     public function scopeCompleted($query)
     {
         return $query->where('status', 'completed');
+    }
+
+    /**
+     * Scope for uncompleted status
+     */
+    public function scopeUncompleted($query)
+    {
+        return $query->where('status', 'uncompleted');
     }
 }

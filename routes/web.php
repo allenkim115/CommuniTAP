@@ -83,6 +83,7 @@ Route::middleware(['auth', 'user', 'active'])->group(function () {
     Route::get('/tap-nominations/create/{task}', [TapNominationController::class, 'create'])->name('tap-nominations.create');
     Route::post('/tap-nominations', [TapNominationController::class, 'store'])->name('tap-nominations.store');
     Route::get('/tap-nominations', [TapNominationController::class, 'index'])->name('tap-nominations.index');
+    Route::get('/tap-nominations/my-nominations', [TapNominationController::class, 'myNominations'])->name('tap-nominations.my-nominations');
     Route::post('/tap-nominations/{nomination}/accept', [TapNominationController::class, 'accept'])->name('tap-nominations.accept');
     Route::post('/tap-nominations/{nomination}/decline', [TapNominationController::class, 'decline'])->name('tap-nominations.decline');
     
@@ -306,6 +307,7 @@ Route::middleware(['auth', 'admin', 'active'])->prefix('admin')->name('admin.')-
     
     // Task submission verification routes
     Route::get('/task-submissions', [TaskSubmissionController::class, 'index'])->name('task-submissions.index');
+    Route::get('/task-submissions/history', [TaskSubmissionController::class, 'history'])->name('task-submissions.history');
     Route::get('/task-submissions/{submission}', [TaskSubmissionController::class, 'show'])->name('task-submissions.show');
     Route::post('/task-submissions/{submission}/approve', [TaskSubmissionController::class, 'approve'])->name('task-submissions.approve');
     Route::post('/task-submissions/{submission}/reject', [TaskSubmissionController::class, 'reject'])->name('task-submissions.reject');

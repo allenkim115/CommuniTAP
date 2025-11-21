@@ -103,7 +103,17 @@
                                         <div>
                                             <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Due Date</dt>
                                             <dd class="text-sm text-gray-900 dark:text-white">
-                                                {{ is_string($task->due_date) ? \Carbon\Carbon::parse($task->due_date)->format('F j, Y \a\t g:i A') : $task->due_date->format('F j, Y \a\t g:i A') }}
+                                                @php
+                                                    $dueDate = is_string($task->due_date) ? \Carbon\Carbon::parse($task->due_date) : $task->due_date;
+                                                    if ($task->end_time) {
+                                                        // Combine due_date with end_time
+                                                        $deadline = \Carbon\Carbon::parse($dueDate->toDateString() . ' ' . $task->end_time);
+                                                        echo $deadline->format('F j, Y \a\t g:i A');
+                                                    } else {
+                                                        // Use due_date directly
+                                                        echo $dueDate->format('F j, Y \a\t g:i A');
+                                                    }
+                                                @endphp
                                             </dd>
                                         </div>
                                         @endif
@@ -180,7 +190,8 @@
                                                     Reject Task
                                                 </button>
                                             </form>
-                                        @elseif($task->status === 'approved')
+                                        @elseif($task->status === 'approved' && $task->task_type !== 'user_uploaded')
+                                            {{-- Only show Publish for admin-created tasks; user-uploaded proposals are auto-published on approval --}}
                                             <form action="{{ route('admin.tasks.publish', $task) }}" method="POST" class="w-full">
                                                 @csrf
                                                 <button type="submit" 
@@ -198,24 +209,27 @@
                                             </form>
                                         @endif
                                         
-                                        @if($task->status !== 'completed' && $task->status !== 'inactive')
-                                            <form action="{{ route('admin.tasks.destroy', $task) }}" method="POST" class="w-full">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" 
-                                                        class="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-                                                        onclick="return confirm('Are you sure you want to deactivate this task?')">
-                                                    Deactivate Task
-                                                </button>
-                                            </form>
-                                        @elseif($task->status === 'inactive')
-                                            <form action="{{ route('admin.tasks.reactivate', $task) }}" method="POST" class="w-full">
-                                                @csrf
-                                                <button type="submit" 
-                                                        class="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
-                                                    Reactivate Task
-                                                </button>
-                                            </form>
+                                        {{-- Only show deactivate/reactivate for non-user-uploaded tasks (admin-created tasks) --}}
+                                        @if($task->task_type !== 'user_uploaded')
+                                            @if($task->status !== 'completed' && $task->status !== 'inactive')
+                                                <form action="{{ route('admin.tasks.destroy', $task) }}" method="POST" class="w-full">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" 
+                                                            class="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                                                            onclick="return confirm('Are you sure you want to deactivate this task?')">
+                                                        Deactivate Task
+                                                    </button>
+                                                </form>
+                                            @elseif($task->status === 'inactive')
+                                                <form action="{{ route('admin.tasks.reactivate', $task) }}" method="POST" class="w-full">
+                                                    @csrf
+                                                    <button type="submit" 
+                                                            class="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                                                        Reactivate Task
+                                                    </button>
+                                                </form>
+                                            @endif
                                         @endif
                                     </div>
                                 </div>

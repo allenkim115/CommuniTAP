@@ -366,7 +366,9 @@
                                             </svg>
                                             <h3 class="text-lg font-semibold text-yellow-800 dark:text-yellow-200 mb-2">Pending Approval</h3>
                                             <p class="text-sm text-yellow-700 dark:text-yellow-300">
-                                                Your task completion has been submitted and is waiting for admin approval.
+                                                ${task.task_type === 'user_uploaded' 
+                                                    ? 'Your task completion has been submitted and is waiting for the task creator\'s approval.'
+                                                    : 'Your task completion has been submitted and is waiting for admin approval.'}
                                             </p>
                                         </div>
                                     </div>
