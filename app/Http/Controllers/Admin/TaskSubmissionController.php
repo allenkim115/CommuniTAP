@@ -18,11 +18,14 @@ class TaskSubmissionController extends Controller
     /**
      * Display a listing of task submissions
      */
-    public function index()
+    public function index(Request $request)
     {
+        $search = $request->get('search');
+        $taskType = $request->get('task_type');
+        
         // Exclude user-uploaded tasks; those are approved/rejected by the creator
         // Also exclude closed submissions (completed or 3+ rejections)
-        $submissions = TaskAssignment::with(['task', 'user'])
+        $query = TaskAssignment::with(['task', 'user'])
             ->where('status', 'submitted')
             ->where(function ($q) {
                 $q->where('rejection_count', '<', 3)
@@ -30,9 +33,32 @@ class TaskSubmissionController extends Controller
             })
             ->whereHas('task', function ($q) {
                 $q->where('task_type', '!=', 'user_uploaded');
-            })
-            ->orderBy('submitted_at', 'desc')
-            ->paginate(10);
+            });
+
+        // Apply search filter
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('task', function ($taskQuery) use ($search) {
+                    $taskQuery->where('title', 'LIKE', '%' . $search . '%')
+                              ->orWhere('description', 'LIKE', '%' . $search . '%');
+                })
+                ->orWhereHas('user', function ($userQuery) use ($search) {
+                    $userQuery->where('name', 'LIKE', '%' . $search . '%')
+                              ->orWhere('email', 'LIKE', '%' . $search . '%');
+                });
+            });
+        }
+
+        // Apply task type filter
+        if ($taskType && $taskType !== 'all') {
+            $query->whereHas('task', function ($q) use ($taskType) {
+                $q->where('task_type', $taskType);
+            });
+        }
+
+        $submissions = $query->orderBy('submitted_at', 'desc')
+            ->paginate(10)
+            ->appends($request->query());
 
         return view('admin.task-submissions.index', compact('submissions'));
     }
@@ -188,6 +214,8 @@ class TaskSubmissionController extends Controller
     public function history(Request $request)
     {
         $type = $request->get('type', 'completed'); // 'completed' or 'rejected'
+        $search = $request->get('search');
+        $taskType = $request->get('task_type');
         
         // Exclude user-uploaded tasks; those are approved/rejected by the creator
         $query = TaskAssignment::with(['task', 'user'])
@@ -195,10 +223,32 @@ class TaskSubmissionController extends Controller
                 $q->where('task_type', '!=', 'user_uploaded');
             });
 
+        // Apply search filter
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('task', function ($taskQuery) use ($search) {
+                    $taskQuery->where('title', 'LIKE', '%' . $search . '%')
+                              ->orWhere('description', 'LIKE', '%' . $search . '%');
+                })
+                ->orWhereHas('user', function ($userQuery) use ($search) {
+                    $userQuery->where('name', 'LIKE', '%' . $search . '%')
+                              ->orWhere('email', 'LIKE', '%' . $search . '%');
+                });
+            });
+        }
+
+        // Apply task type filter
+        if ($taskType && $taskType !== 'all') {
+            $query->whereHas('task', function ($q) use ($taskType) {
+                $q->where('task_type', $taskType);
+            });
+        }
+
         if ($type === 'completed') {
             $submissions = $query->where('status', 'completed')
                 ->orderBy('completed_at', 'desc')
-                ->paginate(15);
+                ->paginate(15)
+                ->appends($request->query());
         } else {
             // Rejected submissions: status is 'uncompleted' with 3+ rejections, or 'assigned' with rejection_count >= 3
             $submissions = $query->where(function ($q) {
@@ -212,7 +262,8 @@ class TaskSubmissionController extends Controller
                 })
                 ->whereNotNull('rejection_reason')
                 ->orderBy('updated_at', 'desc')
-                ->paginate(15);
+                ->paginate(15)
+                ->appends($request->query());
         }
 
         // Get statistics

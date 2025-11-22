@@ -99,10 +99,10 @@
                                 @if($canEdit)
                                     <a href="{{ route('tasks.edit', $task) }}" class="px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white text-xs rounded">Edit</a>
                                     @if(!in_array($task->status, ['draft', 'inactive']))
-                                        <form action="{{ route('tasks.destroy', $task) }}" method="POST" onsubmit="return confirm('Cancel this task proposal?')">
+                                        <form action="{{ route('tasks.destroy', $task) }}" method="POST" id="cancel-task-form-{{ $task->id }}">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="px-3 py-1 bg-red-500 hover:bg-red-600 text-white text-xs rounded">Cancel</button>
+                                            <button type="button" onclick="showConfirmModal('Cancel this task proposal?', 'Cancel Task Proposal', 'Cancel', 'Keep', 'red').then(confirmed => { if(confirmed) document.getElementById('cancel-task-form-{{ $task->id }}').submit(); });" class="px-3 py-1 bg-red-500 hover:bg-red-600 text-white text-xs rounded">Cancel</button>
                                         </form>
                                     @endif
                                 @else

@@ -170,19 +170,19 @@
                         
                         <div class="flex flex-wrap gap-4">
                             @if($user->status === 'active')
-                                <form method="POST" action="{{ route('admin.users.suspend', $user) }}" onsubmit="return confirm('Are you sure you want to suspend this user?');" class="flex-1 min-w-[200px]">
+                                <form method="POST" action="{{ route('admin.users.suspend', $user) }}" id="suspend-user-form" class="flex-1 min-w-[200px]">
                                     @csrf
                                     @method('PATCH')
-                                    <button type="submit" class="w-full px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-2">
+                                    <button type="button" onclick="showConfirmModal('Are you sure you want to suspend this user?', 'Suspend User', 'Suspend', 'Cancel', 'red').then(confirmed => { if(confirmed) document.getElementById('suspend-user-form').submit(); });" class="w-full px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-2">
                                         <i class="fas fa-ban"></i>
                                         Suspend User
                                     </button>
                                 </form>
                             @else
-                                <form method="POST" action="{{ route('admin.users.reactivate', $user) }}" onsubmit="return confirm('Are you sure you want to reactivate this user?');" class="flex-1 min-w-[200px]">
+                                <form method="POST" action="{{ route('admin.users.reactivate', $user) }}" id="reactivate-user-form" class="flex-1 min-w-[200px]">
                                     @csrf
                                     @method('PATCH')
-                                    <button type="submit" class="w-full px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-2">
+                                    <button type="button" onclick="showConfirmModal('Are you sure you want to reactivate this user?', 'Reactivate User', 'Reactivate', 'Cancel', 'green').then(confirmed => { if(confirmed) document.getElementById('reactivate-user-form').submit(); });" class="w-full px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-2">
                                         <i class="fas fa-check-circle"></i>
                                         Reactivate User
                                     </button>

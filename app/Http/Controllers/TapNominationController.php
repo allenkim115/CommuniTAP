@@ -41,9 +41,10 @@ class TapNominationController extends Controller
             return redirect()->back()->with('error', "Cannot create nomination: You must complete a daily task TODAY before you can nominate someone. Tap & Pass is only available for users who have completed a daily task on the same day. Complete a daily task first, then come back to nominate a teammate!");
         }
 
-        // Get available users for nomination (excluding current user and users who have nominated them)
+        // Get available users for nomination (excluding current user, admin users, and users who have nominated them)
         $availableUsers = User::where('userId', '!=', $user->userId)
             ->where('status', 'active')
+            ->where('role', '!=', 'admin')
             ->whereDoesntHave('nominationsMade', function($query) use ($user) {
                 $query->where('FK3_nomineeId', $user->userId)
                       ->where('status', 'pending');
@@ -61,8 +62,14 @@ class TapNominationController extends Controller
             ->orderBy('title')
             ->get();
             
+        // If this is an AJAX request, return the modal partial
+        if (request()->ajax() || request()->wantsJson()) {
+            return view('tap-nominations._modal-form', compact('task', 'availableUsers', 'availableDailyTasks', 'userDailyTaskAssignment'));
+        }
 
-        return view('tap-nominations.create', compact('task', 'availableUsers', 'availableDailyTasks', 'userDailyTaskAssignment'));
+        // If accessed directly (not via AJAX), redirect to the task page
+        // The nomination form should only be accessed via the modal
+        return redirect()->route('tasks.show', $task)->with('info', 'Please use the Tap & Pass button to nominate someone.');
     }
 
     /**

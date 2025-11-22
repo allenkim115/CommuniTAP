@@ -201,10 +201,11 @@
                             
                             <form method="POST" action="{{ route('admin.incident-reports.destroy', $incidentReport) }}" 
                                   class="inline" 
-                                  onsubmit="return confirm('Are you sure you want to delete this incident report? This action cannot be undone.')">
+                                  id="delete-report-form">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" 
+                                <button type="button" 
+                                        onclick="showConfirmModal('Are you sure you want to delete this incident report? This action cannot be undone.', 'Delete Incident Report', 'Delete', 'Cancel', 'red').then(confirmed => { if(confirmed) document.getElementById('delete-report-form').submit(); });"
                                         class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
                                     Delete Report
                                 </button>

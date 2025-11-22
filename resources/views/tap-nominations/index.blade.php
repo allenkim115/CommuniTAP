@@ -150,18 +150,18 @@
                             <!-- Footer actions / status -->
                             @if($nomination->status === 'pending')
                                     <div class="flex items-center gap-3 pt-4 border-t-2 border-gray-100 dark:border-gray-700">
-                                        <form method="POST" action="{{ route('tap-nominations.accept', $nomination) }}" class="flex-1" onsubmit="event.stopPropagation(); return confirm('Accept this nomination? You will earn +1 point.');">
+                                        <form method="POST" action="{{ route('tap-nominations.accept', $nomination) }}" class="flex-1" id="accept-form-{{ $nomination->id }}">
                                         @csrf
-                                            <button type="submit" class="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white text-sm font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 hover:scale-105 active:scale-95">
+                                            <button type="button" onclick="event.stopPropagation(); showConfirmModal('Accept this nomination? You will earn +1 point.', 'Accept Nomination', 'Accept', 'Cancel', 'green').then(confirmed => { if(confirmed) document.getElementById('accept-form-{{ $nomination->id }}').submit(); });" class="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white text-sm font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 hover:scale-105 active:scale-95">
                                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                                             </svg>
                                             Accept
                                         </button>
                                     </form>
-                                        <form method="POST" action="{{ route('tap-nominations.decline', $nomination) }}" class="flex-1" onsubmit="event.stopPropagation(); return confirm('Decline this nomination?');">
+                                        <form method="POST" action="{{ route('tap-nominations.decline', $nomination) }}" class="flex-1" id="decline-form-{{ $nomination->id }}">
                                         @csrf
-                                            <button type="submit" class="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-red-500 to-rose-500 hover:from-red-600 hover:to-rose-600 text-white text-sm font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 hover:scale-105 active:scale-95">
+                                            <button type="button" onclick="event.stopPropagation(); showConfirmModal('Decline this nomination?', 'Decline Nomination', 'Decline', 'Cancel', 'red').then(confirmed => { if(confirmed) document.getElementById('decline-form-{{ $nomination->id }}').submit(); });" class="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-red-500 to-rose-500 hover:from-red-600 hover:to-rose-600 text-white text-sm font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 hover:scale-105 active:scale-95">
                                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                                             </svg>

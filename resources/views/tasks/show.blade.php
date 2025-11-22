@@ -402,20 +402,24 @@
                             @if($userAssignment->status === 'assigned')
                                 <div class="mb-6 flex flex-wrap gap-2">
                                     @foreach(['accepted','on_the_way','working','done'] as $p)
-                                        <form action="{{ route('tasks.progress', $task) }}" method="POST" onsubmit="return confirm('Move progress to {{ ucfirst(str_replace('_',' ', $p)) }}?');">
+                                        @php
+                                            $order = ['accepted','on_the_way','working','done'];
+                                            $curr = $userAssignment->progress ?? 'accepted';
+                                            $currIdx = array_search($curr, $order);
+                                            $btnIdx = array_search($p, $order);
+                                            // Only allow the immediate next step; disable current, previous, or skipping ahead
+                                            $disabled = $btnIdx === false || $currIdx === false || $btnIdx !== $currIdx + 1;
+                                            $progressLabel = ucfirst(str_replace('_',' ', $p));
+                                        @endphp
+                                        <form id="progress-form-{{ $p }}" action="{{ route('tasks.progress', $task) }}" method="POST" class="inline">
                                             @csrf
                                             @method('PATCH')
                                             <input type="hidden" name="progress" value="{{ $p }}">
-                                            @php
-                                                $order = ['accepted','on_the_way','working','done'];
-                                                $curr = $userAssignment->progress ?? 'accepted';
-                                                $currIdx = array_search($curr, $order);
-                                                $btnIdx = array_search($p, $order);
-                                                // Only allow the immediate next step; disable current, previous, or skipping ahead
-                                                $disabled = $btnIdx === false || $currIdx === false || $btnIdx !== $currIdx + 1;
-                                            @endphp
-                                            <button type="submit" {{ $disabled ? 'disabled' : '' }} class="px-3 py-1 rounded border text-sm {{ ($userAssignment->progress ?? 'accepted') === $p ? 'bg-orange-500 text-white border-orange-600' : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-600' }} {{ $disabled ? 'opacity-50 cursor-not-allowed' : '' }}">
-                                                {{ ucfirst(str_replace('_',' ', $p)) }}
+                                            <button type="button" 
+                                                    onclick="showProgressModal('{{ $progressLabel }}', '{{ $p }}')" 
+                                                    {{ $disabled ? 'disabled' : '' }} 
+                                                    class="px-3 py-1 rounded border text-sm {{ ($userAssignment->progress ?? 'accepted') === $p ? 'bg-orange-500 text-white border-orange-600' : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-600' }} {{ $disabled ? 'opacity-50 cursor-not-allowed' : '' }}">
+                                                {{ $progressLabel }}
                                             </button>
                                         </form>
                                     @endforeach
@@ -581,12 +585,12 @@
                                         <!-- Tap & Pass Button - Only for daily tasks completed TODAY -->
                                         @if($task->task_type === 'daily' && $userAssignment->completed_at && \Carbon\Carbon::parse($userAssignment->completed_at)->isToday())
                                         <div>
-                                            <a href="{{ route('tap-nominations.create', $task) }}" class="inline-flex items-center px-4 py-2 bg-green-500 hover:bg-green-600 text-white font-medium rounded-lg transition-colors">
+                                            <button type="button" onclick="openNominationModal({{ $task->taskId }})" class="inline-flex items-center px-4 py-2 bg-green-500 hover:bg-green-600 text-white font-medium rounded-lg transition-colors">
                                                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
                                                 </svg>
                                                 🎯 Tap & Pass
-                                            </a>
+                                            </button>
                                             <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Nominate someone for a daily task (completed today)</p>
                                         </div>
                                         @elseif($task->task_type === 'daily' && $userAssignment->completed_at && !\Carbon\Carbon::parse($userAssignment->completed_at)->isToday())
@@ -719,7 +723,80 @@
     </div>
 
     @if(!$showAdminLayout)
+    <!-- Progress Confirmation Modal -->
+    <div id="progressModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4" style="display: none;">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full transform transition-all">
+            <div class="p-6">
+                <div class="flex items-center mb-4">
+                    <div class="flex-shrink-0 w-12 h-12 bg-orange-100 dark:bg-orange-900/30 rounded-full flex items-center justify-center">
+                        <svg class="w-6 h-6 text-orange-600 dark:text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="ml-4 text-lg font-semibold text-gray-900 dark:text-white">Update Task Progress</h3>
+                </div>
+                <p class="text-gray-700 dark:text-gray-300 mb-6">
+                    Are you sure you want to move progress to <span id="modalProgressLabel" class="font-semibold text-orange-600 dark:text-orange-400"></span>?
+                </p>
+                <div class="flex justify-end space-x-3">
+                    <button type="button" 
+                            onclick="closeProgressModal()" 
+                            class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors font-medium">
+                        Cancel
+                    </button>
+                    <button type="button" 
+                            onclick="confirmProgressUpdate()" 
+                            class="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors font-medium">
+                        Confirm
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Tab JavaScript -->
+    <script>
+        let pendingProgressForm = null;
+        
+        function showProgressModal(progressLabel, progressValue) {
+            document.getElementById('modalProgressLabel').textContent = progressLabel;
+            pendingProgressForm = document.getElementById('progress-form-' + progressValue);
+            const modal = document.getElementById('progressModal');
+            modal.classList.remove('hidden');
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closeProgressModal() {
+            const modal = document.getElementById('progressModal');
+            modal.classList.add('hidden');
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+            pendingProgressForm = null;
+        }
+        
+        function confirmProgressUpdate() {
+            if (pendingProgressForm) {
+                pendingProgressForm.submit();
+            }
+        }
+        
+        // Close modal on backdrop click
+        document.addEventListener('click', function(e) {
+            const modal = document.getElementById('progressModal');
+            if (e.target === modal) {
+                closeProgressModal();
+            }
+        });
+        
+        // Close modal on Escape key
+        document.addEventListener('keydown', function(e) {
+            const modal = document.getElementById('progressModal');
+            if (e.key === 'Escape' && modal && !modal.classList.contains('hidden')) {
+                closeProgressModal();
+            }
+        });
+    </script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const detailsTab = document.getElementById('details-tab');
@@ -857,7 +934,7 @@
                     // Accept Array<File> or FileList; return Array<File> limited to MAX_FILES
                     const files = Array.isArray(fileList) ? fileList : Array.from(fileList);
                     if (files.length > MAX_FILES) {
-                        alert(`You can upload up to ${MAX_FILES} photos.`);
+                        showAlertModal(`You can upload up to ${MAX_FILES} photos.`, 'Upload Limit', 'warning');
                     }
                     return files.slice(0, MAX_FILES);
                 }
@@ -900,7 +977,7 @@
                     const count = selectedFilesState.length || (photosInput.files ? photosInput.files.length : 0);
                     if (count < MIN_FILES || count > MAX_FILES) {
                         e.preventDefault();
-                        alert(`Please upload between ${MIN_FILES} and ${MAX_FILES} photos.`);
+                        showAlertModal(`Please upload between ${MIN_FILES} and ${MAX_FILES} photos.`, 'Upload Required', 'warning');
                     }
                 });
             }
@@ -983,4 +1060,156 @@
         document.addEventListener('keydown', function(e) { const modal = document.getElementById('imageModal'); if (modal && !modal.classList.contains('hidden')) { if (e.key === 'Escape') closeImageModal(); if (e.key === 'ArrowLeft') previousImage(); if (e.key === 'ArrowRight') nextImage(); } });
     </script>
     @endif
+
+    <!-- Tap & Pass Nomination Modal -->
+    <div id="nominationModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4" style="display: none;">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90vh] flex flex-col transform transition-all">
+            <div id="nominationModalContent">
+                <!-- Content will be loaded via AJAX -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Nomination Confirmation Modal -->
+    <div id="nominationConfirmModal" class="fixed inset-0 bg-black bg-opacity-50 z-[60] hidden flex items-center justify-center p-4" style="display: none;">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full transform transition-all">
+            <div class="p-6">
+                <div class="flex items-center mb-4">
+                    <div class="flex-shrink-0 w-12 h-12 rounded-full bg-gradient-to-br from-orange-500 to-teal-500 flex items-center justify-center shadow-lg">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <h3 class="ml-4 text-xl font-bold text-gray-900 dark:text-white">Confirm Nomination</h3>
+                </div>
+                <p class="text-gray-700 dark:text-gray-300 mb-6">
+                    Send this nomination? You will earn <span class="font-bold text-orange-600 dark:text-orange-400">1 point</span> for using Tap & Pass.
+                </p>
+                <div class="flex justify-end space-x-3">
+                    <button type="button" onclick="closeNominationConfirmModal()" class="inline-flex items-center justify-center gap-2 px-6 py-2.5 text-sm font-bold rounded-xl border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200 shadow-sm hover:shadow-md">
+                        Cancel
+                    </button>
+                    <button type="button" onclick="confirmNominationSubmit()" class="inline-flex items-center justify-center gap-2 px-8 py-2.5 text-sm font-bold rounded-xl text-white bg-gradient-to-r from-orange-600 to-teal-500 hover:from-orange-700 hover:to-teal-600 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 focus:ring-2 focus:ring-orange-400 focus:ring-offset-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+                        </svg>
+                        Confirm & Send
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openNominationModal(taskId) {
+            const modal = document.getElementById('nominationModal');
+            const modalContent = document.getElementById('nominationModalContent');
+            
+            // Show loading state
+            modalContent.innerHTML = `
+                <div class="px-6 py-12 text-center">
+                    <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-orange-600"></div>
+                    <p class="mt-4 text-gray-600 dark:text-gray-400">Loading...</p>
+                </div>
+            `;
+            
+            // Show modal
+            modal.classList.remove('hidden');
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+            
+            // Load modal content via AJAX
+            fetch(`/tap-nominations/create/${taskId}`, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'text/html'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.text();
+            })
+            .then(html => {
+                modalContent.innerHTML = html;
+            })
+            .catch(error => {
+                console.error('Error loading nomination form:', error);
+                modalContent.innerHTML = `
+                    <div class="px-6 py-12 text-center">
+                        <div class="text-red-600 dark:text-red-400 mb-4">
+                            <svg class="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </div>
+                        <p class="text-gray-900 dark:text-white font-semibold mb-2">Error loading form</p>
+                        <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">Unable to load the nomination form. Please try again.</p>
+                        <button onclick="closeNominationModal()" class="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg transition-colors">
+                            Close
+                        </button>
+                    </div>
+                `;
+            });
+        }
+        
+        function closeNominationModal() {
+            const modal = document.getElementById('nominationModal');
+            modal.classList.add('hidden');
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+        
+        // Close modal on backdrop click
+        document.addEventListener('click', function(e) {
+            const modal = document.getElementById('nominationModal');
+            if (e.target === modal) {
+                closeNominationModal();
+            }
+        });
+        
+        // Close modal on Escape key
+        document.addEventListener('keydown', function(e) {
+            const modal = document.getElementById('nominationModal');
+            const confirmModal = document.getElementById('nominationConfirmModal');
+            if (e.key === 'Escape') {
+                if (confirmModal && !confirmModal.classList.contains('hidden')) {
+                    closeNominationConfirmModal();
+                } else if (modal && !modal.classList.contains('hidden')) {
+                    closeNominationModal();
+                }
+            }
+        });
+
+        // Confirmation modal functions
+        function showNominationConfirmModal() {
+            const confirmModal = document.getElementById('nominationConfirmModal');
+            confirmModal.classList.remove('hidden');
+            confirmModal.style.display = 'flex';
+        }
+
+        function closeNominationConfirmModal() {
+            const confirmModal = document.getElementById('nominationConfirmModal');
+            confirmModal.classList.add('hidden');
+            confirmModal.style.display = 'none';
+        }
+
+        function confirmNominationSubmit() {
+            const form = document.getElementById('nomination-form');
+            if (form) {
+                closeNominationConfirmModal();
+                // Submit the form
+                form.submit();
+            }
+        }
+
+        // Close confirmation modal on backdrop click
+        document.addEventListener('click', function(e) {
+            const confirmModal = document.getElementById('nominationConfirmModal');
+            if (e.target === confirmModal) {
+                closeNominationConfirmModal();
+            }
+        });
+
+    </script>
 </x-app-layout>

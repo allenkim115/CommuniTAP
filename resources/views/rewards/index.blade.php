@@ -119,12 +119,12 @@
                                 </div>
 
                                 <!-- Redeem Button -->
-                                <form method="POST" action="{{ route('rewards.redeem', $reward) }}">
+                                <form method="POST" action="{{ route('rewards.redeem', $reward) }}" id="redeem-reward-form-{{ $reward->id }}">
                                     @csrf
                                     @if($reward->isAvailable())
-                                        <button type="submit" 
-                                                class="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200"
-                                                onclick="return confirm('Redeem {{ $reward->reward_name }} for {{ $reward->points_cost }} points?')">
+                                        <button type="button" 
+                                                onclick="showConfirmModal('Redeem {{ $reward->reward_name }} for {{ $reward->points_cost }} points?', 'Redeem Reward', 'Redeem', 'Cancel', 'orange').then(confirmed => { if(confirmed) document.getElementById('redeem-reward-form-{{ $reward->id }}').submit(); });"
+                                                class="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200">
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/>
                                             </svg>

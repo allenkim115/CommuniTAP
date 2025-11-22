@@ -26,7 +26,8 @@ class Task extends Model
         'end_time',
         'location',
         'max_participants',
-        'published_date'
+        'published_date',
+        'deactivated_at'
     ];
 
     protected $casts = [
@@ -34,6 +35,7 @@ class Task extends Model
         'approval_date' => 'datetime',
         'due_date' => 'datetime',
         'published_date' => 'datetime',
+        'deactivated_at' => 'datetime',
         'points_awarded' => 'integer',
     ];
 

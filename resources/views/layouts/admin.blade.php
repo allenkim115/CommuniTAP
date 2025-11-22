@@ -42,6 +42,12 @@
         
         <!-- Toast Notifications -->
         <x-session-toast />
+        
+        <!-- Global Alert Modal -->
+        <x-alert-modal />
+        
+        <!-- Global Confirmation Modal -->
+        <x-confirmation-modal />
     </body>
 </html>
 

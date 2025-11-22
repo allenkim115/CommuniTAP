@@ -1,15 +1,15 @@
 <x-admin-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
             {{ __('Incident Reports Management') }}
         </h2>
     </x-slot>
 
-    <div class="py-12">
+    <div class="py-8">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <!-- Statistics Cards -->
             <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
-                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+                <div class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
                     <div class="p-5">
                         <div class="flex items-center">
                             <div class="flex-shrink-0">
@@ -19,15 +19,15 @@
                             </div>
                             <div class="ml-5 w-0 flex-1">
                                 <dl>
-                                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Total Reports</dt>
-                                    <dd class="text-lg font-medium text-gray-900 dark:text-gray-100">{{ $stats['total'] }}</dd>
+                                    <dt class="text-sm font-medium text-gray-600 truncate">Total Reports</dt>
+                                    <dd class="text-lg font-medium text-gray-900">{{ $stats['total'] }}</dd>
                                 </dl>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+                <div class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
                     <div class="p-5">
                         <div class="flex items-center">
                             <div class="flex-shrink-0">
@@ -37,7 +37,7 @@
                             </div>
                             <div class="ml-5 w-0 flex-1">
                                 <dl>
-                                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Pending</dt>
+                                    <dt class="text-sm font-medium text-gray-600 truncate">Pending</dt>
                                     <dd class="text-lg font-medium text-yellow-600">{{ $stats['pending'] }}</dd>
                                 </dl>
                             </div>
@@ -45,7 +45,7 @@
                     </div>
                 </div>
 
-                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+                <div class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
                     <div class="p-5">
                         <div class="flex items-center">
                             <div class="flex-shrink-0">
@@ -64,7 +64,7 @@
                     </div>
                 </div>
 
-                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+                <div class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
                     <div class="p-5">
                         <div class="flex items-center">
                             <div class="flex-shrink-0">
@@ -82,7 +82,7 @@
                     </div>
                 </div>
 
-                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+                <div class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
                     <div class="p-5">
                         <div class="flex items-center">
                             <div class="flex-shrink-0">
@@ -399,21 +399,30 @@
             
             if (!action) {
                 e.preventDefault();
-                alert('Please select a bulk action.');
+                showAlertModal('Please select a bulk action.', 'Action Required', 'warning');
                 return;
             }
             
             if (checkedBoxes.length === 0) {
                 e.preventDefault();
-                alert('Please select at least one report.');
+                showAlertModal('Please select at least one report.', 'Selection Required', 'warning');
                 return;
             }
             
             if (action === 'delete') {
-                if (!confirm(`Are you sure you want to delete ${checkedBoxes.length} report(s)? This action cannot be undone.`)) {
-                    e.preventDefault();
-                    return;
-                }
+                e.preventDefault();
+                showConfirmModal(
+                    `Are you sure you want to delete ${checkedBoxes.length} report(s)? This action cannot be undone.`,
+                    'Confirm Deletion',
+                    'Delete',
+                    'Cancel',
+                    'red'
+                ).then(confirmed => {
+                    if (confirmed) {
+                        document.getElementById('bulk-form').submit();
+                    }
+                });
+                return;
             }
         });
     </script>
