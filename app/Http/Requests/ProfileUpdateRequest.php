@@ -28,6 +28,7 @@ class ProfileUpdateRequest extends FormRequest
                 // Ignore the current user's record using the correct primary key column
                 Rule::unique(User::class, 'email')->ignore($this->user()->userId, 'userId'),
             ],
+            'profile_picture' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:2048'],
         ];
     }
 }

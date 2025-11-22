@@ -149,10 +149,11 @@ class IncidentReportController extends Controller
                 );
             }
 
+            $actionTaken = $request->action_taken ? ucfirst(str_replace('_', ' ', $request->action_taken)) : 'No action';
             return redirect()->route('admin.incident-reports.index')
-                ->with('success', 'Incident report updated successfully.');
+                ->with('success', "Incident report #{$incidentReport->reportId} has been updated successfully. Status: {$request->status}. Action taken: {$actionTaken}. All relevant parties have been notified.");
         } catch (\Exception $e) {
-            return back()->withErrors(['error' => 'Failed to update incident report. Please try again.']);
+            return back()->with('error', 'Failed to update incident report. Please try again.');
         }
     }
 
@@ -164,9 +165,9 @@ class IncidentReportController extends Controller
         try {
             $incidentReport->delete();
             return redirect()->route('admin.incident-reports.index')
-                ->with('success', 'Incident report deleted successfully.');
+                ->with('success', "Incident report #{$incidentReport->reportId} has been permanently deleted from the system.");
         } catch (\Exception $e) {
-            return back()->withErrors(['error' => 'Failed to delete incident report. Please try again.']);
+            return back()->with('error', 'Failed to delete incident report. Please try again.');
         }
     }
 
@@ -207,10 +208,12 @@ class IncidentReportController extends Controller
                     break;
             }
 
+            $actionLabel = ucfirst(str_replace('_', ' ', $action));
+            $count = count($reportIds);
             return redirect()->route('admin.incident-reports.index')
-                ->with('success', 'Bulk action completed successfully.');
+                ->with('success', "Bulk action completed successfully: {$actionLabel} applied to {$count} incident report" . ($count > 1 ? 's' : '') . ".");
         } catch (\Exception $e) {
-            return back()->withErrors(['error' => 'Failed to perform bulk action. Please try again.']);
+            return back()->with('error', 'Failed to perform bulk action. Please try again.');
         }
     }
 

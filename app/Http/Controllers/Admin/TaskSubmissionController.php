@@ -104,8 +104,17 @@ class TaskSubmissionController extends Controller
             ? "Task submission approved successfully. User has been awarded {$pointsResult['added']} points."
             : "Task submission approved successfully. User has reached the points cap (500 points), so no points were added.";
 
-        return redirect()->route('admin.task-submissions.index')
-            ->with('status', $statusMessage);
+        $userName = $user->firstName . ' ' . $user->lastName;
+        $taskTitle = $submission->task->title;
+        $pointsAwarded = $pointsResult['added'] > 0 ? $pointsResult['added'] : 0;
+        $statusMessage = "Submission from {$userName} for '{$taskTitle}' has been approved";
+        if ($pointsAwarded > 0) {
+            $statusMessage .= " and {$pointsAwarded} points have been awarded to their account";
+        } elseif ($pointsResult['capped']) {
+            $statusMessage .= ". Note: User has reached the 500 point cap, so no additional points were awarded";
+        }
+        $statusMessage .= '.';
+        return redirect()->route('admin.task-submissions.index')->with('status', $statusMessage);
     }
 
     /**
@@ -162,8 +171,15 @@ class TaskSubmissionController extends Controller
             ]
         );
 
-        return redirect()->route('admin.task-submissions.index')
-            ->with('status', $message);
+        $userName = $submission->user->firstName . ' ' . $submission->user->lastName;
+        $taskTitle = $submission->task->title;
+        $message = "Submission from {$userName} for '{$taskTitle}' has been rejected";
+        if ($remainingAttempts > 0) {
+            $message .= ". They have {$remainingAttempts} remaining attempt" . ($remainingAttempts > 1 ? 's' : '') . " to resubmit with improvements.";
+        } else {
+            $message .= ". Maximum attempts (3) reached - this submission is now closed.";
+        }
+        return redirect()->route('admin.task-submissions.index')->with('status', $message);
     }
 
     /**

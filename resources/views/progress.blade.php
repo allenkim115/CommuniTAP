@@ -75,7 +75,7 @@
                     </div>
                     
                     <!-- Filters -->
-                    <form method="GET" action="{{ route('progress') }}" class="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4 mb-6">
+                    <form method="GET" action="{{ route('progress') }}" id="progress-filter-form" class="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4 mb-6">
                         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                             <div>
                                 <label for="start_date" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -114,14 +114,6 @@
                         </div>
                         
                             <div class="flex items-end gap-2">
-                        <button type="submit" 
-                                        class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 shadow-sm transition-colors">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
-                                    </svg>
-                            Filter
-                        </button>
-                        
                         @if($startDate || $endDate || ($taskType && $taskType !== 'all'))
                         <a href="{{ route('progress') }}" 
                                    class="inline-flex items-center justify-center px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 text-sm font-semibold rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors">
@@ -133,8 +125,76 @@
                             </div>
                         </div>
                     </form>
+                    
+                    <script>
+                        // Auto-update tasks via AJAX when filters change (no page refresh)
+                        document.addEventListener('DOMContentLoaded', function() {
+                            const filterForm = document.getElementById('progress-filter-form');
+                            const startDateInput = document.getElementById('start_date');
+                            const endDateInput = document.getElementById('end_date');
+                            const taskTypeSelect = document.getElementById('task_type');
+
+                            function updateTasks() {
+                                const tableContainer = document.getElementById('tasks-table-container');
+                                const paginationContainer = document.getElementById('tasks-pagination');
+                                
+                                if (tableContainer) {
+                                    tableContainer.innerHTML = '<div class="p-8 text-center"><div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div><p class="mt-2 text-gray-600 dark:text-gray-400">Loading tasks...</p></div>';
+                                }
+
+                                const formData = new FormData(filterForm);
+                                const params = new URLSearchParams(formData);
+
+                                fetch(`{{ route('progress') }}?${params.toString()}`, {
+                                    method: 'GET',
+                                    headers: {
+                                        'X-Requested-With': 'XMLHttpRequest',
+                                        'Accept': 'text/html',
+                                    }
+                                })
+                                .then(response => response.text())
+                                .then(html => {
+                                    const parser = new DOMParser();
+                                    const doc = parser.parseFromString(html, 'text/html');
+                                    
+                                    const newTableContainer = doc.getElementById('tasks-table-container');
+                                    const newPagination = doc.getElementById('tasks-pagination');
+                                    
+                                    if (newTableContainer && tableContainer) {
+                                        tableContainer.innerHTML = newTableContainer.innerHTML;
+                                    }
+                                    
+                                    if (newPagination && paginationContainer) {
+                                        paginationContainer.innerHTML = newPagination.innerHTML;
+                                    }
+                                    
+                                    const newUrl = `{{ route('progress') }}?${params.toString()}`;
+                                    window.history.pushState({path: newUrl}, '', newUrl);
+                                })
+                                .catch(error => {
+                                    console.error('Error updating tasks:', error);
+                                    if (tableContainer) {
+                                        tableContainer.innerHTML = '<div class="p-8 text-center text-red-600">Error loading tasks. Please refresh the page.</div>';
+                                    }
+                                });
+                            }
+
+                            if (startDateInput) {
+                                startDateInput.addEventListener('change', updateTasks);
+                            }
+                            
+                            if (endDateInput) {
+                                endDateInput.addEventListener('change', updateTasks);
+                            }
+                            
+                            if (taskTypeSelect) {
+                                taskTypeSelect.addEventListener('change', updateTasks);
+                            }
+                        });
+                    </script>
 
                     <!-- Tasks Table -->
+                    <div id="tasks-table-container">
                     @if($completedTasks && $completedTasks->count() > 0)
                         <div class="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700">
                         <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
@@ -246,15 +306,18 @@
                             @endif
                         </div>
                     @endif
+                    </div>
                 </div>
             </div>
             
             <!-- Pagination -->
+            <div id="tasks-pagination">
             @if(isset($completedTasks) && method_exists($completedTasks, 'links'))
                 <div class="mt-6">
                     {{ $completedTasks->links() }}
                 </div>
             @endif
+            </div>
         </div>
     </div>
 </x-app-layout>

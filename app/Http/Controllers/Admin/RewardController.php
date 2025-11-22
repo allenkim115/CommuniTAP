@@ -43,7 +43,7 @@ class RewardController extends Controller
 
         Reward::create($data);
 
-        return redirect()->route('admin.rewards.index')->with('status', 'Reward created');
+        return redirect()->route('admin.rewards.index')->with('status', "Reward '{$request->reward_name}' has been created successfully and is now available for users to redeem.");
     }
 
     public function edit(Reward $reward)
@@ -74,13 +74,14 @@ class RewardController extends Controller
 
         $reward->update($data);
 
-        return redirect()->route('admin.rewards.index')->with('status', 'Reward updated');
+        return redirect()->route('admin.rewards.index')->with('status', "Reward '{$reward->reward_name}' has been updated successfully. All changes have been saved.");
     }
 
     public function destroy(Reward $reward)
     {
         $reward->delete();
-        return redirect()->route('admin.rewards.index')->with('status', 'Reward deleted');
+        $rewardName = $reward->reward_name;
+        return redirect()->route('admin.rewards.index')->with('status', "Reward '{$rewardName}' has been deleted successfully from the system.");
     }
 }
 

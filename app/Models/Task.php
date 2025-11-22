@@ -210,27 +210,103 @@ class Task extends Model
     }
 
     /**
-     * Mark all expired tasks and their active assignments as completed
+     * Mark all expired tasks and their active assignments as completed or uncompleted
+     * Tasks with no participants are marked as uncompleted
+     * Tasks with participants are marked as completed only if at least one participant completed
+     * Tasks with participants but none completed are marked as uncompleted
      */
     public static function completeExpiredTasks(): int
     {
         $updatedCount = 0;
 
         $expiredTasks = static::expired()
-            ->whereIn('status', ['published', 'assigned', 'submitted', 'approved', 'pending'])
+            ->whereIn('status', ['published', 'assigned', 'submitted', 'approved', 'pending', 'completed'])
             ->get();
 
         foreach ($expiredTasks as $task) {
-            // Complete task-level status
-            $task->status = 'completed';
-            $task->save();
-            $updatedCount++;
+            // Check if task has any participants (assignments)
+            $hasParticipants = $task->assignments()->count() > 0;
 
-            // Complete any active assignments
-            foreach ($task->assignments()->whereIn('status', ['assigned', 'submitted'])->get() as $assignment) {
-                $assignment->status = 'completed';
-                $assignment->completed_at = now();
-                $assignment->save();
+            if ($hasParticipants) {
+                // Check if any participant has actually completed their assignment
+                $hasCompletedParticipants = $task->assignments()
+                    ->where('status', 'completed')
+                    ->count() > 0;
+
+                if ($hasCompletedParticipants) {
+                    // At least one participant completed - mark task as completed
+                    $task->status = 'completed';
+                    $task->save();
+                    $updatedCount++;
+
+                    // Mark any remaining active assignments (assigned/submitted) as uncompleted
+                    // since they didn't complete before the deadline
+                    foreach ($task->assignments()->whereIn('status', ['assigned', 'submitted'])->get() as $assignment) {
+                        $assignment->status = 'uncompleted';
+                        $assignment->save();
+                    }
+                } else {
+                    // Task has participants but none completed - mark as uncompleted
+                    $task->status = 'uncompleted';
+                    $task->save();
+                    $updatedCount++;
+
+                    // Mark all non-completed assignments as uncompleted
+                    foreach ($task->assignments()->whereIn('status', ['assigned', 'submitted'])->get() as $assignment) {
+                        $assignment->status = 'uncompleted';
+                        $assignment->save();
+                    }
+                }
+            } else {
+                // Task has no participants - mark as uncompleted
+                $task->status = 'uncompleted';
+                $task->save();
+                $updatedCount++;
+            }
+        }
+
+        return $updatedCount;
+    }
+
+    /**
+     * Re-evaluate and fix incorrectly marked completed tasks
+     * This fixes tasks that were marked as completed but shouldn't be
+     */
+    public static function fixIncorrectlyCompletedTasks(): int
+    {
+        $updatedCount = 0;
+
+        // Get all tasks marked as completed
+        $completedTasks = static::where('status', 'completed')
+            ->get();
+
+        foreach ($completedTasks as $task) {
+            // Check if task has any participants (assignments)
+            $hasParticipants = $task->assignments()->count() > 0;
+
+            if (!$hasParticipants) {
+                // Task has no participants but is marked as completed - fix it
+                $task->status = 'uncompleted';
+                $task->save();
+                $updatedCount++;
+            } else {
+                // Check if any participant has actually completed their assignment
+                $hasCompletedParticipants = $task->assignments()
+                    ->where('status', 'completed')
+                    ->count() > 0;
+
+                if (!$hasCompletedParticipants) {
+                    // Task has participants but none completed - fix it
+                    $task->status = 'uncompleted';
+                    $task->save();
+                    $updatedCount++;
+
+                    // Mark all non-completed assignments as uncompleted
+                    foreach ($task->assignments()->whereIn('status', ['assigned', 'submitted'])->get() as $assignment) {
+                        $assignment->status = 'uncompleted';
+                        $assignment->save();
+                    }
+                }
             }
         }
 

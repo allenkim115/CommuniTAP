@@ -39,7 +39,10 @@
                 {{ $slot }}
             </main>
         </div>
+        
+        <!-- Toast Notifications -->
+        <x-session-toast />
     </body>
-    </html>
+</html>
 
 

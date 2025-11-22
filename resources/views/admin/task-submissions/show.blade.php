@@ -6,7 +6,7 @@
                     {{ __('Review Task Submission') }}
                 </h2>
                 <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                    Submitted by {{ $submission->user->name }} on {{ is_string($submission->submitted_at) ? \Carbon\Carbon::parse($submission->submitted_at)->format('M j, Y \a\t g:i A') : $submission->submitted_at->format('M j, Y \a\t g:i A') }}
+                    Submitted by {{ $submission->user->name }}@if($submission->submitted_at) on {{ is_string($submission->submitted_at) ? \Carbon\Carbon::parse($submission->submitted_at)->format('M j, Y \a\t g:i A') : $submission->submitted_at->format('M j, Y \a\t g:i A') }}@endif
                 </p>
             </div>
             <a href="{{ route('admin.task-submissions.index') }}" 

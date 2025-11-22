@@ -135,10 +135,12 @@ class IncidentReportController extends Controller
                 );
             }
 
+            $reportedUser = User::find($request->reported_user_id);
+            $reportedUserName = $reportedUser ? $reportedUser->firstName . ' ' . $reportedUser->lastName : 'the reported user';
             return redirect()->route('incident-reports.index')
-                ->with('success', 'Incident report submitted successfully. Our moderation team will review it shortly.');
+                ->with('success', "Incident report regarding {$reportedUserName} has been submitted successfully. Our moderation team will review it within 24-48 hours and take appropriate action.");
         } catch (\Exception $e) {
-            return back()->withErrors(['error' => 'Failed to submit incident report. Please try again.']);
+            return back()->with('error', 'Failed to submit incident report. Please try again.');
         }
     }
 
@@ -207,11 +209,12 @@ class IncidentReportController extends Controller
 
             DB::commit();
 
+            $actionTaken = $request->action_taken ? ucfirst(str_replace('_', ' ', $request->action_taken)) : 'No action';
             return redirect()->route('admin.incident-reports.index')
-                ->with('success', 'Incident report updated successfully.');
+                ->with('success', "Incident report #{$incidentReport->reportId} has been updated successfully. Status: {$request->status}. Action taken: {$actionTaken}.");
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->withErrors(['error' => 'Failed to update incident report. Please try again.']);
+            return back()->with('error', 'Failed to update incident report. Please try again.');
         }
     }
 
@@ -225,9 +228,9 @@ class IncidentReportController extends Controller
         try {
             $incidentReport->delete();
             return redirect()->route('admin.incident-reports.index')
-                ->with('success', 'Incident report deleted successfully.');
+                ->with('success', "Incident report #{$incidentReport->reportId} has been deleted successfully from the system.");
         } catch (\Exception $e) {
-            return back()->withErrors(['error' => 'Failed to delete incident report. Please try again.']);
+            return back()->with('error', 'Failed to delete incident report. Please try again.');
         }
     }
 

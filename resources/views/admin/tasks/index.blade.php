@@ -17,8 +17,8 @@
             <x-session-toast />
 
             <!-- Task Statistics -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
+                <a href="{{ route('admin.tasks.index') }}" class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 hover:shadow-lg transition-shadow cursor-pointer {{ !request('status') || request('status') === 'all' ? 'ring-2 ring-blue-500' : '' }}">
                     <div class="flex items-center">
                         <div class="flex-shrink-0">
                             <div class="w-8 h-8 bg-blue-500 rounded-md flex items-center justify-center">
@@ -32,9 +32,9 @@
                             <p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ $taskStats['total'] }}</p>
                         </div>
                     </div>
-                </div>
+                </a>
 
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+                <a href="{{ route('admin.tasks.filter', ['status' => 'pending']) }}" class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 hover:shadow-lg transition-shadow cursor-pointer {{ request('status') === 'pending' ? 'ring-2 ring-yellow-500' : '' }}">
                     <div class="flex items-center">
                         <div class="flex-shrink-0">
                             <div class="w-8 h-8 bg-yellow-500 rounded-md flex items-center justify-center">
@@ -48,9 +48,9 @@
                             <p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ $taskStats['pending'] }}</p>
                         </div>
                     </div>
-                </div>
+                </a>
 
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+                <a href="{{ route('admin.tasks.filter', ['status' => 'completed']) }}" class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 hover:shadow-lg transition-shadow cursor-pointer {{ request('status') === 'completed' ? 'ring-2 ring-green-500' : '' }}">
                     <div class="flex items-center">
                         <div class="flex-shrink-0">
                             <div class="w-8 h-8 bg-green-500 rounded-md flex items-center justify-center">
@@ -64,9 +64,9 @@
                             <p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ $taskStats['completed'] }}</p>
                         </div>
                     </div>
-                </div>
+                </a>
 
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+                <a href="{{ route('admin.tasks.filter', ['status' => 'published']) }}" class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 hover:shadow-lg transition-shadow cursor-pointer {{ request('status') === 'published' ? 'ring-2 ring-purple-500' : '' }}">
                     <div class="flex items-center">
                         <div class="flex-shrink-0">
                             <div class="w-8 h-8 bg-purple-500 rounded-md flex items-center justify-center">
@@ -80,25 +80,31 @@
                             <p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ $taskStats['published'] }}</p>
                         </div>
                     </div>
-                </div>
+                </a>
+
+                <a href="{{ route('admin.tasks.filter', ['status' => 'uncompleted']) }}" class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 hover:shadow-lg transition-shadow cursor-pointer {{ request('status') === 'uncompleted' ? 'ring-2 ring-orange-500' : '' }}">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <div class="w-8 h-8 bg-orange-500 rounded-md flex items-center justify-center">
+                                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Uncompleted</p>
+                            <p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ $taskStats['uncompleted'] ?? 0 }}</p>
+                        </div>
+                    </div>
+                </a>
             </div>
 
             <!-- Filters -->
             <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
-                <form action="{{ route('admin.tasks.filter') }}" method="GET" class="flex flex-wrap gap-4">
-                    <div>
-                        <label for="status" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
-                        <select name="status" id="status" class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
-                            <option value="all" {{ request('status') === 'all' || !request('status') ? 'selected' : '' }}>All Status</option>
-                            <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>Pending</option>
-                            <option value="approved" {{ request('status') === 'approved' ? 'selected' : '' }}>Approved</option>
-                            <option value="published" {{ request('status') === 'published' ? 'selected' : '' }}>Published</option>
-                            <option value="assigned" {{ request('status') === 'assigned' ? 'selected' : '' }}>Assigned</option>
-                            <option value="submitted" {{ request('status') === 'submitted' ? 'selected' : '' }}>Submitted</option>
-                            <option value="completed" {{ request('status') === 'completed' ? 'selected' : '' }}>Completed</option>
-                            <option value="rejected" {{ request('status') === 'rejected' ? 'selected' : '' }}>Rejected</option>
-                        </select>
-                    </div>
+                <form action="{{ route('admin.tasks.filter') }}" method="GET" id="filterForm" class="flex flex-wrap gap-4">
+                    @if(request('status'))
+                        <input type="hidden" name="status" value="{{ request('status') }}">
+                    @endif
                     <div>
                         <label for="task_type" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Task Type</label>
                         <select name="task_type" id="task_type" class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
@@ -120,9 +126,6 @@
                         </select>
                     </div>
                     <div class="flex items-end gap-2">
-                        <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            Filter
-                        </button>
                         <a href="{{ route('admin.tasks.index') }}" class="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500">
                             Clear Filters
                         </a>
@@ -130,8 +133,8 @@
                 </form>
                 
                 <!-- Active Filters Display -->
-                @if(request('status') && request('status') !== 'all' || request('task_type') && request('task_type') !== 'all' || request('assignment_progress') && request('assignment_progress') !== 'all')
-                <div class="mt-4 flex flex-wrap gap-2">
+                <div class="mt-4 flex flex-wrap gap-2" id="active-filters">
+                    @if(request('status') && request('status') !== 'all' || request('task_type') && request('task_type') !== 'all' || request('assignment_progress') && request('assignment_progress') !== 'all')
                     <span class="text-sm text-gray-600 dark:text-gray-400">Active filters:</span>
                     @if(request('status') && request('status') !== 'all')
                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
@@ -148,14 +151,14 @@
                             Progress: {{ ucfirst(str_replace('_', ' ', request('assignment_progress'))) }}
                         </span>
                     @endif
+                    @endif
                 </div>
-                @endif
             </div>
                     
             <!-- Tasks Table -->
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden" id="tasks-table-container">
                     <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700" id="tasks-table">
                             <thead class="bg-gray-50 dark:bg-gray-700">
                                 <tr>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Task</th>
@@ -197,6 +200,7 @@
                                         @elseif($task->status === 'submitted') bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200
                                         @elseif($task->status === 'completed') bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200
                                         @elseif($task->status === 'rejected') bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200
+                                        @elseif($task->status === 'uncompleted') bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200
                                         @else bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200
                                         @endif">
                                         {{ ucfirst($task->status) }}
@@ -307,11 +311,85 @@
                     </div>
                 
                 <!-- Pagination -->
-                <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-700">
+                <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-700" id="tasks-pagination">
                     {{ $tasks->links() }}
                 </div>
             </div>
         </div>
     </div>
+
+    <script>
+        // Update tasks via AJAX when filters change (no page refresh)
+        document.addEventListener('DOMContentLoaded', function() {
+            const taskTypeSelect = document.getElementById('task_type');
+            const assignmentProgressSelect = document.getElementById('assignment_progress');
+            const filterForm = document.getElementById('filterForm');
+
+            function updateTasks() {
+                // Show loading state
+                const tableContainer = document.getElementById('tasks-table-container');
+                if (tableContainer) {
+                    const originalContent = tableContainer.innerHTML;
+                    tableContainer.innerHTML = '<div class="p-8 text-center"><div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div><p class="mt-2 text-gray-600 dark:text-gray-400">Loading tasks...</p></div>';
+                }
+
+                // Get form data
+                const formData = new FormData(filterForm);
+                const params = new URLSearchParams(formData);
+
+                // Make AJAX request
+                fetch(`{{ route('admin.tasks.filter') }}?${params.toString()}`, {
+                    method: 'GET',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'text/html',
+                    }
+                })
+                .then(response => response.text())
+                .then(html => {
+                    // Parse the HTML response
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    
+                    // Extract the table container content
+                    const newTableContainer = doc.getElementById('tasks-table-container');
+                    const newActiveFilters = doc.getElementById('active-filters');
+                    
+                    // Update the table
+                    if (newTableContainer && tableContainer) {
+                        tableContainer.innerHTML = newTableContainer.innerHTML;
+                    }
+                    
+                    // Update active filters
+                    const currentActiveFilters = document.getElementById('active-filters');
+                    if (newActiveFilters && currentActiveFilters) {
+                        currentActiveFilters.innerHTML = newActiveFilters.innerHTML;
+                    }
+                    
+                    // Update URL without page reload
+                    const newUrl = `{{ route('admin.tasks.filter') }}?${params.toString()}`;
+                    window.history.pushState({path: newUrl}, '', newUrl);
+                })
+                .catch(error => {
+                    console.error('Error updating tasks:', error);
+                    if (tableContainer) {
+                        tableContainer.innerHTML = '<div class="p-8 text-center text-red-600">Error loading tasks. Please refresh the page.</div>';
+                    }
+                });
+            }
+
+            if (taskTypeSelect) {
+                taskTypeSelect.addEventListener('change', function() {
+                    updateTasks();
+                });
+            }
+
+            if (assignmentProgressSelect) {
+                assignmentProgressSelect.addEventListener('change', function() {
+                    updateTasks();
+                });
+            }
+        });
+    </script>
 
 </x-admin-layout>
