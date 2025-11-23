@@ -3,30 +3,38 @@
 @endphp
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex justify-between items-center">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
-                <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+                <h2 class="font-bold text-3xl bg-gradient-to-r from-orange-600 via-orange-500 to-teal-500 bg-clip-text text-transparent">
                     {{ __('Review Task Submission') }}
                 </h2>
-                <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                <p class="text-sm font-semibold text-gray-600 dark:text-gray-400 mt-2">
                     Submitted by {{ $submission->user->name }} on {{ is_string($submission->submitted_at) ? \Carbon\Carbon::parse($submission->submitted_at)->format('M j, Y \a\t g:i A') : $submission->submitted_at->format('M j, Y \a\t g:i A') }}
                 </p>
             </div>
             <a href="{{ route('tasks.creator.submissions') }}" 
-               class="inline-flex items-center px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white text-sm font-medium rounded-md">
+               class="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-gray-600 hover:text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-xl transition-all duration-200 shadow-sm hover:shadow-md">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                </svg>
                 Back to Submissions
             </a>
         </div>
     </x-slot>
 
-    <div class="py-12">
+    <div class="min-h-screen bg-gradient-to-b from-gray-50 via-orange-50/30 to-teal-50/20 dark:from-gray-900 dark:via-gray-900 dark:to-gray-950 py-12">
         <x-session-toast />
         <div class="max-w-6xl mx-auto sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <div class="lg:col-span-2 space-y-6">
-                    <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                    <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-lg sm:rounded-2xl border border-gray-200 dark:border-gray-700">
                         <div class="p-6">
-                            <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Task Information</h3>
+                            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
+                                <svg class="w-6 h-6 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                                </svg>
+                                Task Information
+                            </h3>
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
                                     <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Task Title</dt>
@@ -58,9 +66,14 @@
                         </div>
                     </div>
 
-                    <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                    <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-lg sm:rounded-2xl border border-gray-200 dark:border-gray-700">
                         <div class="p-6">
-                            <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">User's Submission</h3>
+                            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
+                                <svg class="w-6 h-6 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                User's Submission
+                            </h3>
                             @if($submission->completion_notes)
                                 <div class="mb-6">
                                     <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Completion Notes</dt>
@@ -91,34 +104,39 @@
                     </div>
                 </div>
                 <div>
-                    <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                    <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-lg sm:rounded-2xl border border-gray-200 dark:border-gray-700">
                         <div class="p-6">
-                            <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Review Actions</h3>
+                            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
+                                <svg class="w-6 h-6 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+                                </svg>
+                                Review Actions
+                            </h3>
                             
                             @php
                                 $isClosed = $submission->status === 'completed' || $submission->rejection_count >= 3;
                             @endphp
 
                             @if($isClosed)
-                                <div class="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg border border-gray-300 dark:border-gray-600">
+                                <div class="p-6 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800 rounded-xl border-2 border-gray-300 dark:border-gray-600 shadow-md">
                                     @if($submission->status === 'completed')
-                                        <div class="flex items-center text-green-600 dark:text-green-400 mb-2">
-                                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <div class="flex items-center text-green-600 dark:text-green-400 mb-3">
+                                            <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                             </svg>
-                                            <span class="font-medium">Submission Approved</span>
+                                            <span class="font-bold text-lg">Submission Approved</span>
                                         </div>
-                                        <p class="text-sm text-gray-600 dark:text-gray-300">
+                                        <p class="text-sm font-semibold text-gray-600 dark:text-gray-300">
                                             This submission has been approved and is closed. No further actions can be taken.
                                         </p>
                                     @elseif($submission->rejection_count >= 3)
-                                        <div class="flex items-center text-red-600 dark:text-red-400 mb-2">
-                                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <div class="flex items-center text-red-600 dark:text-red-400 mb-3">
+                                            <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                                             </svg>
-                                            <span class="font-medium">Submission Closed</span>
+                                            <span class="font-bold text-lg">Submission Closed</span>
                                         </div>
-                                        <p class="text-sm text-gray-600 dark:text-gray-300">
+                                        <p class="text-sm font-semibold text-gray-600 dark:text-gray-300">
                                             This submission has reached the maximum number of rejection attempts (3) and is closed. No further actions can be taken.
                                         </p>
                                     @endif
@@ -127,18 +145,18 @@
                                 <form action="{{ route('tasks.creator.approve', $submission) }}" method="POST" class="mb-4" id="approve-submission-form">
                                     @csrf
                                     <div class="mb-4">
-                                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Notes (optional)</label>
-                                        <textarea name="notes" rows="3" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm dark:bg-gray-700 dark:text-white"></textarea>
+                                        <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Notes (optional)</label>
+                                        <textarea name="notes" rows="3" class="w-full px-4 py-2 border-2 border-gray-300 dark:border-gray-600 rounded-xl shadow-sm dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all"></textarea>
                                     </div>
-                                    <button type="button" onclick="showConfirmModal('Approve this submission?', 'Approve Submission', 'Approve', 'Cancel', 'green').then(confirmed => { if(confirmed) document.getElementById('approve-submission-form').submit(); });" class="w-full px-4 py-2 rounded bg-green-600 hover:bg-green-700 text-white">Approve Submission</button>
+                                    <button type="button" onclick="showConfirmModal('Approve this submission?', 'Approve Submission', 'Approve', 'Cancel', 'green').then(confirmed => { if(confirmed) document.getElementById('approve-submission-form').submit(); });" class="w-full px-4 py-3 rounded-xl bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-bold shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5">Approve Submission</button>
                                 </form>
                                 <form action="{{ route('tasks.creator.reject', $submission) }}" method="POST" id="reject-submission-form">
                                     @csrf
                                     <div class="mb-4">
-                                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Rejection Reason *</label>
-                                        <textarea name="rejection_reason" required rows="3" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm dark:bg-gray-700 dark:text-white"></textarea>
+                                        <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Rejection Reason *</label>
+                                        <textarea name="rejection_reason" required rows="3" class="w-full px-4 py-2 border-2 border-gray-300 dark:border-gray-600 rounded-xl shadow-sm dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all"></textarea>
                                     </div>
-                                    <button type="button" onclick="showConfirmModal('Reject this submission?', 'Reject Submission', 'Reject', 'Cancel', 'red').then(confirmed => { if(confirmed) document.getElementById('reject-submission-form').submit(); });" class="w-full px-4 py-2 rounded bg-red-600 hover:bg-red-700 text-white">Reject Submission</button>
+                                    <button type="button" onclick="showConfirmModal('Reject this submission?', 'Reject Submission', 'Reject', 'Cancel', 'red').then(confirmed => { if(confirmed) document.getElementById('reject-submission-form').submit(); });" class="w-full px-4 py-3 rounded-xl bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 text-white font-bold shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5">Reject Submission</button>
                                 </form>
                             @endif
                         </div>
