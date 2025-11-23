@@ -63,7 +63,7 @@ class FeedbackController extends Controller
         }
         
         $request->validate([
-            'comment' => 'required|string|max:1000',
+            'comment' => 'required|string|min:10|max:1000',
             'rating' => 'required|integer|min:1|max:5',
         ]);
         
@@ -126,7 +126,7 @@ class FeedbackController extends Controller
         }
         
         $request->validate([
-            'comment' => 'required|string|max:1000',
+            'comment' => 'required|string|min:10|max:1000',
             'rating' => 'required|integer|min:1|max:5',
         ]);
         
