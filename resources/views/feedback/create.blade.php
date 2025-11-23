@@ -66,13 +66,15 @@
                                 @endphp
                                 @for($i = 1; $i <= 5; $i++)
                                     <label class="cursor-pointer group relative inline-block" data-rating="{{ $i }}">
-                                        <input type="radio" name="rating" value="{{ $i }}" class="sr-only rating-input" required>
+                                        <input type="radio" name="rating" value="{{ $i }}" class="sr-only rating-input" 
+                                            {{ old('rating') == $i ? 'checked' : '' }}>
                                         <div class="star-wrapper transform transition-all duration-300 group-hover:scale-125 group-active:scale-95">
-                                            <svg class="w-16 h-16 star-icon text-gray-400 transition-all duration-300 drop-shadow-sm star-svg" 
-                                                 fill="currentColor" 
+                                            <svg class="w-16 h-16 star-icon transition-all duration-300 drop-shadow-sm rating-star" 
                                                  viewBox="0 0 20 20"
                                                  xmlns="http://www.w3.org/2000/svg"
-                                                 data-rating="{{ $i }}">
+                                                 data-rating="{{ $i }}"
+                                                 fill="#E5E7EB"
+                                                 stroke="#E5E7EB">
                                                 <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
                                             </svg>
                                         </div>
@@ -174,85 +176,59 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const ratingInputs = document.querySelectorAll('input[name="rating"]');
-            const starIcons = document.querySelectorAll('.star-icon');
+            const stars = document.querySelectorAll('.rating-star');
             const ratingText = document.getElementById('rating-text');
             const ratingContainer = document.getElementById('rating-container');
             const commentTextarea = document.getElementById('comment');
             const charCount = document.getElementById('char-count');
-            
+
             const ratingLabels = {
-                1: { text: 'Poor', color: 'text-red-500' },
-                2: { text: 'Fair', color: 'text-orange-500' },
-                3: { text: 'Good', color: 'text-yellow-500' },
-                4: { text: 'Very Good', color: 'text-yellow-400' },
-                5: { text: 'Excellent', color: 'text-green-500' }
+                1: 'Poor',
+                2: 'Fair',
+                3: 'Good',
+                4: 'Very Good',
+                5: 'Excellent'
             };
-            
-            function updateStars(selectedRating, hoverRating = null) {
-                const activeRating = hoverRating || selectedRating;
-                
-                starIcons.forEach((star) => {
-                    const starRating = parseInt(star.getAttribute('data-rating'));
-                    const starElement = star;
-                    
-                    // Remove all color classes
-                    starElement.classList.remove(
-                        'text-white', 'text-gray-300', 'text-gray-400', 'text-gray-500', 'text-gray-600', 
-                        'text-yellow-300', 'text-yellow-400', 'text-yellow-500', 
-                        'text-orange-500', 'text-red-500', 'text-green-500'
-                    );
-                    
-                    if (activeRating && starRating <= activeRating) {
-                        // Fill stars up to the active rating with yellow
-                        starElement.classList.add('text-yellow-400');
-                    } else {
-                        // Unfilled stars - use grey (default state)
-                        starElement.classList.add('text-gray-400');
-                    }
+
+            const setStarColors = (value, hoverValue = null) => {
+                const activeValue = hoverValue ?? value;
+                stars.forEach(star => {
+                    const starValue = Number(star.dataset.rating);
+                    const color = activeValue && starValue <= activeValue ? '#FBBF24' : '#E5E7EB';
+                    star.setAttribute('fill', color);
+                    star.setAttribute('stroke', color);
                 });
-                
-                // Update rating text with better styling
-                if (activeRating) {
-                    const label = ratingLabels[activeRating];
-                    ratingText.textContent = label.text;
-                    ratingText.className = `text-lg font-semibold text-yellow-500 min-h-[2rem] transition-all duration-300`;
-                } else {
-                    ratingText.textContent = 'Select a rating';
-                    ratingText.className = 'text-lg font-semibold text-gray-600 dark:text-gray-400 min-h-[2rem] transition-all duration-300';
+
+                if (ratingText) {
+                    ratingText.textContent = activeValue ? ratingLabels[activeValue] : 'Select a rating';
+                    ratingText.className = activeValue
+                        ? 'text-lg font-semibold text-yellow-500 min-h-[2rem] transition-all duration-300'
+                        : 'text-lg font-semibold text-gray-600 dark:text-gray-400 min-h-[2rem] transition-all duration-300';
                 }
-            }
-            
-            let selectedRating = null;
-            
-            // Handle click/change
-            ratingInputs.forEach((input) => {
-                input.addEventListener('change', function() {
-                    selectedRating = parseInt(this.value);
-                    updateStars(selectedRating);
+            };
+
+            let selectedRating = Number(document.querySelector('input[name="rating"]:checked')?.value || 0);
+            setStarColors(selectedRating || null);
+
+            ratingInputs.forEach(input => {
+                input.addEventListener('change', () => {
+                    selectedRating = Number(input.value);
+                    setStarColors(selectedRating);
                 });
             });
-            
-            // Handle hover on stars
-            starIcons.forEach((star) => {
+
+            stars.forEach(star => {
                 const label = star.closest('label');
-                
-                label.addEventListener('mouseenter', function() {
-                    const hoverRating = parseInt(star.getAttribute('data-rating'));
-                    updateStars(selectedRating, hoverRating);
+                label?.addEventListener('mouseenter', () => {
+                    setStarColors(selectedRating, Number(star.dataset.rating));
                 });
             });
-            
-            // Reset to selected rating on mouse leave
-            ratingContainer.addEventListener('mouseleave', function() {
-                updateStars(selectedRating);
-            });
-            
-            // Character counter for comment textarea
-            function updateCharCount() {
+
+            ratingContainer?.addEventListener('mouseleave', () => setStarColors(selectedRating || null));
+
+            const updateCharCount = () => {
                 const length = commentTextarea.value.length;
                 charCount.textContent = length;
-                
-                // Optional: Add visual feedback based on length
                 if (length > 500) {
                     charCount.classList.add('text-orange-500', 'font-semibold');
                     charCount.classList.remove('text-gray-400', 'dark:text-gray-500');
@@ -260,27 +236,11 @@
                     charCount.classList.remove('text-orange-500', 'font-semibold');
                     charCount.classList.add('text-gray-400', 'dark:text-gray-500');
                 }
-            }
-            
-            // Initialize character count
+            };
+
             if (commentTextarea && charCount) {
                 updateCharCount();
                 commentTextarea.addEventListener('input', updateCharCount);
-            }
-            
-            // Initialize stars with white color
-            starIcons.forEach((star) => {
-                star.classList.add('text-white');
-            });
-            
-            // Initialize with no selection (all stars white)
-            updateStars(null);
-            
-            // Check if there's an old value (for form errors)
-            const checkedInput = document.querySelector('input[name="rating"]:checked');
-            if (checkedInput) {
-                selectedRating = parseInt(checkedInput.value);
-                updateStars(selectedRating);
             }
         });
     </script>

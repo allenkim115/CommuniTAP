@@ -1346,6 +1346,7 @@ class DashboardController extends Controller
         $query = $user->completedTasks()
             ->where('tasks.status', '!=', 'inactive') // Exclude inactive/deactivated tasks
             ->withPivot('status', 'assigned_at', 'submitted_at', 'completed_at', 'photos', 'completion_notes')
+            ->with(['assignments.user', 'assignedUser'])
             ->orderBy('task_assignments.completed_at', 'desc');
 
         if ($startDate) {

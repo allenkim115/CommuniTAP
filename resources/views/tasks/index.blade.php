@@ -95,10 +95,10 @@
                         <!-- Horizontal row of task cards using responsive grid (no scroll) -->
                         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pb-2">
                             @foreach($filteredTasks as $task)
-                            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 transition-all duration-200 hover:shadow-md cursor-pointer task-card w-full" 
+                            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 transition-all duration-200 hover:shadow-md hover:bg-gray-50 dark:hover:bg-gray-700/60 cursor-pointer task-card w-full" 
                                  data-task-id="{{ $task->taskId }}" 
                                  data-task-type="{{ $task->task_type }}"
-                                 onclick="showTaskDetails({{ $task->taskId }})">
+                                 onclick="openTaskModal({{ $task->taskId }})">
                                  
                                 <!-- Task Header -->
                                 <div class="flex justify-between items-start mb-2">

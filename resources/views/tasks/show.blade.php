@@ -493,7 +493,7 @@
                                     </div>
 
                                     <!-- Task Feedback Button -->
-                                    <div class="mt-4 text-center space-x-2">
+                                    <div class="mt-4 flex flex-wrap justify-center items-center gap-3">
                                         <a href="{{ route('feedback.create', $task) }}" class="inline-flex items-center px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-lg transition-colors">
                                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
@@ -568,7 +568,7 @@
                                     </div>
                                     
                                     <!-- Action Buttons -->
-                                    <div class="mt-4 text-center space-y-3">
+                                    <div class="mt-4 flex flex-wrap justify-center items-center gap-3">
                                         <!-- Task Feedback Button -->
                                         <a href="{{ route('feedback.create', $task) }}" class="inline-flex items-center px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-lg transition-colors">
                                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -576,35 +576,39 @@
                                             </svg>
                                             Task Feedback
                                         </a>
-                                        <div>
-                                            <a href="{{ route('feedback.show', $task) }}" class="inline-flex items-center px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 font-medium rounded-lg transition-colors">
-                                                View Feedback
-                                            </a>
-                                        </div>
+                                        
+                                        <a href="{{ route('feedback.show', $task) }}" class="inline-flex items-center px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 font-medium rounded-lg transition-colors">
+                                            View Feedback
+                                        </a>
                                         
                                         <!-- Tap & Pass Button - Only for daily tasks completed TODAY -->
                                         @if($task->task_type === 'daily' && $userAssignment->completed_at && \Carbon\Carbon::parse($userAssignment->completed_at)->isToday())
-                                        <div>
-                                            <button type="button" onclick="openNominationModal({{ $task->taskId }})" class="inline-flex items-center px-4 py-2 bg-green-500 hover:bg-green-600 text-white font-medium rounded-lg transition-colors">
+                                            <a href="{{ route('tap-nominations.create', $task) }}" class="inline-flex items-center px-4 py-2 bg-green-500 hover:bg-green-600 text-white font-medium rounded-lg transition-colors">
                                                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
                                                 </svg>
                                                 🎯 Tap & Pass
-                                            </button>
-                                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Nominate someone for a daily task (completed today)</p>
-                                        </div>
+                                            </a>
                                         @elseif($task->task_type === 'daily' && $userAssignment->completed_at && !\Carbon\Carbon::parse($userAssignment->completed_at)->isToday())
-                                        <div class="text-center">
                                             <div class="inline-flex items-center px-4 py-2 bg-gray-400 text-white font-medium rounded-lg cursor-not-allowed opacity-60">
                                                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
                                                 </svg>
                                                 🎯 Tap & Pass
                                             </div>
-                                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Only available for tasks completed today</p>
-                                        </div>
                                         @endif
                                     </div>
+                                    
+                                    <!-- Helper text for Tap & Pass -->
+                                    @if($task->task_type === 'daily' && $userAssignment->completed_at)
+                                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-2 text-center">
+                                            @if(\Carbon\Carbon::parse($userAssignment->completed_at)->isToday())
+                                                Nominate someone for a daily task (completed today)
+                                            @else
+                                                Only available for tasks completed today
+                                            @endif
+                                        </p>
+                                    @endif
                                 </div>
                             @endif
                         @endif
