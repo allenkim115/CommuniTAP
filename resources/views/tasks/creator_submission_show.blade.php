@@ -124,21 +124,21 @@
                                     @endif
                                 </div>
                             @else
-                                <form action="{{ route('tasks.creator.approve', $submission) }}" method="POST" class="mb-4" onsubmit="return confirm('Approve this submission?');">
+                                <form action="{{ route('tasks.creator.approve', $submission) }}" method="POST" class="mb-4" id="approve-submission-form">
                                     @csrf
                                     <div class="mb-4">
                                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Notes (optional)</label>
                                         <textarea name="notes" rows="3" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm dark:bg-gray-700 dark:text-white"></textarea>
                                     </div>
-                                    <button type="submit" class="w-full px-4 py-2 rounded bg-green-600 hover:bg-green-700 text-white">Approve Submission</button>
+                                    <button type="button" onclick="showConfirmModal('Approve this submission?', 'Approve Submission', 'Approve', 'Cancel', 'green').then(confirmed => { if(confirmed) document.getElementById('approve-submission-form').submit(); });" class="w-full px-4 py-2 rounded bg-green-600 hover:bg-green-700 text-white">Approve Submission</button>
                                 </form>
-                                <form action="{{ route('tasks.creator.reject', $submission) }}" method="POST" onsubmit="return confirm('Reject this submission?');">
+                                <form action="{{ route('tasks.creator.reject', $submission) }}" method="POST" id="reject-submission-form">
                                     @csrf
                                     <div class="mb-4">
                                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Rejection Reason *</label>
                                         <textarea name="rejection_reason" required rows="3" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm dark:bg-gray-700 dark:text-white"></textarea>
                                     </div>
-                                    <button type="submit" class="w-full px-4 py-2 rounded bg-red-600 hover:bg-red-700 text-white">Reject Submission</button>
+                                    <button type="button" onclick="showConfirmModal('Reject this submission?', 'Reject Submission', 'Reject', 'Cancel', 'red').then(confirmed => { if(confirmed) document.getElementById('reject-submission-form').submit(); });" class="w-full px-4 py-2 rounded bg-red-600 hover:bg-red-700 text-white">Reject Submission</button>
                                 </form>
                             @endif
                         </div>

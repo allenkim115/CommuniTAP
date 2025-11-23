@@ -22,12 +22,11 @@
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Role</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Points</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                                 @foreach(($users ?? []) as $user)
-                                    <tr>
+                                    <tr class="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors" onclick="window.location='{{ route('admin.users.show', $user) }}'">
                                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">{{ $user->full_name ?? ($user->firstName.' '.$user->lastName) }}</td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{{ $user->email }}</td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{{ $user->role }}</td>
@@ -39,22 +38,6 @@
                                             @endif
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{{ $user->points }}</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-3">
-                                            <a href="{{ route('admin.users.show', $user) }}" class="text-blue-600 hover:text-blue-800">View</a>
-                                            @if($user->status === 'active')
-                                                <form method="POST" action="{{ route('admin.users.suspend', $user) }}" class="inline">
-                                                    @csrf
-                                                    @method('PATCH')
-                                                    <button class="text-red-600 hover:text-red-800">Suspend</button>
-                                                </form>
-                                            @else
-                                                <form method="POST" action="{{ route('admin.users.reactivate', $user) }}" class="inline">
-                                                    @csrf
-                                                    @method('PATCH')
-                                                    <button class="text-green-600 hover:text-green-800">Reactivate</button>
-                                                </form>
-                                            @endif
-                                        </td>
                                     </tr>
                                 @endforeach
                             </tbody>

@@ -1,15 +1,15 @@
 <x-admin-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
             {{ __('Incident Reports Management') }}
         </h2>
     </x-slot>
 
-    <div class="py-12">
+    <div class="py-8">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <!-- Statistics Cards -->
             <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
-                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+                <div class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
                     <div class="p-5">
                         <div class="flex items-center">
                             <div class="flex-shrink-0">
@@ -19,15 +19,15 @@
                             </div>
                             <div class="ml-5 w-0 flex-1">
                                 <dl>
-                                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Total Reports</dt>
-                                    <dd class="text-lg font-medium text-gray-900 dark:text-gray-100">{{ $stats['total'] }}</dd>
+                                    <dt class="text-sm font-medium text-gray-600 truncate">Total Reports</dt>
+                                    <dd class="text-lg font-medium text-gray-900">{{ $stats['total'] }}</dd>
                                 </dl>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+                <div class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
                     <div class="p-5">
                         <div class="flex items-center">
                             <div class="flex-shrink-0">
@@ -37,7 +37,7 @@
                             </div>
                             <div class="ml-5 w-0 flex-1">
                                 <dl>
-                                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Pending</dt>
+                                    <dt class="text-sm font-medium text-gray-600 truncate">Pending</dt>
                                     <dd class="text-lg font-medium text-yellow-600">{{ $stats['pending'] }}</dd>
                                 </dl>
                             </div>
@@ -45,7 +45,7 @@
                     </div>
                 </div>
 
-                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+                <div class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
                     <div class="p-5">
                         <div class="flex items-center">
                             <div class="flex-shrink-0">
@@ -64,7 +64,7 @@
                     </div>
                 </div>
 
-                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+                <div class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
                     <div class="p-5">
                         <div class="flex items-center">
                             <div class="flex-shrink-0">
@@ -82,7 +82,7 @@
                     </div>
                 </div>
 
-                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+                <div class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
                     <div class="p-5">
                         <div class="flex items-center">
                             <div class="flex-shrink-0">
@@ -146,17 +146,15 @@
                             <a href="{{ route('admin.incident-reports.index') }}" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">
                                 Clear Filters
                             </a>
-                            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                                Apply Filters
-                            </button>
                         </div>
                     </form>
                 </div>
             </div>
 
             <!-- Reports Table -->
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg" id="reports-table-container">
                 <div class="p-6">
+                    <div id="reports-content">
                     @if($reports->count() > 0)
                         <form id="bulk-form" method="POST" action="{{ route('admin.incident-reports.bulk-update') }}">
                             @csrf
@@ -288,6 +286,7 @@
                             <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">No reports match your current filters.</p>
                         </div>
                     @endif
+                    </div>
                 </div>
             </div>
         </div>
@@ -295,13 +294,103 @@
 
     @push('scripts')
     <script>
-        // Select all functionality
-        document.getElementById('select-all').addEventListener('change', function() {
-            const checkboxes = document.querySelectorAll('.report-checkbox');
-            checkboxes.forEach(checkbox => {
-                checkbox.checked = this.checked;
-            });
+        // Auto-update reports via AJAX when filters change (no page refresh)
+        document.addEventListener('DOMContentLoaded', function() {
+            const filterForm = document.querySelector('form[action="{{ route('admin.incident-reports.index') }}"]');
+            const statusSelect = document.getElementById('status');
+            const incidentTypeSelect = document.getElementById('incident_type');
+            const dateFromInput = document.getElementById('date_from');
+            const dateToInput = document.getElementById('date_to');
+            const searchInput = document.getElementById('search');
+
+            function updateReports() {
+                const reportsContainer = document.getElementById('reports-table-container');
+                const reportsContent = document.getElementById('reports-content');
+                
+                if (reportsContent) {
+                    reportsContent.innerHTML = '<div class="p-8 text-center"><div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div><p class="mt-2 text-gray-600 dark:text-gray-400">Loading reports...</p></div>';
+                }
+
+                const formData = new FormData(filterForm);
+                const params = new URLSearchParams(formData);
+
+                fetch(`{{ route('admin.incident-reports.index') }}?${params.toString()}`, {
+                    method: 'GET',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'text/html',
+                    }
+                })
+                .then(response => response.text())
+                .then(html => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    
+                    const newReportsContent = doc.getElementById('reports-content');
+                    
+                    if (newReportsContent && reportsContent) {
+                        reportsContent.innerHTML = newReportsContent.innerHTML;
+                    }
+                    
+                    // Re-initialize select all functionality
+                    const selectAll = document.getElementById('select-all');
+                    if (selectAll) {
+                        selectAll.addEventListener('change', function() {
+                            const checkboxes = document.querySelectorAll('.report-checkbox');
+                            checkboxes.forEach(checkbox => {
+                                checkbox.checked = this.checked;
+                            });
+                        });
+                    }
+                    
+                    const newUrl = `{{ route('admin.incident-reports.index') }}?${params.toString()}`;
+                    window.history.pushState({path: newUrl}, '', newUrl);
+                })
+                .catch(error => {
+                    console.error('Error updating reports:', error);
+                    if (reportsContent) {
+                        reportsContent.innerHTML = '<div class="p-8 text-center text-red-600">Error loading reports. Please refresh the page.</div>';
+                    }
+                });
+            }
+
+            // Debounce search input
+            let searchTimeout;
+            if (searchInput) {
+                searchInput.addEventListener('input', function() {
+                    clearTimeout(searchTimeout);
+                    searchTimeout = setTimeout(updateReports, 500);
+                });
+            }
+
+            if (statusSelect) {
+                statusSelect.addEventListener('change', updateReports);
+            }
+            
+            if (incidentTypeSelect) {
+                incidentTypeSelect.addEventListener('change', updateReports);
+            }
+            
+            if (dateFromInput) {
+                dateFromInput.addEventListener('change', updateReports);
+            }
+            
+            if (dateToInput) {
+                dateToInput.addEventListener('change', updateReports);
+            }
         });
+
+        // Select all functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const selectAll = document.getElementById('select-all');
+            if (selectAll) {
+                selectAll.addEventListener('change', function() {
+                    const checkboxes = document.querySelectorAll('.report-checkbox');
+                    checkboxes.forEach(checkbox => {
+                        checkbox.checked = this.checked;
+                    });
+                });
+            }
 
         // Bulk form submission
         document.getElementById('bulk-form').addEventListener('submit', function(e) {
@@ -310,21 +399,30 @@
             
             if (!action) {
                 e.preventDefault();
-                alert('Please select a bulk action.');
+                showAlertModal('Please select a bulk action.', 'Action Required', 'warning');
                 return;
             }
             
             if (checkedBoxes.length === 0) {
                 e.preventDefault();
-                alert('Please select at least one report.');
+                showAlertModal('Please select at least one report.', 'Selection Required', 'warning');
                 return;
             }
             
             if (action === 'delete') {
-                if (!confirm(`Are you sure you want to delete ${checkedBoxes.length} report(s)? This action cannot be undone.`)) {
-                    e.preventDefault();
-                    return;
-                }
+                e.preventDefault();
+                showConfirmModal(
+                    `Are you sure you want to delete ${checkedBoxes.length} report(s)? This action cannot be undone.`,
+                    'Confirm Deletion',
+                    'Delete',
+                    'Cancel',
+                    'red'
+                ).then(confirmed => {
+                    if (confirmed) {
+                        document.getElementById('bulk-form').submit();
+                    }
+                });
+                return;
             }
         });
     </script>

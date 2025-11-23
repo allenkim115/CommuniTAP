@@ -170,7 +170,7 @@
             // Only prevent submission if critical fields are missing
             if (!reportedUserId || !incidentType || !description || description.length < 10 || !taskId) {
                 e.preventDefault();
-                alert('Please fill in all required fields:\n- Select a user to report\n- Select the related task\n- Choose an incident type\n- Provide a description (minimum 10 characters)');
+                showAlertModal('Please fill in all required fields:\n- Select a user to report\n- Select the related task\n- Choose an incident type\n- Provide a description (minimum 10 characters)', 'Validation Error', 'warning');
                 return false;
             }
             

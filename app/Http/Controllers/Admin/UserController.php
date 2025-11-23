@@ -38,19 +38,24 @@ class UserController extends Controller
 
     public function show(User $user): View
     {
-        return view('admin.users.show', compact('user'));
+        // Load task statistics
+        $tasksCompleted = $user->completedTasks()->count();
+        $tasksInProgress = $user->assignedTasks()->wherePivotIn('status', ['assigned', 'submitted'])->count();
+        $tasksAssigned = $user->assignedTasks()->count();
+        
+        return view('admin.users.show', compact('user', 'tasksCompleted', 'tasksInProgress', 'tasksAssigned'));
     }
 
     public function suspend(User $user): RedirectResponse
     {
         $user->update(['status' => 'suspended']);
-        return back()->with('status', 'User suspended successfully.');
+        return back()->with('status', "User {$user->firstName} {$user->lastName} has been suspended successfully. Their account access has been restricted.");
     }
 
     public function reactivate(User $user): RedirectResponse
     {
         $user->update(['status' => 'active']);
-        return back()->with('status', 'User reactivated successfully.');
+        return back()->with('status', "User {$user->firstName} {$user->lastName} has been reactivated successfully. Their account access has been restored.");
     }
 
     

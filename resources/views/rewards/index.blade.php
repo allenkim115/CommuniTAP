@@ -119,7 +119,7 @@
                                 </div>
 
                                 <!-- Redeem Button -->
-                                <form method="POST" action="{{ route('rewards.redeem', $reward) }}">
+                                <form method="POST" action="{{ route('rewards.redeem', $reward) }}" id="redeem-reward-form-{{ $reward->id }}">
                                     @csrf
                                     @if($reward->isAvailable())
                                         <button type="submit" 

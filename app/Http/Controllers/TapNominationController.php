@@ -25,7 +25,7 @@ class TapNominationController extends Controller
         
         // Check if task is a daily task
         if (!$task->isDailyTask()) {
-            return redirect()->back()->with('error', 'Tap & Pass nominations are only available for daily tasks.');
+            return redirect()->back()->with('error', "Cannot create nomination: Tap & Pass nominations are only available for daily tasks. '{$task->title}' is a {$task->task_type} task.");
         }
 
         // Check if user has completed ANY daily task TODAY
@@ -38,12 +38,13 @@ class TapNominationController extends Controller
             ->first();
             
         if (!$userDailyTaskAssignment) {
-            return redirect()->back()->with('error', 'You must complete a daily task TODAY before nominating someone. Tap & Pass is only available for users who have completed a daily task on the same day.');
+            return redirect()->back()->with('error', "Cannot create nomination: You must complete a daily task TODAY before you can nominate someone. Tap & Pass is only available for users who have completed a daily task on the same day. Complete a daily task first, then come back to nominate a teammate!");
         }
 
-        // Get available users for nomination (excluding current user and users who have nominated them)
+        // Get available users for nomination (excluding current user, admin users, and users who have nominated them)
         $availableUsers = User::where('userId', '!=', $user->userId)
             ->where('status', 'active')
+            ->where('role', '!=', 'admin')
             ->whereDoesntHave('nominationsMade', function($query) use ($user) {
                 $query->where('FK3_nomineeId', $user->userId)
                       ->where('status', 'pending');
@@ -61,8 +62,14 @@ class TapNominationController extends Controller
             ->orderBy('title')
             ->get();
             
+        // If this is an AJAX request, return the modal partial
+        if (request()->ajax() || request()->wantsJson()) {
+            return view('tap-nominations._modal-form', compact('task', 'availableUsers', 'availableDailyTasks', 'userDailyTaskAssignment'));
+        }
 
-        return view('tap-nominations.create', compact('task', 'availableUsers', 'availableDailyTasks', 'userDailyTaskAssignment'));
+        // If accessed directly (not via AJAX), redirect to the task page
+        // The nomination form should only be accessed via the modal
+        return redirect()->route('tasks.show', $task)->with('info', 'Please use the Tap & Pass button to nominate someone.');
     }
 
     /**
@@ -111,7 +118,7 @@ class TapNominationController extends Controller
         
         // Check if task is a daily task
         if (!$task->isDailyTask()) {
-            return redirect()->back()->with('error', 'Tap & Pass nominations are only available for daily tasks.');
+            return redirect()->back()->with('error', "Cannot create nomination: Tap & Pass nominations are only available for daily tasks. '{$task->title}' is a {$task->task_type} task.");
         }
 
         // Check if user has completed ANY daily task TODAY
@@ -131,7 +138,7 @@ class TapNominationController extends Controller
             
         if (!$userDailyTaskAssignment) {
             \Log::info('User has not completed any daily task today, redirecting back');
-            return redirect()->back()->with('error', 'You must complete a daily task TODAY before nominating someone. Tap & Pass is only available for users who have completed a daily task on the same day.');
+            return redirect()->back()->with('error', "Cannot create nomination: You must complete a daily task TODAY before you can nominate someone. Tap & Pass is only available for users who have completed a daily task on the same day. Complete a daily task first, then come back to nominate a teammate!");
         }
 
         \Log::info('User has completed a daily task today, proceeding with nomination creation');
@@ -144,7 +151,9 @@ class TapNominationController extends Controller
             ->first();
 
         if ($existingNomination) {
-            return redirect()->back()->with('error', 'You have already nominated this user for this task.');
+            $nominee = \App\Models\User::find($request->nominee_id);
+            $nomineeName = $nominee ? $nominee->firstName . ' ' . $nominee->lastName : 'this user';
+            return redirect()->back()->with('error', "Cannot create nomination: You have already nominated {$nomineeName} for '{$task->title}'. They will receive a notification when they accept.");
         }
 
         // Check if the nominee has already nominated this user (prevent reciprocal nominations)
@@ -156,7 +165,9 @@ class TapNominationController extends Controller
 
 
         if ($reciprocalNomination) {
-            return redirect()->back()->with('error', 'This user has already nominated you for this task. You cannot nominate them back to prevent circular nominations.');
+            $nominee = \App\Models\User::find($request->nominee_id);
+            $nomineeName = $nominee ? $nominee->firstName . ' ' . $nominee->lastName : 'This user';
+            return redirect()->back()->with('error', "Cannot create nomination: {$nomineeName} has already nominated you for '{$task->title}'. You cannot nominate them back to prevent circular nominations. Check your nominations to accept theirs instead!");
         }
 
         // Create the nomination
@@ -211,11 +222,13 @@ class TapNominationController extends Controller
                 'nominations_for_nominee' => $nomineeNominations->toArray()
             ]);
 
-            return redirect()->route('tap-nominations.index')->with('success', 'Nomination sent successfully! You earned 1 point for using Tap & Pass. The nominated user will be notified.');
+            $nominee = \App\Models\User::find($request->nominee_id);
+            $nomineeName = $nominee ? $nominee->firstName . ' ' . $nominee->lastName : 'the nominated user';
+            return redirect()->route('tap-nominations.index')->with('success', "Nomination sent successfully! You nominated {$nomineeName} for '{$task->title}' and earned 1 point for using Tap & Pass. {$nomineeName} will be notified and can accept to join the task.");
         } catch (\Exception $e) {
             \Log::error('Error creating nomination: ' . $e->getMessage());
             \Log::error('Stack trace: ' . $e->getTraceAsString());
-            return redirect()->back()->with('error', 'There was an error creating the nomination. Please try again. Error: ' . $e->getMessage());
+            return redirect()->back()->with('error', "Failed to create nomination for '{$task->title}'. Please try again. If the problem persists, contact support.");
         }
     }
 
@@ -258,23 +271,24 @@ class TapNominationController extends Controller
         
         // Check if the nomination is for the current user
         if ($nomination->FK3_nomineeId !== $user->userId) {
-            return redirect()->back()->with('error', 'You can only accept nominations sent to you.');
+            return redirect()->back()->with('error', "Cannot accept nomination: This nomination was sent to a different user. You can only accept nominations that were sent directly to you.");
         }
 
         // Check if nomination is still pending
         if (!$nomination->isPending()) {
-            return redirect()->back()->with('error', 'This nomination has already been processed.');
+            $statusLabel = ucfirst($nomination->status);
+            return redirect()->back()->with('error', "Cannot process nomination: This nomination has already been {$statusLabel}. Check your nominations list for current status.");
         }
 
         // Check if the task is still available
         $task = $nomination->task;
         if ($task->status !== 'published') {
-            return redirect()->back()->with('error', 'This task is no longer available.');
+            return redirect()->back()->with('error', "Cannot accept nomination: The task '{$task->title}' is no longer available. It may have been completed, deactivated, or reached its participant limit.");
         }
 
         // Check if user is already assigned to this task
         if ($task->isAssignedTo($user->userId)) {
-            return redirect()->back()->with('error', 'You are already assigned to this task.');
+            return redirect()->back()->with('error', "Cannot accept nomination: You are already assigned to '{$task->title}'. Check your task list to view your progress.");
         }
 
         // Create task assignment
@@ -303,7 +317,8 @@ class TapNominationController extends Controller
             );
         }
 
-        return redirect()->route('tasks.index')->with('status', 'Nomination accepted! You have been assigned to the task and earned 1 point.');
+        $nominatorName = $nomination->nominator ? $nomination->nominator->firstName . ' ' . $nomination->nominator->lastName : 'the nominator';
+        return redirect()->route('tasks.index')->with('status', "Nomination accepted! You've been assigned to '{$task->title}' and earned 1 point. Thank you for accepting {$nominatorName}'s nomination!");
     }
 
     /**
@@ -320,7 +335,8 @@ class TapNominationController extends Controller
 
         // Check if nomination is still pending
         if (!$nomination->isPending()) {
-            return redirect()->back()->with('error', 'This nomination has already been processed.');
+            $statusLabel = ucfirst($nomination->status);
+            return redirect()->back()->with('error', "Cannot process nomination: This nomination has already been {$statusLabel}. Check your nominations list for current status.");
         }
 
         // Update nomination status
@@ -338,7 +354,8 @@ class TapNominationController extends Controller
             );
         }
 
-        return redirect()->route('tap-nominations.index')->with('status', 'Nomination declined.');
+        $nominatorName = $nomination->nominator ? $nomination->nominator->firstName . ' ' . $nomination->nominator->lastName : 'the nominator';
+        return redirect()->route('tap-nominations.index')->with('status', "You've declined {$nominatorName}'s nomination for '{$nomination->task->title}'. {$nominatorName} has been notified and can nominate someone else.");
     }
 
     /**

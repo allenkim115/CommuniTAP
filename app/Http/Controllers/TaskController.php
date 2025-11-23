@@ -35,7 +35,7 @@ class TaskController extends Controller
 
         // Prevent moving to submitted_proof via this endpoint; that happens on submit
         if ($request->progress === 'submitted_proof') {
-            return redirect()->back()->with('error', 'Submit proof using the submit action.');
+            return redirect()->back()->with('error', 'To submit proof, please use the "Submit Task" button with your photos and completion notes.');
         }
 
         // Enforce STRICT forward-only, one-step-at-a-time progress
@@ -45,17 +45,20 @@ class TaskController extends Controller
         $requestedIndex = array_search($request->progress, $order);
 
         if ($currentIndex === false || $requestedIndex === false) {
-            return redirect()->back()->with('error', 'Invalid progress transition.');
+            return redirect()->back()->with('error', 'Invalid progress state. Please refresh the page and try again.');
         }
 
         // No backtracking
         if ($requestedIndex < $currentIndex) {
-            return redirect()->back()->with('error', 'You cannot move progress backward.');
+            $currentState = ucfirst(str_replace('_', ' ', $currentProgress));
+            $requestedState = ucfirst(str_replace('_', ' ', $request->progress));
+            return redirect()->back()->with('error', "Cannot go back from '{$currentState}' to '{$requestedState}'. Progress must move forward only.");
         }
 
         // No skipping steps; must move exactly to the next step
         if ($requestedIndex !== $currentIndex + 1) {
-            return redirect()->back()->with('error', 'Please follow the sequence step-by-step.');
+            $nextState = ucfirst(str_replace('_', ' ', $order[$currentIndex + 1] ?? 'done'));
+            return redirect()->back()->with('error', "Please complete the current step first. The next step is: '{$nextState}'.");
         }
 
         $assignment->update([
@@ -75,7 +78,8 @@ class TaskController extends Controller
             );
         }
 
-        return redirect()->route('tasks.show', $task)->with('status', 'Progress updated.');
+        $progressLabel = ucfirst(str_replace('_', ' ', $request->progress));
+        return redirect()->route('tasks.show', $task)->with('status', "Task progress updated to '{$progressLabel}' for '{$task->title}'.");
     }
     /**
      * Display a listing of tasks for the authenticated user
@@ -266,12 +270,14 @@ class TaskController extends Controller
 
         // Prevent approving already completed submissions
         if ($submission->status === 'completed') {
-            return redirect()->back()->with('error', 'This submission has already been approved and is closed.');
+            $assigneeName = $submission->user ? $submission->user->firstName . ' ' . $submission->user->lastName : 'This user';
+            return redirect()->back()->with('error', "This submission from {$assigneeName} for '{$task->title}' has already been approved and points have been awarded.");
         }
 
         // Prevent approving submissions that have reached maximum rejection attempts
         if ($submission->rejection_count >= 3) {
-            return redirect()->back()->with('error', 'This submission has reached the maximum number of rejection attempts (3) and is closed.');
+            $assigneeName = $submission->user ? $submission->user->firstName . ' ' . $submission->user->lastName : 'This user';
+            return redirect()->back()->with('error', "This submission from {$assigneeName} has been rejected 3 times and is now closed. No further attempts are allowed.");
         }
 
         $request->validate([
@@ -308,10 +314,15 @@ class TaskController extends Controller
             );
         }
 
-        $statusMessage = 'Submission approved.';
-        if ($taskMarkedCompleted) {
-            $statusMessage .= ' Task automatically marked as completed since all participants have finished.';
+        $assigneeName = $assignee ? $assignee->firstName . ' ' . $assignee->lastName : 'the participant';
+        $pointsAwarded = $pointsResult['added'] > 0 ? $pointsResult['added'] : 0;
+        $statusMessage = "Submission from {$assigneeName} for '{$task->title}' has been approved";
+        if ($pointsAwarded > 0) {
+            $statusMessage .= " and {$pointsAwarded} points have been awarded";
+        } elseif ($pointsResult['capped']) {
+            $statusMessage .= ". Note: Participant has reached the 500 point cap, so no additional points were awarded";
         }
+        $statusMessage .= '.';
 
         return redirect()->route('tasks.creator.submissions')->with('status', $statusMessage);
     }
@@ -333,11 +344,13 @@ class TaskController extends Controller
 
         // Prevent rejecting already completed submissions
         if ($submission->status === 'completed') {
-            return redirect()->back()->with('error', 'This submission has already been approved and is closed.');
+            $assigneeName = $submission->user ? $submission->user->firstName . ' ' . $submission->user->lastName : 'This user';
+            return redirect()->back()->with('error', "Cannot reject: {$assigneeName}'s submission for '{$task->title}' has already been approved and points have been awarded.");
         }
 
         if ($submission->rejection_count >= 3) {
-            return redirect()->back()->with('error', 'Maximum rejection attempts reached.');
+            $assigneeName = $submission->user ? $submission->user->firstName . ' ' . $submission->user->lastName : 'This user';
+            return redirect()->back()->with('error', "Cannot reject: {$assigneeName} has already reached the maximum of 3 rejection attempts for this submission.");
         }
 
         $newRejectionCount = $submission->rejection_count + 1;
@@ -371,7 +384,15 @@ class TaskController extends Controller
             );
         }
 
-        return redirect()->route('tasks.creator.submissions')->with('status', 'Submission rejected.');
+        $assigneeName = $assignee ? $assignee->firstName . ' ' . $assignee->lastName : 'the participant';
+        $remainingAttempts = 3 - $newRejectionCount;
+        $statusMessage = "Submission from {$assigneeName} for '{$task->title}' has been rejected";
+        if ($remainingAttempts > 0) {
+            $statusMessage .= ". They have {$remainingAttempts} remaining attempt" . ($remainingAttempts > 1 ? 's' : '') . " to resubmit with improvements.";
+        } else {
+            $statusMessage .= ". Maximum attempts (3) reached - this submission is now closed.";
+        }
+        return redirect()->route('tasks.creator.submissions')->with('status', $statusMessage);
     }
 
     /**
@@ -460,7 +481,7 @@ class TaskController extends Controller
             );
         }
 
-        return redirect()->route('tasks.my-uploads')->with('status', 'Task proposal submitted');
+        return redirect()->route('tasks.my-uploads')->with('status', "Task proposal '{$request->title}' has been submitted successfully! It is now pending admin review and will be published once approved.");
     }
 
     /**
@@ -514,7 +535,7 @@ class TaskController extends Controller
         // Don't allow editing if task is already approved/published/completed
         // Allow editing for pending, rejected, and draft (cancelled) tasks
         if (in_array($task->status, ['approved', 'published', 'completed'])) {
-            return redirect()->back()->with('error', 'Cannot edit approved, published, or completed tasks.');
+            return redirect()->back()->with('error', "Cannot edit '{$task->title}': This task has been {$task->status} and cannot be modified. Please create a new task proposal if needed.");
         }
 
         return view('tasks.edit', compact('task'));
@@ -533,7 +554,7 @@ class TaskController extends Controller
         // Don't allow editing if task is already approved/published/completed
         // Allow editing for pending, rejected, and draft (cancelled) tasks
         if (in_array($task->status, ['approved', 'published', 'completed'])) {
-            return redirect()->back()->with('error', 'Cannot edit approved, published, or completed tasks.');
+            return redirect()->back()->with('error', "Cannot edit '{$task->title}': This task has been {$task->status} and cannot be modified. Please create a new task proposal if needed.");
         }
 
         // Normalize time inputs to 24-hour H:i format before validation
@@ -633,7 +654,7 @@ class TaskController extends Controller
             'status' => 'pending', // Reset to pending after edit
         ]);
 
-        return redirect()->route('tasks.my-uploads')->with('status', 'Task updated successfully and resubmitted for approval.');
+        return redirect()->route('tasks.my-uploads')->with('status', "Task '{$task->title}' has been updated and resubmitted for admin approval. Changes will be reviewed before publishing.");
     }
 
     /**
@@ -648,13 +669,13 @@ class TaskController extends Controller
 
         // Don't allow canceling if task is already approved/published/completed
         if (in_array($task->status, ['approved', 'published', 'completed'])) {
-            return redirect()->back()->with('error', 'Cannot cancel approved, published, or completed tasks.');
+            return redirect()->back()->with('error', "Cannot cancel '{$task->title}': This task is currently {$task->status} and cannot be cancelled. Only pending or rejected tasks can be cancelled.");
         }
 
         // Set to 'draft' status to remove from approval queue but keep it editable
         $task->update(['status' => 'draft']);
 
-        return redirect()->route('tasks.my-uploads')->with('status', 'Task proposal cancelled. You can edit and resubmit it.');
+        return redirect()->route('tasks.my-uploads')->with('status', "Task proposal '{$task->title}' has been cancelled. You can now edit it and resubmit when ready.");
     }
 
     /**
@@ -667,12 +688,12 @@ class TaskController extends Controller
             abort(403, 'You can only reactivate your own user-uploaded tasks.');
         }
         if ($task->status !== 'inactive') {
-            return redirect()->back()->with('error', 'Only deactivated tasks can be reactivated.');
+            return redirect()->back()->with('error', "Cannot reactivate '{$task->title}': Only tasks that have been deactivated can be reactivated. This task is currently {$task->status}.");
         }
 
         // Send back to pending for admin review
         $task->update(['status' => 'pending']);
-        return redirect()->route('tasks.my-uploads')->with('status', 'Task reactivated and sent for approval.');
+        return redirect()->route('tasks.my-uploads')->with('status', "Task '{$task->title}' has been reactivated and sent for admin approval. It will be published once approved.");
     }
 
     /**
@@ -685,25 +706,28 @@ class TaskController extends Controller
         // Check if task is available for joining
         // Block inactive/deactivated tasks
         if ($task->status === 'inactive') {
-            return redirect()->back()->with('error', 'This task has been deactivated and is no longer available.');
+            return redirect()->back()->with('error', "Cannot join '{$task->title}': This task has been deactivated by an admin and is no longer available for participation.");
         }
         if ($task->status !== 'published') {
-            return redirect()->back()->with('error', 'This task is not available for joining.');
+            $statusLabel = ucfirst($task->status);
+            return redirect()->back()->with('error', "Cannot join '{$task->title}': This task is currently {$statusLabel} and not open for new participants.");
         }
 
         // Prevent the creator from joining their own task
         if (!is_null($task->FK1_userId) && $task->FK1_userId === $user->userId) {
-            return redirect()->back()->with('error', 'You cannot join a task you created.');
+            return redirect()->back()->with('error', "Cannot join '{$task->title}': You created this task and cannot participate in it. You can view submissions and approve them instead.");
         }
 
         // Check if user is already assigned to this task
         if ($task->isAssignedTo($user->userId)) {
-            return redirect()->back()->with('error', 'You are already assigned to this task.');
+            return redirect()->back()->with('error', "You are already assigned to '{$task->title}'. Check your task list to view your progress.");
         }
 
         // Check if task can accept more users
         if (!$task->canAcceptMoreUsers()) {
-            return redirect()->back()->with('error', 'This task has reached its participant limit.');
+            $currentCount = $task->assignments()->count();
+            $maxParticipants = $task->max_participants ?? 'unlimited';
+            return redirect()->back()->with('error', "Cannot join '{$task->title}': This task has reached its participant limit ({$currentCount} participants).");
         }
 
         // Create task assignment
@@ -740,7 +764,7 @@ class TaskController extends Controller
             }
         }
 
-        return redirect()->route('tasks.show', $task)->with('status', 'Successfully joined the task.');
+        return redirect()->route('tasks.show', $task)->with('status', "Successfully joined '{$task->title}'! You can now track your progress and submit proof when completed.");
     }
 
     /**
@@ -819,6 +843,6 @@ class TaskController extends Controller
         }
 
         return redirect()->route('tasks.show', $task)
-            ->with('status', 'Task completion submitted for review');
+            ->with('status', "Your completion proof for '{$task->title}' has been submitted successfully! " . ($task->task_type === 'user_uploaded' ? 'The task creator will review it shortly.' : 'An admin will review it and award points if approved.'));
     }
 }

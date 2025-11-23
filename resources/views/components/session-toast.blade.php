@@ -59,8 +59,16 @@ document.addEventListener('DOMContentLoaded', function() {
     @if(session('status'))
         showToast('{{ session('status') }}', 'success', 5000);
     @endif
+    @if(session('success'))
+        showToast('{{ session('success') }}', 'success', 5000);
+    @endif
     @if(session('error'))
         showToast('{{ session('error') }}', 'error', 5000);
+    @endif
+    @if($errors->any())
+        @foreach($errors->all() as $error)
+            showToast('{{ $error }}', 'error', 5000);
+        @endforeach
     @endif
 });
 </script>

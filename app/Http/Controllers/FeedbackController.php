@@ -92,8 +92,14 @@ class FeedbackController extends Controller
             ? 'Feedback submitted successfully! You earned 1 point.'
             : 'Feedback submitted successfully! However, you have reached the points cap (500 points), so no points were added.';
         
-        return redirect()->route('tasks.show', $task)
-            ->with('success', $successMessage);
+        $pointsEarned = $pointsResult['added'] > 0 ? $pointsResult['added'] : 0;
+        $successMessage = "Feedback for '{$task->title}' submitted successfully";
+        if ($pointsEarned > 0) {
+            $successMessage .= "! You earned {$pointsEarned} point" . ($pointsEarned > 1 ? 's' : '') . " for providing feedback.";
+        } else {
+            $successMessage .= ". Note: You've reached the points cap (500 points), so no additional points were awarded.";
+        }
+        return redirect()->route('tasks.show', $task)->with('success', $successMessage);
     }
     
     /**
@@ -136,7 +142,7 @@ class FeedbackController extends Controller
         ]);
         
         return redirect()->route('tasks.show', $feedback->task)
-            ->with('success', 'Feedback updated successfully!');
+            ->with('success', "Your feedback for '{$feedback->task->title}' has been updated successfully!");
     }
     
     /**

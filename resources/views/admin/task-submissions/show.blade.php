@@ -1,75 +1,90 @@
 <x-admin-layout>
     <x-slot name="header">
-        <div class="flex justify-between items-center">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
-                <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+                <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                     {{ __('Review Task Submission') }}
                 </h2>
-                <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                    Submitted by {{ $submission->user->name }} on {{ is_string($submission->submitted_at) ? \Carbon\Carbon::parse($submission->submitted_at)->format('M j, Y \a\t g:i A') : $submission->submitted_at->format('M j, Y \a\t g:i A') }}
+                <p class="text-sm text-gray-600 mt-1">
+                    Submitted by <span class="font-medium">{{ $submission->user->name }}</span>
+                    @if($submission->submitted_at) 
+                        on {{ is_string($submission->submitted_at) ? \Carbon\Carbon::parse($submission->submitted_at)->format('M j, Y \a\t g:i A') : $submission->submitted_at->format('M j, Y \a\t g:i A') }}
+                    @endif
                 </p>
             </div>
             <a href="{{ route('admin.task-submissions.index') }}" 
-               class="inline-flex items-center px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white text-sm font-medium rounded-md">
-                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-                </svg>
+               class="inline-flex items-center px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white text-sm font-medium rounded-lg transition-colors">
+                <i class="fas fa-arrow-left mr-2"></i>
                 Back to Submissions
             </a>
         </div>
     </x-slot>
 
-    <div class="py-12">
+    <div class="py-8">
         <!-- Toast Notifications -->
         <x-session-toast />
         <div class="max-w-6xl mx-auto sm:px-6 lg:px-8">
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <!-- Main Content -->
                 <div class="lg:col-span-2 space-y-6">
                     <!-- Task Information -->
-                    <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                    <div class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
+                        <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+                            <h3 class="text-lg font-semibold text-gray-900 flex items-center">
+                                <i class="fas fa-tasks mr-2 text-blue-600"></i>
+                                Task Information
+                            </h3>
+                        </div>
                         <div class="p-6">
-                            <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Task Information</h3>
-                            <div class="grid grid-cols-2 gap-4">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                                 <div>
-                                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Task Title</dt>
-                                    <dd class="text-sm text-gray-900 dark:text-white mt-1">{{ $submission->task->title }}</dd>
+                                    <dt class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Task Title</dt>
+                                    <dd class="text-sm font-medium text-gray-900">{{ $submission->task->title }}</dd>
                                 </div>
                                 <div>
-                                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Task Type</dt>
-                                    <dd class="text-sm text-gray-900 dark:text-white mt-1">{{ ucfirst(str_replace('_', ' ', $submission->task->task_type)) }}</dd>
+                                    <dt class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Task Type</dt>
+                                    <dd class="text-sm font-medium text-gray-900">{{ ucfirst(str_replace('_', ' ', $submission->task->task_type)) }}</dd>
                                 </div>
                                 <div>
-                                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Points Awarded</dt>
-                                    <dd class="text-sm text-gray-900 dark:text-white mt-1">{{ $submission->task->points_awarded }}</dd>
+                                    <dt class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Points Awarded</dt>
+                                    <dd class="text-sm font-medium text-gray-900">
+                                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg bg-blue-50 text-blue-700 font-semibold">
+                                            <i class="fas fa-star mr-1 text-xs"></i>
+                                            {{ $submission->task->points_awarded }}
+                                        </span>
+                                    </dd>
                                 </div>
                                 <div>
-                                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Due Date</dt>
-                                    <dd class="text-sm text-gray-900 dark:text-white mt-1">
+                                    <dt class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Due Date</dt>
+                                    <dd class="text-sm font-medium text-gray-900">
                                         @if($submission->task->due_date)
                                             {{ is_string($submission->task->due_date) ? \Carbon\Carbon::parse($submission->task->due_date)->format('M j, Y') : $submission->task->due_date->format('M j, Y') }}
                                         @else
-                                            No due date
+                                            <span class="text-gray-400">No due date</span>
                                         @endif
                                     </dd>
                                 </div>
                             </div>
-                            <div class="mt-4">
-                                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Description</dt>
-                                <dd class="text-sm text-gray-900 dark:text-white mt-1">{{ $submission->task->description }}</dd>
+                            <div class="pt-4 border-t border-gray-200">
+                                <dt class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Description</dt>
+                                <dd class="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">{{ $submission->task->description }}</dd>
                             </div>
                         </div>
                     </div>
 
                     <!-- User's Submission -->
-                    <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                    <div class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
+                        <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+                            <h3 class="text-lg font-semibold text-gray-900 flex items-center">
+                                <i class="fas fa-file-upload mr-2 text-green-600"></i>
+                                User's Submission
+                            </h3>
+                        </div>
                         <div class="p-6">
-                            <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">User's Submission</h3>
-                            
                             @if($submission->completion_notes)
                                 <div class="mb-6">
-                                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Completion Notes</dt>
-                                    <dd class="text-sm text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-700 p-4 rounded-md">
+                                    <dt class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Completion Notes</dt>
+                                    <dd class="text-sm text-gray-700 bg-gray-50 p-4 rounded-lg border border-gray-200 leading-relaxed whitespace-pre-wrap">
                                         {{ $submission->completion_notes }}
                                     </dd>
                                 </div>
@@ -77,37 +92,33 @@
 
                             @if($submission->photos && count($submission->photos) > 0)
                                 <div>
-                                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-4">Proof Photos ({{ count($submission->photos) }})</dt>
+                                    <dt class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-4 flex items-center">
+                                        <i class="fas fa-images mr-2"></i>
+                                        Proof Photos ({{ count($submission->photos) }})
+                                    </dt>
                                     <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                                         @foreach($submission->photos as $index => $photo)
                                             <div class="relative group">
                                                 @php
                                                     $photoUrl = Storage::url($photo);
                                                 @endphp
-                                                <div class="relative overflow-hidden rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200" onclick="openImageModal('{{ $photoUrl }}')">
+                                                <div class="relative overflow-hidden rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer" onclick="openImageModal('{{ $photoUrl }}')">
                                                     <img src="{{ $photoUrl }}" 
                                                          alt="Task completion proof {{ $index + 1 }}" 
-                                                         class="w-full h-32 object-cover cursor-pointer hover:scale-105 transition-transform duration-200"
+                                                         class="w-full h-32 object-cover hover:scale-105 transition-transform duration-200"
                                                          data-photo-url="{{ $photoUrl }}"
                                                          onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0zMCAzMEg3MFY3MEgzMFYzMFoiIHN0cm9rZT0iIzlDQTNBRiIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KPHBhdGggZD0iTTQwIDQwTDUwIDUwTDYwIDQwIiBzdHJva2U9IiM5Q0EzQUYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+CjxjaXJjbGUgY3g9IjQ1IiBjeT0iNDUiIHI9IjMiIGZpbGw9IiM5Q0EzQUYiLz4KPC9zdmc+'; console.log('Image failed to load:', '{{ $photoUrl }}');">
                                                     
                                                     <!-- Overlay with zoom icon -->
-                                                    <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all duration-200 flex items-center justify-center">
-                                                        <div class="bg-white bg-opacity-90 rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                                                            <svg class="w-6 h-6 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path>
-                                                            </svg>
+                                                    <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-all duration-200 flex items-center justify-center">
+                                                        <div class="bg-white rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                                            <i class="fas fa-search-plus text-gray-800"></i>
                                                         </div>
                                                     </div>
                                                     
                                                     <!-- Image number badge -->
-                                                    <div class="absolute top-2 left-2 bg-black bg-opacity-70 text-white text-xs px-2 py-1 rounded-full">
+                                                    <div class="absolute top-2 left-2 bg-blue-600 text-white text-xs font-semibold px-2 py-1 rounded">
                                                         {{ $index + 1 }}
-                                                    </div>
-                                                    
-                                                    <!-- Click to enlarge text -->
-                                                    <div class="absolute bottom-2 left-2 right-2 bg-black bg-opacity-70 text-white text-xs px-2 py-1 rounded text-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                                                        Click to enlarge
                                                     </div>
                                                 </div>
                                             </div>
@@ -115,11 +126,11 @@
                                     </div>
                                 </div>
                             @else
-                                <div class="text-center py-8 text-gray-500 dark:text-gray-400">
-                                    <svg class="mx-auto h-12 w-12 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                                    </svg>
-                                    <p>No photos submitted</p>
+                                <div class="text-center py-12">
+                                    <div class="mx-auto h-16 w-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                                        <i class="fas fa-image text-gray-400 text-2xl"></i>
+                                    </div>
+                                    <p class="text-sm text-gray-500 font-medium">No photos submitted</p>
                                 </div>
                             @endif
                         </div>
@@ -127,39 +138,49 @@
                 </div>
 
                 <!-- Sidebar -->
-                <div class="lg:col-span-1">
+                <div class="lg:col-span-1 space-y-6">
                     <!-- User Information -->
-                    <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg mb-6">
+                    <div class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
+                        <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+                            <h3 class="text-lg font-semibold text-gray-900 flex items-center">
+                                <i class="fas fa-user mr-2 text-blue-600"></i>
+                                User Information
+                            </h3>
+                        </div>
                         <div class="p-6">
-                            <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">User Information</h3>
-                            <div class="flex items-center space-x-3 mb-4">
-                                <div class="h-12 w-12 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center">
-                                    <span class="text-lg font-medium text-gray-700 dark:text-gray-300">
-                                        {{ substr($submission->user->name, 0, 2) }}
+                            <div class="flex items-center space-x-3 mb-6">
+                                <div class="h-14 w-14 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center flex-shrink-0 shadow-md">
+                                    <span class="text-lg font-bold text-white">
+                                        {{ strtoupper(substr($submission->user->name, 0, 1)) }}
                                     </span>
                                 </div>
-                                <div>
-                                    <div class="text-sm font-medium text-gray-900 dark:text-white">{{ $submission->user->name }}</div>
-                                    <div class="text-sm text-gray-500 dark:text-gray-400">{{ $submission->user->email }}</div>
+                                <div class="min-w-0 flex-1">
+                                    <div class="text-sm font-semibold text-gray-900 truncate">{{ $submission->user->name }}</div>
+                                    <div class="text-xs text-gray-500 truncate">{{ $submission->user->email }}</div>
                                 </div>
                             </div>
-                            <div class="space-y-2">
-                                <div class="flex justify-between">
-                                    <span class="text-sm text-gray-500 dark:text-gray-400">Current Points:</span>
-                                    <span class="text-sm font-medium text-gray-900 dark:text-white">{{ $submission->user->points ?? 0 }}</span>
+                            <div class="space-y-3 pt-4 border-t border-gray-200">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Current Points</span>
+                                    <span class="text-sm font-bold text-gray-900">{{ $submission->user->points ?? 0 }}</span>
                                 </div>
-                                <div class="flex justify-between">
-                                    <span class="text-sm text-gray-500 dark:text-gray-400">Points to Award:</span>
-                                    <span class="text-sm font-medium text-gray-900 dark:text-white">{{ $submission->task->points_awarded }}</span>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Points to Award</span>
+                                    <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-sm font-bold bg-blue-50 text-blue-700">
+                                        <i class="fas fa-star mr-1 text-xs"></i>
+                                        {{ $submission->task->points_awarded }}
+                                    </span>
                                 </div>
-                                <div class="flex justify-between">
-                                    <span class="text-sm text-gray-500 dark:text-gray-400">Rejection Count:</span>
-                                    <span class="text-sm font-medium text-gray-900 dark:text-white">{{ $submission->rejection_count ?? 0 }}/3</span>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Rejection Count</span>
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                        {{ $submission->rejection_count ?? 0 }}/3
+                                    </span>
                                 </div>
                                 @if($submission->rejection_reason)
-                                <div class="mt-3 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-                                    <p class="text-sm font-medium text-red-800 dark:text-red-200 mb-1">Last Rejection Reason:</p>
-                                    <p class="text-sm text-red-700 dark:text-red-300">{{ $submission->rejection_reason }}</p>
+                                <div class="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                                    <p class="text-xs font-semibold text-red-800 mb-1 uppercase tracking-wide">Last Rejection Reason</p>
+                                    <p class="text-sm text-red-700 leading-relaxed">{{ $submission->rejection_reason }}</p>
                                 </div>
                                 @endif
                             </div>
@@ -167,58 +188,59 @@
                     </div>
 
                     <!-- Review Actions -->
-                    <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                    <div class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
+                        <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+                            <h3 class="text-lg font-semibold text-gray-900 flex items-center">
+                                <i class="fas fa-gavel mr-2 text-blue-600"></i>
+                                Review Actions
+                            </h3>
+                        </div>
                         <div class="p-6">
-                            <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Review Actions</h3>
-                            
                             @php
                                 $isClosed = $submission->status === 'completed' || $submission->rejection_count >= 3;
                             @endphp
 
                             @if($isClosed)
-                                <div class="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg border border-gray-300 dark:border-gray-600">
+                                <div class="p-4 rounded-lg border-2
+                                    @if($submission->status === 'completed') bg-green-50 border-green-200
+                                    @else bg-red-50 border-red-200
+                                    @endif">
                                     @if($submission->status === 'completed')
-                                        <div class="flex items-center text-green-600 dark:text-green-400 mb-2">
-                                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                            </svg>
-                                            <span class="font-medium">Submission Approved</span>
+                                        <div class="flex items-center text-green-700 mb-2">
+                                            <i class="fas fa-check-circle mr-2"></i>
+                                            <span class="font-semibold">Submission Approved</span>
                                         </div>
-                                        <p class="text-sm text-gray-600 dark:text-gray-300">
+                                        <p class="text-sm text-green-600">
                                             This submission has been approved and is closed. No further actions can be taken.
                                         </p>
                                     @elseif($submission->rejection_count >= 3)
-                                        <div class="flex items-center text-red-600 dark:text-red-400 mb-2">
-                                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                                            </svg>
-                                            <span class="font-medium">Submission Closed</span>
+                                        <div class="flex items-center text-red-700 mb-2">
+                                            <i class="fas fa-times-circle mr-2"></i>
+                                            <span class="font-semibold">Submission Closed</span>
                                         </div>
-                                        <p class="text-sm text-gray-600 dark:text-gray-300">
+                                        <p class="text-sm text-red-600">
                                             This submission has reached the maximum number of rejection attempts (3) and is closed. No further actions can be taken.
                                         </p>
                                     @endif
                                 </div>
                             @else
                                 <!-- Approve Form -->
-                                <form action="{{ route('admin.task-submissions.approve', $submission) }}" method="POST" class="mb-4">
+                                <form action="{{ route('admin.task-submissions.approve', $submission) }}" method="POST" class="mb-6">
                                     @csrf
                                     <div class="mb-4">
-                                        <label for="admin_notes" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                            Admin Notes (Optional)
+                                        <label for="admin_notes" class="block text-xs font-semibold text-gray-600 uppercase tracking-wide mb-2">
+                                            Admin Notes <span class="text-gray-400 normal-case">(Optional)</span>
                                         </label>
                                         <textarea 
                                             id="admin_notes" 
                                             name="admin_notes" 
                                             rows="3" 
-                                            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 dark:bg-gray-700 dark:text-white"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm"
                                             placeholder="Add notes about this approval..."></textarea>
                                     </div>
                                     <button type="submit" 
-                                            class="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
-                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                                        </svg>
+                                            class="w-full inline-flex justify-center items-center px-4 py-2.5 border border-transparent text-sm font-semibold rounded-lg text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors shadow-sm">
+                                        <i class="fas fa-check mr-2"></i>
                                         Approve Submission
                                     </button>
                                 </form>
@@ -227,7 +249,7 @@
                                 <form action="{{ route('admin.task-submissions.reject', $submission) }}" method="POST">
                                     @csrf
                                     <div class="mb-4">
-                                        <label for="rejection_reason" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                        <label for="rejection_reason" class="block text-xs font-semibold text-gray-600 uppercase tracking-wide mb-2">
                                             Rejection Reason <span class="text-red-500">*</span>
                                         </label>
                                         <textarea 
@@ -235,14 +257,12 @@
                                             name="rejection_reason" 
                                             rows="3" 
                                             required
-                                            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 dark:bg-gray-700 dark:text-white"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 text-sm"
                                             placeholder="Explain why this submission is being rejected..."></textarea>
                                     </div>
                                     <button type="submit" 
-                                            class="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
-                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                                        </svg>
+                                            class="w-full inline-flex justify-center items-center px-4 py-2.5 border border-transparent text-sm font-semibold rounded-lg text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors shadow-sm">
+                                        <i class="fas fa-times mr-2"></i>
                                         Reject Submission
                                     </button>
                                 </form>
@@ -255,26 +275,20 @@
     </div>
 
     <!-- Image Modal -->
-    <div id="imageModal" class="fixed inset-0 bg-black bg-opacity-90 z-50 hidden flex items-center justify-center p-4" style="display: none;">
+    <div id="imageModal" class="fixed inset-0 bg-black bg-opacity-95 z-50 hidden flex items-center justify-center p-4" style="display: none;">
         <div class="relative max-w-7xl max-h-full w-full h-full flex items-center justify-center">
             <!-- Close Button -->
-            <button onclick="closeImageModal()" class="absolute top-4 right-4 text-white hover:text-gray-300 z-10 bg-black bg-opacity-50 rounded-full p-2 transition-colors">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                </svg>
+            <button onclick="closeImageModal()" class="absolute top-4 right-4 text-white hover:bg-white hover:bg-opacity-20 z-10 bg-black bg-opacity-60 rounded-full p-3 transition-all">
+                <i class="fas fa-times text-lg"></i>
             </button>
             
             <!-- Navigation Buttons -->
-            <button id="prevButton" onclick="previousImage()" class="absolute left-4 top-1/2 transform -translate-y-1/2 text-white hover:text-gray-300 z-10 bg-black bg-opacity-50 rounded-full p-3 transition-colors">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-                </svg>
+            <button id="prevButton" onclick="previousImage()" class="absolute left-4 top-1/2 transform -translate-y-1/2 text-white hover:bg-white hover:bg-opacity-20 z-10 bg-black bg-opacity-60 rounded-full p-3 transition-all">
+                <i class="fas fa-chevron-left text-lg"></i>
             </button>
             
-            <button id="nextButton" onclick="nextImage()" class="absolute right-4 top-1/2 transform -translate-y-1/2 text-white hover:text-gray-300 z-10 bg-black bg-opacity-50 rounded-full p-3 transition-colors">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                </svg>
+            <button id="nextButton" onclick="nextImage()" class="absolute right-4 top-1/2 transform -translate-y-1/2 text-white hover:bg-white hover:bg-opacity-20 z-10 bg-black bg-opacity-60 rounded-full p-3 transition-all">
+                <i class="fas fa-chevron-right text-lg"></i>
             </button>
             
             <!-- Image Container -->
@@ -283,15 +297,13 @@
             </div>
             
             <!-- Image Counter -->
-            <div id="imageCounter" class="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-white bg-black bg-opacity-50 px-4 py-2 rounded-full text-sm">
+            <div id="imageCounter" class="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-white bg-black bg-opacity-70 px-4 py-2 rounded-full text-sm font-medium">
                 <span id="currentImageIndex">1</span> / <span id="totalImages">1</span>
             </div>
             
             <!-- Download Button -->
-            <button id="downloadButton" onclick="downloadImage()" class="absolute bottom-4 right-4 text-white hover:text-gray-300 z-10 bg-black bg-opacity-50 rounded-full p-2 transition-colors">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                </svg>
+            <button id="downloadButton" onclick="downloadImage()" class="absolute bottom-4 right-4 text-white hover:bg-white hover:bg-opacity-20 z-10 bg-black bg-opacity-60 rounded-full p-3 transition-all">
+                <i class="fas fa-download text-lg"></i>
             </button>
         </div>
     </div>

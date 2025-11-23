@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Storage;
 
 class User extends Authenticatable
 {
@@ -41,6 +42,7 @@ class User extends Authenticatable
         'status',
         'points',
         'date_registered',
+        'profile_picture',
     ];
 
     /**
@@ -291,5 +293,28 @@ class User extends Authenticatable
     public function hasReachedPointsCap(): bool
     {
         return $this->points >= self::POINTS_CAP;
+    }
+
+    /**
+     * Get the profile picture URL
+     *
+     * @return string|null
+     */
+    public function getProfilePictureUrlAttribute(): ?string
+    {
+        if ($this->profile_picture && Storage::disk('public')->exists($this->profile_picture)) {
+            return Storage::url($this->profile_picture);
+        }
+        return null;
+    }
+
+    /**
+     * Get the user's initials for avatar
+     *
+     * @return string
+     */
+    public function getInitialsAttribute(): string
+    {
+        return strtoupper(substr($this->firstName, 0, 1) . substr($this->lastName, 0, 1));
     }
 }

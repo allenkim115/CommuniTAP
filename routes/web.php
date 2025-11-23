@@ -287,6 +287,8 @@ Route::middleware(['auth', 'active'])->group(function () {
 Route::middleware(['auth', 'admin', 'active'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', [App\Http\Controllers\DashboardController::class, 'adminDashboard'])->name('dashboard');
     Route::get('/dashboard/chart-details/{chart}', [App\Http\Controllers\DashboardController::class, 'chartDetails'])->name('dashboard.chart-details');
+    Route::get('/dashboard/segmented-insights', [App\Http\Controllers\DashboardController::class, 'getSegmentedInsights'])->name('dashboard.segmented-insights');
+    Route::get('/dashboard/data', [App\Http\Controllers\DashboardController::class, 'getDashboardData'])->name('dashboard.data');
     Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
     Route::get('/users/create', [AdminUserController::class, 'create'])->name('users.create');
     Route::post('/users', [AdminUserController::class, 'store'])->name('users.store');

@@ -23,6 +23,9 @@ class TaskController extends Controller
         // Auto-complete expired tasks before listing
         \App\Models\Task::completeExpiredTasks();
         
+        // Fix incorrectly marked completed tasks (tasks with no participants or no completed participants)
+        \App\Models\Task::fixIncorrectlyCompletedTasks();
+        
         // Auto-publish any approved user-uploaded tasks (for tasks approved before the auto-publish feature)
         Task::where('task_type', 'user_uploaded')
             ->where('status', 'approved')
@@ -53,6 +56,8 @@ class TaskController extends Controller
             'assigned' => Task::where('status', 'assigned')->count(),
             'submitted' => Task::where('status', 'submitted')->count(),
             'completed' => Task::where('status', 'completed')->count(),
+            'uncompleted' => Task::where('status', 'uncompleted')->count(),
+            'inactive' => Task::where('status', 'inactive')->count(),
         ];
 
         return view('admin.tasks.index', compact('tasks', 'taskStats'));
@@ -154,7 +159,7 @@ class TaskController extends Controller
             );
         }
 
-        return redirect()->route('admin.tasks.index')->with('status', 'Task created successfully');
+        return redirect()->route('admin.tasks.index')->with('status', "Task '{$request->title}' has been created successfully" . ($request->publish_immediately ? ' and published immediately. All active users have been notified.' : '. It is now approved and ready to be published when needed.'));
     }
 
     /**
@@ -173,15 +178,15 @@ class TaskController extends Controller
     {
         // Admin cannot edit user-uploaded tasks
         if ($task->task_type === 'user_uploaded') {
-            return redirect()->route('admin.tasks.show', $task)->with('error', 'Admins cannot edit user-uploaded tasks. Use Approve/Reject/Publish actions instead.');
+            return redirect()->route('admin.tasks.show', $task)->with('error', "Cannot edit '{$task->title}': This is a user-uploaded task. Use the Approve, Reject, or Publish actions in the task details page instead.");
         }
         // Do not allow editing published tasks
         if ($task->status === 'published') {
-            return redirect()->route('admin.tasks.show', $task)->with('error', 'Published tasks cannot be edited.');
+            return redirect()->route('admin.tasks.show', $task)->with('error', "Cannot edit '{$task->title}': Published tasks cannot be modified as they may have active participants. Deactivate the task first if changes are needed.");
         }
         // Do not allow editing completed tasks
         if ($task->status === 'completed') {
-            return redirect()->route('admin.tasks.show', $task)->with('error', 'Completed tasks cannot be edited.');
+            return redirect()->route('admin.tasks.show', $task)->with('error', "Cannot edit '{$task->title}': Completed tasks cannot be modified. Create a new task if needed.");
         }
         return view('admin.tasks.edit', compact('task'));
     }
@@ -193,11 +198,11 @@ class TaskController extends Controller
     {
         // Admin cannot update user-uploaded tasks
         if ($task->task_type === 'user_uploaded') {
-            return redirect()->route('admin.tasks.show', $task)->with('error', 'Admins cannot edit user-uploaded tasks.');
+            return redirect()->route('admin.tasks.show', $task)->with('error', "Cannot edit '{$task->title}': User-uploaded tasks must be managed through the approval workflow, not direct editing.");
         }
         // Do not allow updating published tasks
         if ($task->status === 'published') {
-            return redirect()->route('admin.tasks.show', $task)->with('error', 'Published tasks cannot be updated.');
+            return redirect()->route('admin.tasks.show', $task)->with('error', "Cannot update '{$task->title}': Published tasks are live and may have active participants. Deactivate the task first to make changes.");
         }
         
         // Normalize time inputs to 24-hour H:i format before validation
@@ -252,6 +257,7 @@ class TaskController extends Controller
             'end_time' => 'required|date_format:H:i',
             'location' => 'required|string|max:255',
             'max_participants' => 'nullable|integer|min:1',
+            'publish_after_update' => 'boolean',
             // Status is not editable through the form - it's managed through specific actions
         ]);
 
@@ -291,7 +297,7 @@ class TaskController extends Controller
             }
         }
 
-        $task->update([
+        $updateData = [
             'title' => $request->title,
             'description' => $request->description,
             'points_awarded' => $request->points_awarded,
@@ -300,10 +306,59 @@ class TaskController extends Controller
             'end_time' => $request->end_time,
             'location' => $request->location,
             'max_participants' => $request->max_participants,
-            // Status is not updated here - it's managed through specific actions (approve, reject, publish, etc.)
-        ]);
+        ];
 
-        return redirect()->route('admin.tasks.index')->with('status', 'Task updated successfully.');
+        // If task is inactive and publish_after_update is set, publish it
+        $shouldPublish = $task->status === 'inactive' && $request->boolean('publish_after_update');
+        
+        if ($shouldPublish) {
+            $updateData['status'] = 'published';
+            $updateData['published_date'] = now();
+            $updateData['deactivated_at'] = null; // Clear deactivated_at on publishing
+        }
+
+        $task->update($updateData);
+        
+        // Refresh the model to ensure status is updated
+        $task->refresh();
+
+        $message = "Task '{$task->title}' has been updated successfully. All changes have been saved.";
+        
+        if ($shouldPublish) {
+            // Notify task creator if it's a user-uploaded task
+            if ($task->task_type === 'user_uploaded' && $task->FK1_userId && $task->assignedUser) {
+                $this->notificationService->notify(
+                    $task->assignedUser,
+                    'task_proposal_reactivated',
+                    "Your task \"{$task->title}\" was updated and is now live!",
+                    [
+                        'url' => route('tasks.show', $task),
+                        'description' => 'The task is available for users to join again.',
+                    ]
+                );
+            }
+
+            // Notify all active users that the task is available
+            $activeUsers = User::where('status', 'active')
+                ->where('role', '!=', 'admin')
+                ->when(!is_null($task->FK1_userId), fn ($query) => $query->where('userId', '!=', $task->FK1_userId))
+                ->get(['userId', 'firstName', 'lastName']);
+            $this->notificationService->notifyMany(
+                $activeUsers,
+                'task_reactivated',
+                "Task \"{$task->title}\" is available again!",
+                [
+                    'url' => route('tasks.show', $task),
+                    'description' => 'Join now while slots are open.',
+                ]
+            );
+
+            $message .= " The task has been published and all active users have been notified.";
+        } elseif ($task->status === 'inactive') {
+            $message .= " You can now reactivate this task.";
+        }
+
+        return redirect()->route('admin.tasks.index')->with('status', $message);
     }
 
     /**
@@ -313,15 +368,18 @@ class TaskController extends Controller
     {
         // Admin cannot deactivate user-uploaded tasks from here; manage via approval flow
         if ($task->task_type === 'user_uploaded') {
-            return redirect()->route('admin.tasks.show', $task)->with('error', 'Admins cannot deactivate user-uploaded tasks here.');
+            return redirect()->route('admin.tasks.show', $task)->with('error', "Cannot deactivate '{$task->title}': User-uploaded tasks should be managed through the Reject action in the approval workflow.");
         }
         // Do not allow deactivation of completed tasks
         if ($task->status === 'completed') {
-            return redirect()->route('admin.tasks.show', $task)->with('error', 'Completed tasks cannot be deactivated.');
+            return redirect()->route('admin.tasks.show', $task)->with('error', "Cannot deactivate '{$task->title}': Completed tasks are final and cannot be deactivated.");
         }
 
-        $task->update(['status' => 'inactive']);
-        return redirect()->route('admin.tasks.index')->with('status', 'Task deactivated successfully.');
+        $task->update([
+            'status' => 'inactive',
+            'deactivated_at' => now(),
+        ]);
+        return redirect()->route('admin.tasks.index')->with('status', "Task '{$task->title}' has been deactivated successfully. It is no longer visible to users and cannot be joined. Please edit the task before reactivating it.");
     }
 
     /**
@@ -330,13 +388,26 @@ class TaskController extends Controller
     public function reactivate(Task $task)
     {
         if ($task->status !== 'inactive') {
-            return redirect()->back()->with('error', 'Only deactivated tasks can be reactivated.');
+            return redirect()->back()->with('error', "Cannot reactivate '{$task->title}': Only tasks that have been deactivated can be reactivated. This task is currently {$task->status}.");
+        }
+        
+        // Check if task has been edited since deactivation
+        // For tasks without deactivated_at (old inactive tasks), set it to updated_at to enforce editing requirement
+        if (!$task->deactivated_at) {
+            $task->update(['deactivated_at' => $task->updated_at]);
+            $task->refresh();
+        }
+        
+        // Check if task has been edited since deactivation
+        if ($task->updated_at <= $task->deactivated_at) {
+            return redirect()->back()->with('error', "Cannot reactivate '{$task->title}': This task must be edited before it can be reactivated. Please edit the task first to make any necessary changes.");
         }
         
         // Automatically publish reactivated tasks
         $task->update([
             'status' => 'published',
             'published_date' => now(),
+            'deactivated_at' => null, // Clear deactivated_at on reactivation
         ]);
         
         // Refresh the model to ensure status is updated
@@ -370,7 +441,7 @@ class TaskController extends Controller
             ]
         );
 
-        return redirect()->back()->with('status', 'Task reactivated and published successfully.');
+        return redirect()->back()->with('status', "Task '{$task->title}' has been reactivated and published successfully! All active users have been notified that this task is available again.");
     }
 
     /**
@@ -418,7 +489,7 @@ class TaskController extends Controller
                 ]
             );
 
-            return redirect()->back()->with('status', 'Task proposal approved and published successfully.');
+            return redirect()->back()->with('status', "Task proposal '{$task->title}' has been approved and published successfully! The creator and all active users have been notified.");
         } else {
             // For admin-created tasks, just approve (publishing is a separate step)
             $task->update([
@@ -426,7 +497,7 @@ class TaskController extends Controller
                 'approval_date' => now(),
             ]);
 
-            return redirect()->back()->with('status', 'Task approved successfully.');
+            return redirect()->back()->with('status', "Task '{$task->title}' has been approved successfully. You can now publish it when ready to make it available to users.");
         }
     }
 
@@ -451,7 +522,7 @@ class TaskController extends Controller
             );
         }
 
-        return redirect()->back()->with('status', 'Task rejected successfully.');
+        return redirect()->back()->with('status', "Task proposal '{$task->title}' has been rejected. The creator has been notified and can resubmit with changes if needed.");
     }
 
     /**
@@ -491,7 +562,7 @@ class TaskController extends Controller
             ]
         );
 
-        return redirect()->back()->with('status', 'Task published successfully.');
+        return redirect()->back()->with('status', "Task '{$task->title}' has been published successfully! All active users have been notified and can now join this task.");
     }
 
     /**
@@ -502,7 +573,7 @@ class TaskController extends Controller
         $assignmentId = request('assignment_id');
         
         if (!$assignmentId) {
-            return redirect()->back()->with('error', 'Assignment ID is required.');
+            return redirect()->back()->with('error', 'Cannot complete assignment: Assignment ID is missing. Please try again from the task submissions page.');
         }
 
         $assignment = TaskAssignment::where('assignmentId', $assignmentId)
@@ -511,7 +582,7 @@ class TaskController extends Controller
             ->first();
 
         if (!$assignment) {
-            return redirect()->back()->with('error', 'Assignment not found or not submitted.');
+            return redirect()->back()->with('error', 'Cannot complete assignment: The submission was not found or has not been submitted yet. Please verify the assignment status.');
         }
 
         // Update assignment status to completed
@@ -557,10 +628,16 @@ class TaskController extends Controller
     {
         // Auto-complete expired tasks before filtering
         \App\Models\Task::completeExpiredTasks();
+        
+        // Fix incorrectly marked completed tasks (tasks with no participants or no completed participants)
+        \App\Models\Task::fixIncorrectlyCompletedTasks();
 
         $status = $request->get('status');
         $taskType = $request->get('task_type');
         $assignmentProgress = $request->get('assignment_progress');
+        $dateFrom = $request->get('date_from');
+        $dateTo = $request->get('date_to');
+        $search = $request->get('search');
         
         $query = Task::with(['assignments.user', 'assignedUser']);
         
@@ -568,6 +645,11 @@ class TaskController extends Controller
         // Inactive tasks should still be visible
         if (!$status || $status !== 'draft') {
             $query->whereNotIn('status', ['draft']);
+        }
+        
+        // Search by task title
+        if ($search) {
+            $query->where('title', 'LIKE', '%' . $search . '%');
         }
         
         if ($status && $status !== 'all') {
@@ -583,6 +665,14 @@ class TaskController extends Controller
             });
         }
         
+        // Date filtering based on creation_date
+        if ($dateFrom) {
+            $query->whereDate('creation_date', '>=', $dateFrom);
+        }
+        if ($dateTo) {
+            $query->whereDate('creation_date', '<=', $dateTo);
+        }
+        
         $tasks = $query->orderBy('created_at', 'desc')->paginate(15)->appends($request->query());
         
         $taskStats = [
@@ -593,8 +683,10 @@ class TaskController extends Controller
             'assigned' => Task::where('status', 'assigned')->count(),
             'submitted' => Task::where('status', 'submitted')->count(),
             'completed' => Task::where('status', 'completed')->count(),
+            'uncompleted' => Task::where('status', 'uncompleted')->count(),
+            'inactive' => Task::where('status', 'inactive')->count(),
         ];
 
-        return view('admin.tasks.index', compact('tasks', 'taskStats', 'status', 'taskType', 'assignmentProgress'));
+        return view('admin.tasks.index', compact('tasks', 'taskStats', 'status', 'taskType', 'assignmentProgress', 'dateFrom', 'dateTo', 'search'));
     }
 }
