@@ -12,7 +12,10 @@
                     <div class="flex justify-between items-center mb-6">
                         <h3 class="text-lg font-medium">Your Incident Reports</h3>
                         <a href="{{ route('incident-reports.create') }}" 
-                           class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                           class="text-white font-bold py-2 px-4 rounded shadow-md transition-colors"
+                           style="background-color: #F3A261;"
+                           onmouseover="this.style.backgroundColor='#E8944F'"
+                           onmouseout="this.style.backgroundColor='#F3A261'">
                             Report User
                         </a>
                     </div>
@@ -111,7 +114,10 @@
                             <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">You haven't submitted any incident reports yet.</p>
                             <div class="mt-6">
                                 <a href="{{ route('incident-reports.create') }}" 
-                                   class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700">
+                                   class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white transition-colors"
+                                   style="background-color: #F3A261;"
+                                   onmouseover="this.style.backgroundColor='#E8944F'"
+                                   onmouseout="this.style.backgroundColor='#F3A261'">
                                     Report a User
                                 </a>
                             </div>

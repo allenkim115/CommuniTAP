@@ -9,8 +9,9 @@
             </div>
             
             <a href="{{ route('admin.task-submissions.index') }}" 
-               class="inline-flex items-center px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white text-sm font-medium rounded-lg transition-colors">
-                <i class="fas fa-arrow-left mr-2"></i>
+               class="inline-flex items-center px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white text-sm font-medium rounded-lg transition-colors"
+               style="color: white !important;">
+                <i class="fas fa-arrow-left mr-2" style="color: white !important;"></i>
                 Back to Pending
             </a>
         </div>
@@ -29,8 +30,8 @@
                             <p class="text-sm font-medium text-gray-600 mb-1">Total Completed</p>
                             <p class="text-2xl font-bold text-gray-900">{{ $stats['total_completed'] }}</p>
                             </div>
-                        <div class="h-12 w-12 rounded-lg bg-green-50 flex items-center justify-center">
-                            <i class="fas fa-check-circle text-green-600 text-xl"></i>
+                        <div class="h-12 w-12 rounded-lg flex items-center justify-center" style="background-color: rgba(43, 157, 141, 0.2);">
+                            <i class="fas fa-check-circle text-xl" style="color: #2B9D8D;"></i>
                         </div>
                     </div>
                 </div>
@@ -41,8 +42,8 @@
                             <p class="text-sm font-medium text-gray-600 mb-1">Total Rejected</p>
                             <p class="text-2xl font-bold text-gray-900">{{ $stats['total_rejected'] }}</p>
                             </div>
-                        <div class="h-12 w-12 rounded-lg bg-red-50 flex items-center justify-center">
-                            <i class="fas fa-times-circle text-red-600 text-xl"></i>
+                        <div class="h-12 w-12 rounded-lg flex items-center justify-center" style="background-color: rgba(43, 157, 141, 0.2);">
+                            <i class="fas fa-times-circle text-xl" style="color: #2B9D8D;"></i>
                         </div>
                     </div>
                 </div>
@@ -53,14 +54,16 @@
                 <div class="border-b border-gray-200">
                     <nav class="flex" aria-label="Tabs">
                         <a href="{{ route('admin.task-submissions.history', ['type' => 'completed']) }}" 
-                           class="@if($type === 'completed') border-green-500 text-green-600 bg-green-50 @else border-transparent text-gray-600 hover:text-gray-800 hover:border-gray-300 @endif flex-1 text-center py-4 px-4 border-b-2 font-medium text-sm transition-colors">
+                           class="@if($type === 'completed') @else border-transparent text-gray-600 hover:text-gray-800 hover:border-gray-300 @endif flex-1 text-center py-4 px-4 border-b-2 font-medium text-sm transition-colors"
+                           @if($type === 'completed') style="border-color: #2B9D8D; color: #2B9D8D; background-color: rgba(43, 157, 141, 0.1);" @endif>
                             <div class="flex items-center justify-center">
                                 <i class="fas fa-check-circle mr-2"></i>
                                 Completed ({{ $stats['total_completed'] }})
                             </div>
                         </a>
                         <a href="{{ route('admin.task-submissions.history', ['type' => 'rejected']) }}" 
-                           class="@if($type === 'rejected') border-red-500 text-red-600 bg-red-50 @else border-transparent text-gray-600 hover:text-gray-800 hover:border-gray-300 @endif flex-1 text-center py-4 px-4 border-b-2 font-medium text-sm transition-colors">
+                           class="@if($type === 'rejected') @else border-transparent text-gray-600 hover:text-gray-800 hover:border-gray-300 @endif flex-1 text-center py-4 px-4 border-b-2 font-medium text-sm transition-colors"
+                           @if($type === 'rejected') style="border-color: #2B9D8D; color: #2B9D8D; background-color: rgba(43, 157, 141, 0.1);" @endif>
                             <div class="flex items-center justify-center">
                                 <i class="fas fa-times-circle mr-2"></i>
                                 Rejected ({{ $stats['total_rejected'] }})
@@ -74,7 +77,7 @@
             <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-6 mb-6">
                 <div class="mb-4">
                     <h3 class="text-lg font-semibold text-gray-900 mb-1 flex items-center gap-2">
-                        <i class="fas fa-filter text-blue-600"></i>
+                        <i class="fas fa-filter" style="color: #2B9D8D;"></i>
                         Filter Submissions
                     </h3>
                     <p class="text-sm text-gray-600">Refine your submission list by task type or search</p>
@@ -86,7 +89,7 @@
                         <!-- Search Input -->
                         <div>
                             <label for="search" class="block text-sm font-medium text-gray-700 mb-2">
-                                <i class="fas fa-search text-blue-600"></i> Search
+                                <i class="fas fa-search" style="color: #2B9D8D;"></i> Search
                             </label>
                             <div class="relative">
                                 <input type="text" 
@@ -137,7 +140,7 @@
                             </span>
                         @endif
                         @if(request('task_type') && request('task_type') !== 'all')
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium" style="background-color: rgba(43, 157, 141, 0.2); color: #2B9D8D;">
                                 Type: {{ ucfirst(str_replace('_', ' ', request('task_type'))) }}
                             </span>
                         @endif

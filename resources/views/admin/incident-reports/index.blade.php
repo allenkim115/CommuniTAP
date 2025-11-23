@@ -31,14 +31,14 @@
                     <div class="p-5">
                         <div class="flex items-center">
                             <div class="flex-shrink-0">
-                                <svg class="h-6 w-6 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color: #FED2B3;">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
                             </div>
                             <div class="ml-5 w-0 flex-1">
                                 <dl>
                                     <dt class="text-sm font-medium text-gray-600 truncate">Pending</dt>
-                                    <dd class="text-lg font-medium text-yellow-600">{{ $stats['pending'] }}</dd>
+                                    <dd class="text-lg font-medium" style="color: #FED2B3;">{{ $stats['pending'] }}</dd>
                                 </dl>
                             </div>
                         </div>
@@ -49,7 +49,7 @@
                     <div class="p-5">
                         <div class="flex items-center">
                             <div class="flex-shrink-0">
-                                <svg class="h-6 w-6 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color: #2B9D8D;">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                 </svg>
@@ -57,7 +57,7 @@
                             <div class="ml-5 w-0 flex-1">
                                 <dl>
                                     <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Under Review</dt>
-                                    <dd class="text-lg font-medium text-blue-600">{{ $stats['under_review'] }}</dd>
+                                    <dd class="text-lg font-medium" style="color: #2B9D8D;">{{ $stats['under_review'] }}</dd>
                                 </dl>
                             </div>
                         </div>
@@ -68,14 +68,14 @@
                     <div class="p-5">
                         <div class="flex items-center">
                             <div class="flex-shrink-0">
-                                <svg class="h-6 w-6 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color: #2B9D8D;">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
                             </div>
                             <div class="ml-5 w-0 flex-1">
                                 <dl>
                                     <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Resolved</dt>
-                                    <dd class="text-lg font-medium text-green-600">{{ $stats['resolved'] }}</dd>
+                                    <dd class="text-lg font-medium" style="color: #2B9D8D;">{{ $stats['resolved'] }}</dd>
                                 </dl>
                             </div>
                         </div>
@@ -168,7 +168,10 @@
                                         <option value="mark_dismissed">Mark as Dismissed</option>
                                         <option value="delete">Delete Selected</option>
                                     </select>
-                                    <button type="submit" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded text-sm">
+                                    <button type="submit" class="text-white font-bold py-2 px-4 rounded text-sm transition-colors"
+                                            style="background-color: #2B9D8D;"
+                                            onmouseover="this.style.backgroundColor='#248A7C'"
+                                            onmouseout="this.style.backgroundColor='#2B9D8D'">
                                         Apply
                                     </button>
                                 </div>
@@ -182,7 +185,10 @@
                                     <thead class="bg-gray-50 dark:bg-gray-700">
                                         <tr>
                                             <th class="px-6 py-3 text-left">
-                                                <input type="checkbox" id="select-all" class="rounded border-gray-300 text-red-600 shadow-sm focus:border-red-300 focus:ring focus:ring-red-200 focus:ring-opacity-50">
+                                                <input type="checkbox" id="select-all" class="rounded border-gray-300 shadow-sm focus:ring focus:ring-opacity-50"
+                                                       style="accent-color: #2B9D8D;"
+                                                       onfocus="this.style.borderColor='#2B9D8D'; this.style.boxShadow='0 0 0 3px rgba(43, 157, 141, 0.1)';"
+                                                       onblur="this.style.borderColor=''; this.style.boxShadow='';">
                                             </th>
                                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                                                 ID
@@ -211,7 +217,10 @@
                                         @foreach($reports as $report)
                                             <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
                                                 <td class="px-6 py-4 whitespace-nowrap">
-                                                    <input type="checkbox" name="report_ids[]" value="{{ $report->reportId }}" class="report-checkbox rounded border-gray-300 text-red-600 shadow-sm focus:border-red-300 focus:ring focus:ring-red-200 focus:ring-opacity-50">
+                                                    <input type="checkbox" name="report_ids[]" value="{{ $report->reportId }}" class="report-checkbox rounded border-gray-300 shadow-sm focus:ring focus:ring-opacity-50"
+                                                           style="accent-color: #2B9D8D;"
+                                                           onfocus="this.style.borderColor='#2B9D8D'; this.style.boxShadow='0 0 0 3px rgba(43, 157, 141, 0.1)';"
+                                                           onblur="this.style.borderColor=''; this.style.boxShadow='';">
                                                 </td>
                                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
                                                     #{{ $report->reportId }}
@@ -233,24 +242,40 @@
                                                     </div>
                                                 </td>
                                                 <td class="px-6 py-4 whitespace-nowrap">
-                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                                                        @if($report->incident_type === 'non_participation') bg-yellow-100 text-yellow-800
-                                                        @elseif($report->incident_type === 'abuse') bg-red-100 text-red-800
-                                                        @elseif($report->incident_type === 'spam') bg-blue-100 text-blue-800
-                                                        @elseif($report->incident_type === 'inappropriate_content') bg-purple-100 text-purple-800
-                                                        @elseif($report->incident_type === 'harassment') bg-red-100 text-red-800
-                                                        @else bg-gray-100 text-gray-800
-                                                        @endif">
+                                                    @php
+                                                        $typeBg = 'rgba(254, 210, 179, 0.2)';
+                                                        $typeColor = '#FED2B3';
+                                                        if(in_array($report->incident_type, ['abuse', 'spam', 'harassment', 'inappropriate_content'])) {
+                                                            $typeBg = 'rgba(43, 157, 141, 0.2)';
+                                                            $typeColor = '#2B9D8D';
+                                                        }
+                                                    @endphp
+                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium" style="background-color: {{ $typeBg }}; color: {{ $typeColor }};"
+                                                        @if($report->incident_type === 'non_participation') 
+                                                        @elseif($report->incident_type === 'abuse') 
+                                                        @elseif($report->incident_type === 'spam')
+                                                        @elseif($report->incident_type === 'inappropriate_content') 
+                                                        @elseif($report->incident_type === 'harassment') 
+                                                        @else 
+                                                        @endif>
                                                         {{ ucwords(str_replace('_', ' ', $report->incident_type)) }}
                                                     </span>
                                                 </td>
                                                 <td class="px-6 py-4 whitespace-nowrap">
-                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                                                        @if($report->status === 'pending') bg-yellow-100 text-yellow-800
-                                                        @elseif($report->status === 'under_review') bg-blue-100 text-blue-800
-                                                        @elseif($report->status === 'resolved') bg-green-100 text-green-800
-                                                        @elseif($report->status === 'dismissed') bg-gray-100 text-gray-800
-                                                        @endif">
+                                                    @php
+                                                        $statusBg = 'rgba(254, 210, 179, 0.2)';
+                                                        $statusColor = '#FED2B3';
+                                                        if($report->status === 'under_review' || $report->status === 'resolved') {
+                                                            $statusBg = 'rgba(43, 157, 141, 0.2)';
+                                                            $statusColor = '#2B9D8D';
+                                                        }
+                                                    @endphp
+                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium" style="background-color: {{ $statusBg }}; color: {{ $statusColor }};"
+                                                        @if($report->status === 'pending') 
+                                                        @elseif($report->status === 'under_review') 
+                                                        @elseif($report->status === 'resolved')
+                                                        @elseif($report->status === 'dismissed') 
+                                                        @endif>
                                                         {{ ucwords(str_replace('_', ' ', $report->status)) }}
                                                     </span>
                                                 </td>
@@ -263,7 +288,10 @@
                                                         View
                                                     </a>
                                                     <a href="{{ route('admin.incident-reports.edit', $report) }}" 
-                                                       class="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300">
+                                                       class="dark:text-green-400 dark:hover:text-green-300"
+                                                       style="color: #2B9D8D;"
+                                                       onmouseover="this.style.color='#248A7C';"
+                                                       onmouseout="this.style.color='#2B9D8D';">
                                                         Edit
                                                     </a>
                                                 </td>
@@ -349,7 +377,7 @@
                 .catch(error => {
                     console.error('Error updating reports:', error);
                     if (reportsContent) {
-                        reportsContent.innerHTML = '<div class="p-8 text-center text-red-600">Error loading reports. Please refresh the page.</div>';
+                        reportsContent.innerHTML = '<div class="p-8 text-center" style="color: #2B9D8D;">Error loading reports. Please refresh the page.</div>';
                     }
                 });
             }

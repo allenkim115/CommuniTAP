@@ -10,7 +10,7 @@
                     
                     <div class="overflow-x-auto">
                         @if (session('status'))
-                            <div class="mb-4 rounded-md bg-green-50 border border-green-200 p-3 text-sm text-green-800">
+                            <div class="mb-4 rounded-md p-3 text-sm" style="background-color: rgba(43, 157, 141, 0.1); border-color: #2B9D8D; border-width: 1px; color: #2B9D8D;">
                                 {{ session('status') }}
                             </div>
                         @endif
@@ -32,9 +32,9 @@
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{{ $user->role }}</td>
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             @if($user->status === 'active')
-                                                <span class="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 rounded-full">Active</span>
+                                                <span class="px-2 py-1 text-xs font-medium dark:bg-green-900 dark:text-green-200 rounded-full" style="background-color: rgba(43, 157, 141, 0.2); color: #2B9D8D;">Active</span>
                                             @else
-                                                <span class="px-2 py-1 text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200 rounded-full">Suspended</span>
+                                                <span class="px-2 py-1 text-xs font-medium dark:bg-red-900 dark:text-red-200 rounded-full" style="background-color: rgba(43, 157, 141, 0.2); color: #2B9D8D;">Suspended</span>
                                             @endif
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{{ $user->points }}</td>

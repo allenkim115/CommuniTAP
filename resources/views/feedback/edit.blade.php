@@ -4,7 +4,10 @@
             <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
                 {{ __('Edit Task Feedback') }}
             </h2>
-            <a href="{{ route('tasks.show', $feedback->task) }}" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
+            <a href="{{ route('tasks.show', $feedback->task) }}" class="text-white font-bold py-2 px-4 rounded transition-colors"
+               style="background-color: #2B9D8D;"
+               onmouseover="this.style.backgroundColor='#248A7C'"
+               onmouseout="this.style.backgroundColor='#2B9D8D'">
                 Back to Task
             </a>
         </div>

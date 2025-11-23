@@ -1,20 +1,18 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <h2 class="font-bold text-3xl bg-gradient-to-r from-orange-600 via-orange-500 to-teal-500 bg-clip-text text-transparent">
+            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                 {{ __('Task Details') }}
             </h2>
-            <a href="{{ route('tasks.index') }}" class="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-gray-600 hover:text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-xl transition-all duration-200 shadow-sm hover:shadow-md">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-                </svg>
+            <a href="{{ route('tasks.index') }}" class="inline-flex items-center gap-2 bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-lg transition-colors" style="color: white !important;">
+                <i class="fas fa-arrow-left" style="color: white !important;"></i>
                 Back to Tasks
             </a>
         </div>
     </x-slot>
 
-    <div class="min-h-screen bg-gradient-to-b from-gray-50 via-orange-50/30 to-teal-50/20 dark:from-gray-900 dark:via-gray-900 dark:to-gray-950 transition-colors duration-200">
-        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="py-8">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <!-- Toast Notifications -->
             <x-session-toast />
             
@@ -24,229 +22,307 @@
             
             @if($showAdminLayout)
                 <!-- Admin-style layout for creators of user-uploaded tasks -->
-                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+                <div class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
                     <!-- Task Header -->
-                    <div class="px-6 py-6 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700">
-                        <div class="flex justify-between items-start">
+                    <div class="px-6 py-6" style="background: linear-gradient(135deg, #F3A261 0%, #2B9D8D 100%);">
+                        <div class="flex flex-col lg:flex-row justify-between items-start gap-4">
                             <div class="flex-1">
-                                <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-3">{{ $task->title }}</h1>
-                                <div class="mt-2 flex items-center space-x-4 flex-wrap gap-2">
-                                    <span class="px-4 py-1.5 text-sm font-bold rounded-lg
-                                        @if($task->status === 'pending') bg-gradient-to-r from-yellow-100 to-amber-100 text-yellow-800 dark:from-yellow-900/30 dark:to-amber-900/30 dark:text-yellow-300
-                                        @elseif($task->status === 'approved') bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 dark:from-green-900/30 dark:to-emerald-900/30 dark:text-green-300
-                                        @elseif($task->status === 'published') bg-gradient-to-r from-blue-100 to-cyan-100 text-blue-800 dark:from-blue-900/30 dark:to-cyan-900/30 dark:text-blue-300
-                                        @elseif($task->status === 'assigned') bg-gradient-to-r from-purple-100 to-violet-100 text-purple-800 dark:from-purple-900/30 dark:to-violet-900/30 dark:text-purple-300
-                                        @elseif($task->status === 'submitted') bg-gradient-to-r from-indigo-100 to-blue-100 text-indigo-800 dark:from-indigo-900/30 dark:to-blue-900/30 dark:text-indigo-300
-                                        @elseif($task->status === 'completed') bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 dark:from-green-900/30 dark:to-emerald-900/30 dark:text-green-300
-                                        @elseif($task->status === 'rejected') bg-gradient-to-r from-red-100 to-rose-100 text-red-800 dark:from-red-900/30 dark:to-rose-900/30 dark:text-red-300
-                                        @else bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200
-                                        @endif shadow-sm">
+                                <h1 class="text-2xl lg:text-3xl font-bold text-white mb-3">{{ $task->title }}</h1>
+                                <div class="flex flex-wrap items-center gap-2">
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 text-sm font-medium rounded-full bg-white/20 text-white">
+                                        <i class="fas 
+                                            @if($task->status === 'pending') fa-clock
+                                            @elseif($task->status === 'approved') fa-check-circle
+                                            @elseif($task->status === 'published') fa-rocket
+                                            @elseif($task->status === 'assigned') fa-user-check
+                                            @elseif($task->status === 'submitted') fa-paper-plane
+                                            @elseif($task->status === 'completed') fa-check-double
+                                            @elseif($task->status === 'rejected') fa-times-circle
+                                            @elseif($task->status === 'uncompleted') fa-exclamation-triangle
+                                            @elseif($task->status === 'inactive') fa-pause-circle
+                                            @else fa-list
+                                            @endif text-xs
+                                        "></i>
                                         {{ ucfirst($task->status) }}
                                     </span>
-                                    <span class="px-4 py-1.5 text-sm font-bold bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-600 text-gray-800 dark:text-gray-200 rounded-lg shadow-sm">
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 text-sm font-medium rounded-full bg-white/20 text-white">
+                                        <i class="fas 
+                                            @if($task->task_type === 'daily') fa-calendar-day
+                                            @elseif($task->task_type === 'one_time') fa-bullseye
+                                            @else fa-user-plus
+                                            @endif text-xs
+                                        "></i>
                                         {{ ucfirst(str_replace('_', ' ', $task->task_type)) }}
                                     </span>
                                 </div>
                             </div>
-                            <div class="text-right ml-4">
-                                <div class="text-3xl font-bold bg-gradient-to-r from-orange-600 to-teal-500 bg-clip-text text-transparent">{{ $task->points_awarded }}</div>
-                                <div class="text-sm font-semibold text-gray-600 dark:text-gray-400">Points</div>
+                            <div class="bg-white/20 rounded-lg px-6 py-4">
+                                <div class="text-center">
+                                    <div class="text-3xl font-bold text-white mb-1">{{ $task->points_awarded }}</div>
+                                    <div class="text-xs text-white/90 font-medium">Points</div>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Task Content -->
+                    <!-- Task Content Section -->
                     <div class="px-6 py-6">
                         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                            <!-- Main Content -->
-                            <div class="lg:col-span-2">
-                                <div class="mb-6">
-                                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">Description</h3>
-                                    <div class="prose dark:prose-invert max-w-none">
-                                        <p class="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{{ $task->description }}</p>
-                                    </div>
+                            <!-- Main Content Column -->
+                            <div class="lg:col-span-2 space-y-4">
+                                <!-- Description -->
+                                <div class="bg-white rounded-lg p-5 border border-gray-200 shadow-sm">
+                                    <h3 class="text-lg font-semibold text-gray-900 mb-3">Description</h3>
+                                    <p class="text-gray-700 whitespace-pre-wrap leading-relaxed">{{ $task->description }}</p>
                                 </div>
+
+                            <!-- Task Details -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                @if($task->creation_date)
+                                <div class="bg-white rounded-lg p-4 border border-gray-200 shadow-sm">
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <i class="fas fa-calendar-alt" style="color: #F3A261;"></i>
+                                        <h4 class="text-xs font-semibold text-gray-600 uppercase">Created</h4>
+                                    </div>
+                                    <p class="text-sm font-medium text-gray-900">
+                                        {{ is_string($task->creation_date) ? \Carbon\Carbon::parse($task->creation_date)->format('M j, Y \a\t g:i A') : $task->creation_date->format('M j, Y \a\t g:i A') }}
+                                    </p>
+                                </div>
+                                @endif
+
+                                @if($task->approval_date)
+                                <div class="bg-white rounded-lg p-4 border border-gray-200 shadow-sm">
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <i class="fas fa-check-square" style="color: #2B9D8D;"></i>
+                                        <h4 class="text-xs font-semibold text-gray-600 uppercase">Approved</h4>
+                                    </div>
+                                    <p class="text-sm font-medium text-gray-900">
+                                        {{ is_string($task->approval_date) ? \Carbon\Carbon::parse($task->approval_date)->format('M j, Y \a\t g:i A') : $task->approval_date->format('M j, Y \a\t g:i A') }}
+                                    </p>
+                                </div>
+                                @endif
+
+                                @if($task->published_date)
+                                <div class="bg-white rounded-lg p-4 border border-gray-200 shadow-sm">
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <i class="fas fa-bullhorn" style="color: #2B9D8D;"></i>
+                                        <h4 class="text-xs font-semibold text-gray-600 uppercase">Published</h4>
+                                    </div>
+                                    <p class="text-sm font-medium text-gray-900">
+                                        {{ is_string($task->published_date) ? \Carbon\Carbon::parse($task->published_date)->format('M j, Y \a\t g:i A') : $task->published_date->format('M j, Y \a\t g:i A') }}
+                                    </p>
+                                </div>
+                                @endif
+
+                                @if($task->due_date)
+                                <div class="bg-white rounded-lg p-4 border border-gray-200 shadow-sm">
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <i class="fas fa-hourglass-end text-gray-600"></i>
+                                        <h4 class="text-xs font-semibold text-gray-600 uppercase">Due Date</h4>
+                                    </div>
+                                    <p class="text-sm font-medium text-gray-900">
+                                        @php
+                                            $dueDate = is_string($task->due_date) ? \Carbon\Carbon::parse($task->due_date) : $task->due_date;
+                                            if ($task->end_time) {
+                                                $deadline = \Carbon\Carbon::parse($dueDate->toDateString() . ' ' . $task->end_time);
+                                                echo $deadline->format('M j, Y \a\t g:i A');
+                                            } else {
+                                                echo $dueDate->format('M j, Y \a\t g:i A');
+                                            }
+                                        @endphp
+                                    </p>
+                                </div>
+                                @endif
+
+                                @if($task->location)
+                                <div class="bg-white rounded-lg p-4 border border-gray-200 shadow-sm">
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <i class="fas fa-map-marker-alt" style="color: #2B9D8D;"></i>
+                                        <h4 class="text-xs font-semibold text-gray-600 uppercase">Location</h4>
+                                    </div>
+                                    <p class="text-sm font-medium text-gray-900">
+                                        {{ $task->location }}
+                                    </p>
+                                </div>
+                                @endif
                             </div>
+                        </div>
 
-                            <!-- Sidebar -->
-                            <div class="lg:col-span-1">
-                                <div class="space-y-6">
-                                    <!-- Task Information -->
-                                    <div>
-                                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">Task Information</h3>
-                                        <dl class="space-y-3">
-                                            <div>
-                                                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Created</dt>
-                                                <dd class="text-sm text-gray-900 dark:text-white">
-                                                    @if($task->creation_date)
-                                                        {{ is_string($task->creation_date) ? \Carbon\Carbon::parse($task->creation_date)->format('F j, Y \a\t g:i A') : $task->creation_date->format('F j, Y \a\t g:i A') }}
-                                                    @else
-                                                        Not available
-                                                    @endif
-                                                </dd>
-                                            </div>
-                                            
-                                            @if($task->approval_date)
-                                            <div>
-                                                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Approved</dt>
-                                                <dd class="text-sm text-gray-900 dark:text-white">
-                                                    {{ is_string($task->approval_date) ? \Carbon\Carbon::parse($task->approval_date)->format('F j, Y \a\t g:i A') : $task->approval_date->format('F j, Y \a\t g:i A') }}
-                                                </dd>
-                                            </div>
-                                            @endif
-                                            
-                                            @if($task->published_date)
-                                            <div>
-                                                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Published</dt>
-                                                <dd class="text-sm text-gray-900 dark:text-white">
-                                                    {{ is_string($task->published_date) ? \Carbon\Carbon::parse($task->published_date)->format('F j, Y \a\t g:i A') : $task->published_date->format('F j, Y \a\t g:i A') }}
-                                                </dd>
-                                            </div>
-                                            @endif
-                                            
-                                            @if($task->due_date)
-                                            <div>
-                                                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Due Date</dt>
-                                                <dd class="text-sm text-gray-900 dark:text-white">
-                                                    @php
-                                                        $dueDate = is_string($task->due_date) ? \Carbon\Carbon::parse($task->due_date) : $task->due_date;
-                                                        if ($task->end_time) {
-                                                            // Combine due_date with end_time
-                                                            $deadline = \Carbon\Carbon::parse($dueDate->toDateString() . ' ' . $task->end_time);
-                                                            echo $deadline->format('F j, Y \a\t g:i A');
-                                                        } else {
-                                                            // Use due_date directly
-                                                            echo $dueDate->format('F j, Y \a\t g:i A');
-                                                        }
-                                                    @endphp
-                                                </dd>
-                                            </div>
-                                            @endif
-                                            
-                                            @if($task->location)
-                                            <div>
-                                                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Location</dt>
-                                                <dd class="text-sm text-gray-900 dark:text-white">{{ $task->location }}</dd>
-                                            </div>
-                                            @endif
-                                            
-                                            @if($task->start_time || $task->end_time)
-                                            <div>
-                                                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Time</dt>
-                                                <dd class="text-sm text-gray-900 dark:text-white">
-                                                    @if($task->start_time && $task->end_time)
-                                                        {{ \Carbon\Carbon::parse($task->start_time)->format('g:i A') }} - {{ \Carbon\Carbon::parse($task->end_time)->format('g:i A') }}
-                                                    @elseif($task->start_time)
-                                                        {{ \Carbon\Carbon::parse($task->start_time)->format('g:i A') }} onwards
-                                                    @else
-                                                        Flexible
-                                                    @endif
-                                                </dd>
-                                            </div>
-                                            @endif
-                                            
-                                            <div>
-                                                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Participants</dt>
-                                                <dd class="text-sm text-gray-900 dark:text-white">
-                                                    @if($task->max_participants !== null)
-                                                        {{ $task->assignments->count() }} / {{ $task->max_participants }}
-                                                    @else
-                                                        {{ $task->assignments->count() }} (unlimited)
-                                                    @endif
-                                                </dd>
-                                            </div>
-                                        </dl>
-                                    </div>
-
-                                    <!-- Participants -->
-                                    <div>
-                                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">
-                                            Participants 
-                                            @if($task->max_participants !== null)
-                                                ({{ $task->assignments->count() }} / {{ $task->max_participants }})
-                                            @else
-                                                ({{ $task->assignments->count() }})
-                                            @endif
-                                        </h3>
-                                        @if($task->assignments->count() > 0)
-                                            <div class="space-y-3 max-h-64 overflow-y-auto">
-                                                @foreach($task->assignments as $assignment)
-                                                    <div class="flex items-center justify-between p-4 mb-3 last:mb-0 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800 rounded-xl border border-gray-200 dark:border-gray-600 hover:shadow-md transition-all duration-200">
-                                                        <div class="flex items-center space-x-3">
-                                                            <div class="h-10 w-10 rounded-full bg-gradient-to-br from-orange-500 to-teal-500 flex items-center justify-center shadow-md">
-                                                                <span class="text-sm font-bold text-white">
-                                                                    {{ substr($assignment->user->name, 0, 2) }}
-                                                                </span>
-                                                            </div>
-                                                            <div>
-                                                                <p class="text-sm font-bold text-gray-900 dark:text-white">{{ $assignment->user->name }}</p>
-                                                                <p class="text-xs text-gray-500 dark:text-gray-400">{{ $assignment->user->email }}</p>
-                                                            </div>
-                                                        </div>
-                                                        <div class="flex items-center space-x-2">
-                                                            <span class="px-3 py-1.5 text-xs font-bold rounded-lg
-                                                                @if($assignment->status === 'assigned') bg-gradient-to-r from-blue-100 to-blue-200 text-blue-800 dark:from-blue-900/30 dark:to-blue-800/30 dark:text-blue-300
-                                                                @elseif($assignment->status === 'submitted') bg-gradient-to-r from-yellow-100 to-amber-100 text-yellow-800 dark:from-yellow-900/30 dark:to-amber-900/30 dark:text-yellow-300
-                                                                @elseif($assignment->status === 'completed') bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 dark:from-green-900/30 dark:to-emerald-900/30 dark:text-green-300
-                                                                @endif shadow-sm">
-                                                                {{ ucfirst($assignment->status) }}
-                                                            </span>
-                                                            @if(!empty($assignment->progress))
-                                                            <span class="px-2 py-1 text-xs rounded-full
-                                                                @switch($assignment->progress)
-                                                                    @case('accepted') bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200 @break
-                                                                    @case('on_the_way') bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200 @break
-                                                                    @case('working') bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200 @break
-                                                                    @case('done') bg-teal-100 text-teal-800 dark:bg-teal-900 dark:text-teal-200 @break
-                                                                    @case('submitted_proof') bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200 @break
-                                                                    @default bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200
-                                                                @endswitch">
-                                                                {{ ucfirst(str_replace('_',' ', $assignment->progress)) }}
-                                                            </span>
-                                                            @endif
-                                                        </div>
-                                                    </div>
-                                                    @if($assignment->status === 'submitted')
-                                                        <div class="ml-11 mb-3">
-                                                            <a href="{{ route('tasks.creator.show', $assignment) }}" class="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
-                                                                Review Submission →
-                                                            </a>
-                                                        </div>
-                                                    @endif
-                                                @endforeach
-                                            </div>
-                                        @else
-                                            <p class="text-sm text-gray-500 dark:text-gray-400">No users have joined this task yet.</p>
-                                        @endif
-                                    </div>
+                        <!-- Sidebar Column -->
+                        <div class="lg:col-span-1 space-y-6">
+                            <!-- Participants Section -->
+                            <div class="bg-white rounded-lg p-6 border border-gray-200 shadow-sm">
+                                <div class="flex items-center justify-between mb-4">
+                                    <h3 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                                        <i class="fas fa-users" style="color: #F3A261;"></i>
+                                        Participants
+                                    </h3>
+                                    <span class="px-3 py-1 text-white text-sm font-bold rounded-full" style="background: linear-gradient(135deg, #F3A261 0%, #F3A261 100%);">
+                                        {{ $task->assignments->count() }}
+                                    </span>
                                 </div>
+
+                                @if($task->assignments->count() > 0)
+                                    @php
+                                        $displayLimit = 3;
+                                        $displayedParticipants = $task->assignments->take($displayLimit);
+                                        $hasMore = $task->assignments->count() > $displayLimit;
+                                    @endphp
+                                    <!-- Limited Participants List -->
+                                    <div class="space-y-3 mb-4">
+                                        @foreach($displayedParticipants as $assignment)
+                                            @php
+                                                $firstName = $assignment->user->firstName ?? '';
+                                                $lastName = $assignment->user->lastName ?? '';
+                                                $initials = strtoupper(
+                                                    (!empty($firstName) ? substr($firstName, 0, 1) : '') . 
+                                                    (!empty($lastName) ? substr($lastName, 0, 1) : '')
+                                                );
+                                                if (empty($initials)) {
+                                                    $initials = strtoupper(substr($assignment->user->name ?? 'U', 0, 1));
+                                                }
+                                            @endphp
+                                            <div class="flex items-center justify-between p-4 bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+                                                <div class="flex items-center space-x-3 flex-1 min-w-0">
+                                                    <div class="h-10 w-10 rounded-full flex items-center justify-center flex-shrink-0 shadow-md" style="background: linear-gradient(135deg, #F3A261 0%, #F3A261 100%);">
+                                                        <span class="text-sm font-bold text-white">
+                                                            {{ $initials }}
+                                                        </span>
+                                                    </div>
+                                                    <div class="min-w-0 flex-1">
+                                                        <p class="text-sm font-semibold text-gray-900 truncate">{{ $assignment->user->name }}</p>
+                                                        <p class="text-xs text-gray-500 truncate">{{ $assignment->user->email }}</p>
+                                                    </div>
+                                                </div>
+                                                <div class="flex items-center space-x-2 flex-shrink-0 ml-3">
+                                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-full
+                                                        @if($assignment->status === 'assigned') bg-orange-100 text-orange-800
+                                                        @elseif($assignment->status === 'submitted') bg-yellow-100 text-yellow-800
+                                                        @elseif($assignment->status === 'completed') bg-teal-100 text-teal-800
+                                                        @endif">
+                                                        <i class="fas 
+                                                            @if($assignment->status === 'assigned') fa-user-check
+                                                            @elseif($assignment->status === 'submitted') fa-paper-plane
+                                                            @elseif($assignment->status === 'completed') fa-check-circle
+                                                            @endif"></i>
+                                                        {{ ucfirst($assignment->status) }}
+                                                    </span>
+                                                    @if(!empty($assignment->progress))
+                                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-full
+                                                        @switch($assignment->progress)
+                                                            @case('accepted') bg-gray-100 text-gray-800 @break
+                                                            @case('on_the_way') text-white @break
+                                                            @php $bgColor = '#2B9D8D'; @endphp
+                                                            @case('working') text-white @break
+                                                            @php $bgColor = '#2B9D8D'; @endphp
+                                                            @case('done') text-white @break
+                                                            @php $bgColor = '#2B9D8D'; @endphp
+                                                            @case('submitted_proof') text-white @break
+                                                            @php $bgColor = '#F3A261'; @endphp
+                                                            @default bg-gray-100 text-gray-800
+                                                        @endswitch">
+                                                        <i class="fas 
+                                                            @if($assignment->progress === 'accepted') fa-handshake
+                                                            @elseif($assignment->progress === 'on_the_way') fa-route
+                                                            @elseif($assignment->progress === 'working') fa-tools
+                                                            @elseif($assignment->progress === 'done') fa-clipboard-check
+                                                            @elseif($assignment->progress === 'submitted_proof') fa-file-upload
+                                                            @endif"></i>
+                                                        {{ ucfirst(str_replace('_',' ', $assignment->progress)) }}
+                                                    </span>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                            @if($assignment->status === 'submitted')
+                                                <div class="ml-11 mb-3">
+                                                    <a href="{{ route('tasks.creator.show', $assignment) }}" class="text-sm" style="color: #2B9D8D;" onmouseover="this.style.color='#248A7C';" onmouseout="this.style.color='#2B9D8D';">
+                                                        Review Submission →
+                                                    </a>
+                                                </div>
+                                            @endif
+                                        @endforeach
+                                    </div>
+                                    
+                                    <button type="button" onclick="openParticipantsModal()" class="w-full inline-flex justify-center items-center gap-2 px-4 py-2.5 text-sm font-semibold rounded-lg text-white shadow-md transition-all hover:shadow-lg transform hover:-translate-y-0.5"
+                                            style="background-color: #F3A261;"
+                                            onmouseover="this.style.backgroundColor='#E8944F'"
+                                            onmouseout="this.style.backgroundColor='#F3A261'">
+                                        <i class="fas fa-eye"></i>
+                                        View All ({{ $task->assignments->count() }})
+                                    </button>
+                                @else
+                                    <div class="text-center py-8">
+                                        <i class="fas fa-users-slash text-gray-300 text-3xl mb-3"></i>
+                                        <p class="text-sm text-gray-500 font-medium">No users have joined this task yet.</p>
+                                    </div>
+                                @endif
                             </div>
                         </div>
                     </div>
                 </div>
             @else
                 <!-- Regular user layout with tabs -->
-                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
-                    <!-- Task Title and Admin Label -->
-                    <div class="px-6 py-6 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700">
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">{{ $task->title }}</h1>
-                                <p class="text-sm font-semibold text-gray-600 dark:text-gray-400">
+                <div class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
+                    <!-- Task Header -->
+                    <div class="px-6 py-6" style="background: linear-gradient(135deg, #F3A261 0%, #2B9D8D 100%);">
+                        <div class="flex flex-col lg:flex-row justify-between items-start gap-4">
+                            <div class="flex-1">
+                                <h1 class="text-2xl lg:text-3xl font-bold text-white mb-3">
+                                    {{ $task->title }}
+                                </h1>
+                                <div class="flex flex-wrap items-center gap-2">
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 text-sm font-medium rounded-full bg-white/20 text-white">
+                                        <i class="fas 
+                                            @if($task->status === 'pending') fa-clock
+                                            @elseif($task->status === 'approved') fa-check-circle
+                                            @elseif($task->status === 'published') fa-rocket
+                                            @elseif($task->status === 'assigned') fa-user-check
+                                            @elseif($task->status === 'submitted') fa-paper-plane
+                                            @elseif($task->status === 'completed') fa-check-double
+                                            @elseif($task->status === 'rejected') fa-times-circle
+                                            @elseif($task->status === 'uncompleted') fa-exclamation-triangle
+                                            @elseif($task->status === 'inactive') fa-pause-circle
+                                            @else fa-list
+                                            @endif text-xs
+                                        "></i>
+                                        {{ ucfirst($task->status) }}
+                                    </span>
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 text-sm font-medium rounded-full bg-white/20 text-white">
+                                        <i class="fas 
+                                            @if($task->task_type === 'daily') fa-calendar-day
+                                            @elseif($task->task_type === 'one_time') fa-bullseye
+                                            @else fa-user-plus
+                                            @endif text-xs
+                                        "></i>
+                                        {{ ucfirst(str_replace('_', ' ', $task->task_type)) }}
+                                    </span>
                                     @php $uploader = $task->assignedUser; @endphp
-                                    <strong>Uploaded by:</strong> {{ $uploader?->name ?? 'Admin' }}
-                                </p>
+                                    @if($uploader)
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 text-sm font-medium rounded-full bg-white/20 text-white">
+                                        <i class="fas fa-user text-xs"></i>
+                                        Uploaded by: {{ $uploader->name ?? 'Admin' }}
+                                    </span>
+                                    @endif
+                                </div>
+                            </div>
+                            <div class="bg-white/20 rounded-lg px-6 py-4">
+                                <div class="text-center">
+                                    <div class="text-3xl font-bold text-white mb-1">
+                                        {{ $task->points_awarded }}
+                                    </div>
+                                    <div class="text-xs text-white/90 font-medium">Points</div>
+                                </div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Tabs -->
-                    <div class="border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+                    <div class="border-b border-gray-200 bg-white">
                         <nav class="flex space-x-8 px-6" aria-label="Tabs">
-                            <button id="details-tab" class="py-4 px-1 border-b-2 border-orange-500 font-bold text-sm text-orange-600 dark:text-orange-400">
+                            <button id="details-tab" class="py-4 px-1 border-b-2 font-bold text-sm text-gray-900 transition-colors" style="border-color: #F3A261;">
                                 Details
                             </button>
-                            <button id="participants-tab" class="py-4 px-1 border-b-2 border-transparent font-semibold text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300">
+                            <button id="participants-tab" class="py-4 px-1 border-b-2 border-transparent font-semibold text-sm text-gray-500 hover:text-gray-700 transition-colors">
                                 Participants
                             </button>
                         </nav>
@@ -262,27 +338,36 @@
                         </div>
 
                         <!-- Task Details Grid -->
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-                            <div class="flex items-center space-x-3 p-4 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800 rounded-xl border border-gray-200 dark:border-gray-600">
-                                <svg class="w-5 h-5 text-orange-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                                </svg>
-                                <span class="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                                    <strong>Date:</strong> 
-                                    @if($task->due_date)
-                                        {{ is_string($task->due_date) ? \Carbon\Carbon::parse($task->due_date)->format('M j, Y') : $task->due_date->format('M j, Y') }}
-                                    @else
-                                        {{ is_string($task->creation_date) ? \Carbon\Carbon::parse($task->creation_date)->format('M j, Y') : $task->creation_date->format('M j, Y') }}
-                                    @endif
-                                </span>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                            @if($task->due_date)
+                            <div class="bg-white rounded-lg p-4 border border-gray-200 shadow-sm">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <i class="fas fa-calendar-alt" style="color: #F3A261;"></i>
+                                    <h4 class="text-xs font-semibold text-gray-600 uppercase">Date</h4>
+                                </div>
+                                <p class="text-sm font-medium text-gray-900">
+                                    {{ is_string($task->due_date) ? \Carbon\Carbon::parse($task->due_date)->format('M j, Y') : $task->due_date->format('M j, Y') }}
+                                </p>
                             </div>
+                            @elseif($task->creation_date)
+                            <div class="bg-white rounded-lg p-4 border border-gray-200 shadow-sm">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <i class="fas fa-calendar-alt" style="color: #F3A261;"></i>
+                                    <h4 class="text-xs font-semibold text-gray-600 uppercase">Created</h4>
+                                </div>
+                                <p class="text-sm font-medium text-gray-900">
+                                    {{ is_string($task->creation_date) ? \Carbon\Carbon::parse($task->creation_date)->format('M j, Y') : $task->creation_date->format('M j, Y') }}
+                                </p>
+                            </div>
+                            @endif
                             
-                            <div class="flex items-center space-x-3 p-4 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800 rounded-xl border border-gray-200 dark:border-gray-600">
-                                <svg class="w-5 h-5 text-teal-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                </svg>
-                                <span class="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                                    <strong>Time:</strong> 
+                            @if($task->start_time || $task->end_time)
+                            <div class="bg-white rounded-lg p-4 border border-gray-200 shadow-sm">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <i class="fas fa-clock" style="color: #2B9D8D;"></i>
+                                    <h4 class="text-xs font-semibold text-gray-600 uppercase">Time</h4>
+                                </div>
+                                <p class="text-sm font-medium text-gray-900">
                                     @if($task->start_time && $task->end_time)
                                         {{ \Carbon\Carbon::parse($task->start_time)->format('g:i A') }} - {{ \Carbon\Carbon::parse($task->end_time)->format('g:i A') }}
                                     @elseif($task->start_time)
@@ -290,57 +375,54 @@
                                     @else
                                         Flexible
                                     @endif
-                                </span>
+                                </p>
+                            </div>
+                            @endif
+                            
+                            @if($task->location)
+                            <div class="bg-white rounded-lg p-4 border border-gray-200 shadow-sm">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <i class="fas fa-map-marker-alt" style="color: #2B9D8D;"></i>
+                                    <h4 class="text-xs font-semibold text-gray-600 uppercase">Location</h4>
+                                </div>
+                                <p class="text-sm font-medium text-gray-900">
+                                    {{ $task->location }}
+                                </p>
+                            </div>
+                            @endif
+                            
+                            <div class="bg-white rounded-lg p-4 border border-gray-200 shadow-sm">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <i class="fas fa-star" style="color: #F3A261;"></i>
+                                    <h4 class="text-xs font-semibold text-gray-600 uppercase">Points</h4>
+                                </div>
+                                <p class="text-sm font-medium text-gray-900">
+                                    {{ $task->points_awarded }}
+                                </p>
                             </div>
                             
-                            <div class="flex items-center space-x-3 p-4 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800 rounded-xl border border-gray-200 dark:border-gray-600">
-                                <svg class="w-5 h-5 text-orange-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path>
-                                </svg>
-                                <span class="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                                    <strong>Location:</strong> {{ $task->location ?: 'Community' }}
-                                </span>
+                            <div class="bg-white rounded-lg p-4 border border-gray-200 shadow-sm">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <i class="fas fa-tag" style="color: #2B9D8D;"></i>
+                                    <h4 class="text-xs font-semibold text-gray-600 uppercase">Type</h4>
+                                </div>
+                                <p class="text-sm font-medium text-gray-900">
+                                    {{ ucfirst(str_replace('_', ' ', $task->task_type)) }}
+                                </p>
                             </div>
                             
-                            <div class="flex items-center space-x-3 p-4 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800 rounded-xl border border-gray-200 dark:border-gray-600">
-                                <svg class="w-5 h-5 text-orange-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
-                                </svg>
-                                <span class="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                                    <strong>Points:</strong> {{ $task->points_awarded }}
-                                </span>
-                            </div>
-                            
-                            <div class="flex items-center space-x-3 p-4 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800 rounded-xl border border-gray-200 dark:border-gray-600">
-                                <svg class="w-5 h-5 text-teal-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M4 4a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2H4zm2 6a2 2 0 114 0 2 2 0 01-4 0zm8 0a2 2 0 114 0 2 2 0 01-4 0z" clip-rule="evenodd"></path>
-                                </svg>
-                                <span class="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                                    <strong>Type:</strong> {{ ucfirst(str_replace('_', ' ', $task->task_type)) }}
-                                </span>
-                            </div>
-                            
-                            <div class="flex items-center space-x-3 p-4 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800 rounded-xl border border-gray-200 dark:border-gray-600">
-                                <svg class="w-5 h-5 text-orange-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
-                                </svg>
-                                <span class="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                                    <strong>Created:</strong> {{ is_string($task->creation_date) ? \Carbon\Carbon::parse($task->creation_date)->format('M j, Y') : $task->creation_date->format('M j, Y') }}
-                                </span>
-                            </div>
-                            
-                            <div class="flex items-center space-x-3 p-4 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800 rounded-xl border border-gray-200 dark:border-gray-600">
-                                <svg class="w-5 h-5 text-teal-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
-                                </svg>
-                                <span class="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                                    <strong>Participants:</strong> 
+                            <div class="bg-white rounded-lg p-4 border border-gray-200 shadow-sm">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <i class="fas fa-users" style="color: #F3A261;"></i>
+                                    <h4 class="text-xs font-semibold text-gray-600 uppercase">Participants</h4>
+                                </div>
+                                <p class="text-sm font-medium text-gray-900">
                                     @if($task->max_participants !== null)
                                         {{ $task->assignments->count() }} / {{ $task->max_participants }}
                                     @else
                                         {{ $task->assignments->count() }} (unlimited)
                                     @endif
-                                </span>
+                                </p>
                             </div>
                         </div>
 
@@ -351,14 +433,14 @@
                                 $isFull = !is_null($task->max_participants) && $task->assignments->count() >= $task->max_participants;
                             @endphp
                             @if($isFull)
-                                <button type="button" class="bg-gray-400 text-white font-bold py-3 px-8 rounded-xl cursor-not-allowed shadow-md" title="This task has reached its participant limit" aria-disabled="true">
-                                    Join This Task
+                                <button type="button" class="bg-gray-400 text-white font-bold py-3 px-8 rounded-lg cursor-not-allowed shadow-md" title="This task has reached its participant limit" aria-disabled="true">
+                                    <i class="fas fa-users-slash mr-2"></i>Join This Task
                                 </button>
                             @else
                                 <form action="{{ route('tasks.join', $task) }}" method="POST" class="inline">
                                     @csrf
-                                    <button type="submit" class="bg-gradient-to-r from-orange-600 to-teal-500 hover:from-orange-700 hover:to-teal-600 text-white font-bold py-3 px-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5">
-                                        Join This Task
+                                    <button type="submit" class="inline-flex items-center gap-2 px-8 py-3 border border-transparent text-sm font-bold rounded-lg text-white shadow-md transition-colors brand-primary-btn">
+                                        <i class="fas fa-user-plus"></i> Join This Task
                                     </button>
                                 </form>
                             @endif
@@ -366,8 +448,8 @@
                         @endif
                         @if($isCreator)
                         <div class="mb-6 text-center">
-                            <button type="button" class="bg-gray-400 text-white font-bold py-3 px-8 rounded-xl cursor-not-allowed shadow-md" title="You created this task" aria-disabled="true">
-                                Join This Task
+                            <button type="button" class="bg-gray-400 text-white font-bold py-3 px-8 rounded-lg cursor-not-allowed shadow-md" title="You created this task" aria-disabled="true">
+                                <i class="fas fa-user-check mr-2"></i>Join This Task
                             </button>
                         </div>
                         @endif
@@ -387,14 +469,14 @@
                                 if ($currentIndex === false) { $currentIndex = 0; }
                             @endphp
                             <div class="mb-6">
-                                <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mb-4">
+                                <div class="w-full bg-gray-200 rounded-full h-2 mb-4">
                                     @php $percent = ($currentIndex) * (100 / (count($steps) - 1)); @endphp
-                                    <div class="bg-orange-500 h-2 rounded-full" style="width: {{ $percent }}%"></div>
+                                    <div class="h-2 rounded-full" style="width: {{ $percent }}%; background: linear-gradient(135deg, #F3A261 0%, #F3A261 100%);"></div>
                                 </div>
                                 <div class="flex justify-between">
                                     @foreach($steps as $key => $label)
                                         @php $index = array_search($key, $stepKeys); $active = $index <= $currentIndex; @endphp
-                                        <div class="text-xs {{ $active ? 'text-orange-600 dark:text-orange-400' : 'text-gray-500 dark:text-gray-400' }}">
+                                        <div class="text-xs {{ $active ? 'text-gray-900 font-semibold' : 'text-gray-500' }}">
                                             {{ $label }}
                                         </div>
                                     @endforeach
@@ -421,7 +503,13 @@
                                             <button type="button" 
                                                     onclick="showProgressModal('{{ $progressLabel }}', '{{ $p }}')" 
                                                     {{ $disabled ? 'disabled' : '' }} 
-                                                    class="px-4 py-2 rounded-xl border-2 text-sm font-bold transition-all duration-200 {{ ($userAssignment->progress ?? 'accepted') === $p ? 'bg-gradient-to-r from-orange-500 to-teal-500 text-white border-orange-600 shadow-md' : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-600 hover:border-orange-400' }} {{ $disabled ? 'opacity-50 cursor-not-allowed' : '' }}">
+                                                    class="inline-flex items-center gap-2 px-4 py-2 rounded-lg border-2 text-sm font-bold transition-all duration-200 {{ ($userAssignment->progress ?? 'accepted') === $p ? 'text-white border-transparent shadow-md brand-primary-btn' : 'bg-white text-gray-700 border-gray-300 hover:border-orange-400' }} {{ $disabled ? 'opacity-50 cursor-not-allowed' : '' }}">
+                                                <i class="fas 
+                                                    @if($p === 'accepted') fa-handshake
+                                                    @elseif($p === 'on_the_way') fa-route
+                                                    @elseif($p === 'working') fa-tools
+                                                    @elseif($p === 'done') fa-clipboard-check
+                                                    @endif"></i>
                                                 {{ $progressLabel }}
                                             </button>
                                         </form>
@@ -432,13 +520,11 @@
                             @if($userAssignment->status === 'submitted')
                                 <!-- Pending Approval Status -->
                                 <div class="mb-6">
-                                    <div class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-6 text-center">
+                                    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-6 text-center">
                                         <div class="flex flex-col items-center">
-                                            <svg class="w-12 h-12 text-yellow-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                            </svg>
-                                            <h3 class="text-lg font-semibold text-yellow-800 dark:text-yellow-200 mb-2">Pending Approval</h3>
-                                            <p class="text-sm text-yellow-700 dark:text-yellow-300 mb-4">
+                                            <i class="fas fa-clock text-yellow-500 text-5xl mb-4"></i>
+                                            <h3 class="text-lg font-semibold text-yellow-800 mb-2">Pending Approval</h3>
+                                            <p class="text-sm text-yellow-700 mb-4">
                                                 @if($task->task_type === 'user_uploaded')
                                                     Your task completion has been submitted and is waiting for the task creator's approval.
                                                 @else
@@ -446,7 +532,7 @@
                                                 @endif
                                             </p>
                                             @if($userAssignment->submitted_at)
-                                                <p class="text-xs text-yellow-600 dark:text-yellow-400">
+                                                <p class="text-xs text-yellow-600">
                                                     Submitted on {{ is_string($userAssignment->submitted_at) ? \Carbon\Carbon::parse($userAssignment->submitted_at)->format('M j, Y \a\t g:i A') : $userAssignment->submitted_at->format('M j, Y \a\t g:i A') }}
                                                 </p>
                                             @endif
@@ -485,7 +571,7 @@
                                                     @endforeach
                                                 </div>
                                                 <div class="mt-3">
-                                                    <button type="button" onclick="openImageModal(document.querySelector('img[data-photo-url]')?.getAttribute('data-photo-url'))" class="inline-flex items-center px-3 py-2 bg-gray-900 text-white text-sm rounded hover:bg-black">
+                                                    <button type="button" onclick="openImageModal(document.querySelector('img[data-photo-url]')?.getAttribute('data-photo-url'))" class="inline-flex items-center px-3 py-2 bg-gray-900 text-white text-sm rounded hover:bg-black" style="color: white !important;">
                                                         Review Proof
                                                     </button>
                                                 </div>
@@ -497,13 +583,15 @@
 
                                     <!-- Task Feedback Button -->
                                     <div class="mt-4 flex flex-wrap justify-center items-center gap-3">
-                                        <a href="{{ route('feedback.create', $task) }}" class="inline-flex items-center px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-lg transition-colors">
-                                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
-                                            </svg>
+                                        <a href="{{ route('feedback.create', $task) }}" class="inline-flex items-center px-4 py-2 text-white font-medium rounded-lg transition-colors"
+                                           style="background-color: #2B9D8D;"
+                                           onmouseover="this.style.backgroundColor='#248A7C'"
+                                           onmouseout="this.style.backgroundColor='#2B9D8D'">
+                                            <i class="fas fa-comment mr-2"></i>
                                             Task Feedback
                                         </a>
-                                        <a href="{{ route('feedback.show', $task) }}" class="inline-flex items-center px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 font-medium rounded-lg transition-colors">
+                                        <a href="{{ route('feedback.show', $task) }}" class="inline-flex items-center px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium rounded-lg transition-colors">
+                                            <i class="fas fa-eye mr-2"></i>
                                             View Feedback
                                         </a>
                                     </div>
@@ -511,35 +599,33 @@
                             @elseif($userAssignment->status === 'assigned' && $userAssignment->rejection_count > 0)
                                 <!-- Rejected Status - Show rejection reason and allow resubmission -->
                                 <div class="mb-6">
-                                    <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6">
+                                    <div class="border rounded-lg p-6" style="background-color: rgba(43, 157, 141, 0.1); border-color: #2B9D8D;">
                                         <div class="flex flex-col items-center">
-                                            <svg class="w-12 h-12 text-red-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                                            </svg>
-                                            <h3 class="text-lg font-semibold text-red-800 dark:text-red-200 mb-2">Submission Rejected</h3>
-                                            <p class="text-sm text-red-700 dark:text-red-300 mb-4">
+                                            <i class="fas fa-times-circle text-5xl mb-4" style="color: #2B9D8D;"></i>
+                                            <h3 class="text-lg font-semibold mb-2" style="color: #2B9D8D;">Submission Rejected</h3>
+                                            <p class="text-sm mb-4" style="color: #2B9D8D;">
                                                 Your task submission was rejected. Please review the feedback and resubmit.
                                             </p>
                                             
                                             <!-- Rejection Details -->
-                                            <div class="w-full max-w-md bg-red-100 dark:bg-red-800/30 rounded-lg p-4 mb-4">
-                                                <p class="text-sm font-medium text-red-800 dark:text-red-200 mb-2">Rejection Details:</p>
-                                                <p class="text-sm text-red-700 dark:text-red-300 mb-2">
+                                            <div class="w-full max-w-md rounded-lg p-4 mb-4" style="background-color: rgba(43, 157, 141, 0.2);">
+                                                <p class="text-sm font-medium mb-2" style="color: #2B9D8D;">Rejection Details:</p>
+                                                <p class="text-sm mb-2" style="color: #2B9D8D;">
                                                     <strong>Attempt:</strong> {{ $userAssignment->rejection_count }}/3
                                                 </p>
                                                 @if($userAssignment->rejection_reason)
-                                                    <p class="text-sm text-red-700 dark:text-red-300">
+                                                    <p class="text-sm" style="color: #2B9D8D;">
                                                         <strong>Reason:</strong> {{ $userAssignment->rejection_reason }}
                                                     </p>
                                                 @endif
                                             </div>
                                             
                                             @if($userAssignment->rejection_count < 3)
-                                                <p class="text-sm text-red-600 dark:text-red-400 mb-4">
+                                                <p class="text-sm mb-4" style="color: #2B9D8D;">
                                                     You have {{ 3 - $userAssignment->rejection_count }} remaining attempts to resubmit.
                                                 </p>
                                             @else
-                                                <p class="text-sm text-red-600 dark:text-red-400 mb-4">
+                                                <p class="text-sm mb-4" style="color: #2B9D8D;">
                                                     You have reached the maximum number of attempts (3). Please contact admin for assistance.
                                                 </p>
                                             @endif
@@ -553,17 +639,15 @@
                             @elseif($userAssignment->status === 'completed')
                                 <!-- Completed Status -->
                                 <div class="mb-6">
-                                    <div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-6 text-center">
+                                    <div class="border rounded-lg p-6 text-center" style="background-color: rgba(43, 157, 141, 0.1); border-color: #2B9D8D;">
                                         <div class="flex flex-col items-center">
-                                            <svg class="w-12 h-12 text-green-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                            </svg>
-                                            <h3 class="text-lg font-semibold text-green-800 dark:text-green-200 mb-2">Task Completed</h3>
-                                            <p class="text-sm text-green-700 dark:text-green-300 mb-4">
+                                            <i class="fas fa-check-circle text-5xl mb-4" style="color: #2B9D8D;"></i>
+                                            <h3 class="text-lg font-semibold mb-2" style="color: #2B9D8D;">Task Completed</h3>
+                                            <p class="text-sm mb-4" style="color: #2B9D8D;">
                                                 Congratulations! Your task has been approved and completed.
                                             </p>
                                             @if($userAssignment->completed_at)
-                                                <p class="text-xs text-green-600 dark:text-green-400">
+                                                <p class="text-xs" style="color: #2B9D8D;">
                                                     Completed on {{ is_string($userAssignment->completed_at) ? \Carbon\Carbon::parse($userAssignment->completed_at)->format('M j, Y \a\t g:i A') : $userAssignment->completed_at->format('M j, Y \a\t g:i A') }}
                                                 </p>
                                             @endif
@@ -573,30 +657,31 @@
                                     <!-- Action Buttons -->
                                     <div class="mt-4 flex flex-wrap justify-center items-center gap-3">
                                         <!-- Task Feedback Button -->
-                                        <a href="{{ route('feedback.create', $task) }}" class="inline-flex items-center px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-lg transition-colors">
-                                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
-                                            </svg>
+                                        <a href="{{ route('feedback.create', $task) }}" class="inline-flex items-center px-4 py-2 text-white font-medium rounded-lg transition-colors"
+                                           style="background-color: #2B9D8D;"
+                                           onmouseover="this.style.backgroundColor='#248A7C'"
+                                           onmouseout="this.style.backgroundColor='#2B9D8D'">
+                                            <i class="fas fa-comment mr-2"></i>
                                             Task Feedback
                                         </a>
                                         
-                                        <a href="{{ route('feedback.show', $task) }}" class="inline-flex items-center px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 font-medium rounded-lg transition-colors">
+                                        <a href="{{ route('feedback.show', $task) }}" class="inline-flex items-center px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium rounded-lg transition-colors">
+                                            <i class="fas fa-eye mr-2"></i>
                                             View Feedback
                                         </a>
                                         
                                         <!-- Tap & Pass Button - Only for daily tasks completed TODAY -->
                                         @if($task->task_type === 'daily' && $userAssignment->completed_at && \Carbon\Carbon::parse($userAssignment->completed_at)->isToday())
-                                            <button onclick="openNominationModal({{ $task->taskId }})" class="inline-flex items-center px-4 py-2 bg-green-500 hover:bg-green-600 text-white font-medium rounded-lg transition-colors">
-                                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                                                </svg>
+                                            <button onclick="openNominationModal({{ $task->taskId }})" class="inline-flex items-center px-4 py-2 text-white font-medium rounded-lg transition-colors"
+                                                    style="background-color: #2B9D8D;"
+                                                    onmouseover="this.style.backgroundColor='#248A7C'"
+                                                    onmouseout="this.style.backgroundColor='#2B9D8D'">
+                                                <i class="fas fa-bolt mr-2"></i>
                                                 🎯 Tap & Pass
                                             </button>
                                         @elseif($task->task_type === 'daily' && $userAssignment->completed_at && !\Carbon\Carbon::parse($userAssignment->completed_at)->isToday())
                                             <div class="inline-flex items-center px-4 py-2 bg-gray-400 text-white font-medium rounded-lg cursor-not-allowed opacity-60">
-                                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                                                </svg>
+                                                <i class="fas fa-bolt mr-2"></i>
                                                 🎯 Tap & Pass
                                             </div>
                                         @endif
@@ -604,7 +689,7 @@
                                     
                                     <!-- Helper text for Tap & Pass -->
                                     @if($task->task_type === 'daily' && $userAssignment->completed_at)
-                                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-2 text-center">
+                                        <p class="text-xs text-gray-500 mt-2 text-center">
                                             @if(\Carbon\Carbon::parse($userAssignment->completed_at)->isToday())
                                                 Nominate someone for a daily task (completed today)
                                             @else
@@ -638,7 +723,7 @@
                                         class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500 dark:bg-gray-700 dark:text-white"
                                         placeholder="Describe what you did to complete this task..."></textarea>
                                     @error('completion_notes')
-                                        <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                                        <p class="mt-2 text-sm dark:text-red-400" style="color: #2B9D8D;">{{ $message }}</p>
                                     @enderror
                                 </div>
 
@@ -648,7 +733,7 @@
                                 <!-- In-form Upload Area (only when progress is done) -->
                                 <div id="form-upload-area" class="mt-4 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center hover:border-gray-400 dark:hover:border-gray-500 transition-colors cursor-pointer">
                                     <div class="flex flex-col items-center">
-                                        <svg class="w-10 h-10 text-red-500 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg class="w-10 h-10 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: #2B9D8D;">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                                         </svg>
                                         <p id="form-upload-text" class="text-sm text-gray-600 dark:text-gray-400 mb-1">Click to select photos or drag and drop (2–3 photos)</p>
@@ -666,8 +751,8 @@
                                     <div id="form-file-list" class="space-y-2 grid grid-cols-3 gap-2"></div>
                                 </div>
                                 
-                                <button type="submit" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-6 rounded-lg transition-colors">
-                                    Complete Task
+                                <button type="submit" class="w-full inline-flex justify-center items-center gap-2 px-4 py-3 border border-transparent text-sm font-bold rounded-lg text-white shadow-md transition-colors brand-primary-btn">
+                                    <i class="fas fa-check-double"></i> Complete Task
                                 </button>
                             </form>
                         </div>
@@ -677,50 +762,91 @@
                     <!-- Participants Tab Content -->
                     <div id="participants-content" class="tab-content hidden">
                         <div class="mb-4">
-                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">
-                                Participants 
-                                @if($task->max_participants !== null)
-                                    ({{ $task->assignments->count() }} / {{ $task->max_participants }})
-                                @else
-                                    ({{ $task->assignments->count() }})
-                                @endif
-                            </h3>
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                                    <i class="fas fa-users" style="color: #F3A261;"></i>
+                                    Participants
+                                </h3>
+                                <span class="px-3 py-1 text-white text-sm font-bold rounded-full" style="background: linear-gradient(135deg, #F3A261 0%, #F3A261 100%);">
+                                    @if($task->max_participants !== null)
+                                        {{ $task->assignments->count() }} / {{ $task->max_participants }}
+                                    @else
+                                        {{ $task->assignments->count() }}
+                                    @endif
+                                </span>
+                            </div>
                             @if($task->assignments->count() > 0)
-                                <div class="space-y-3">
-                                    @foreach($task->assignments as $assignment)
-                                        <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                                            <div class="flex items-center space-x-3">
-                                                <div class="h-10 w-10 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center">
-                                                    <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
-                                                        {{ substr($assignment->user->name, 0, 2) }}
+                                @php
+                                    $displayLimit = 3;
+                                    $displayedParticipants = $task->assignments->take($displayLimit);
+                                    $hasMore = $task->assignments->count() > $displayLimit;
+                                @endphp
+                                <!-- Limited Participants List -->
+                                <div class="space-y-3 mb-4">
+                                    @foreach($displayedParticipants as $assignment)
+                                        @php
+                                            $firstName = $assignment->user->firstName ?? '';
+                                            $lastName = $assignment->user->lastName ?? '';
+                                            $initials = strtoupper(
+                                                (!empty($firstName) ? substr($firstName, 0, 1) : '') . 
+                                                (!empty($lastName) ? substr($lastName, 0, 1) : '')
+                                            );
+                                            if (empty($initials)) {
+                                                $initials = strtoupper(substr($assignment->user->name ?? 'U', 0, 1));
+                                            }
+                                        @endphp
+                                        <div class="flex items-center justify-between p-4 bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+                                            <div class="flex items-center space-x-3 flex-1 min-w-0">
+                                                <div class="h-10 w-10 rounded-full flex items-center justify-center flex-shrink-0 shadow-md" style="background: linear-gradient(135deg, #F3A261 0%, #F3A261 100%);">
+                                                    <span class="text-sm font-bold text-white">
+                                                        {{ $initials }}
                                                     </span>
                                                 </div>
-                                                <div>
-                                                    <p class="text-sm font-medium text-gray-900 dark:text-white">{{ $assignment->user->name }}</p>
-                                                    <p class="text-xs text-gray-500 dark:text-gray-400">{{ $assignment->user->email }}</p>
+                                                <div class="min-w-0 flex-1">
+                                                    <p class="text-sm font-semibold text-gray-900 truncate">{{ $assignment->user->name ?? 'Unknown User' }}</p>
+                                                    <p class="text-xs text-gray-500 truncate">{{ $assignment->user->email ?? '' }}</p>
                                                 </div>
                                             </div>
-                                            <div class="flex items-center space-x-2">
-                                                <span class="px-2 py-1 text-xs rounded-full
-                                                    @if($assignment->status === 'assigned') bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200
-                                                    @elseif($assignment->status === 'submitted') bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200
-                                                    @elseif($assignment->status === 'completed') bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200
+                                            <div class="flex items-center space-x-2 flex-shrink-0 ml-3 flex-wrap justify-end gap-2">
+                                                <span class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-full
+                                                    @if($assignment->status === 'assigned') bg-orange-100 text-orange-800
+                                                    @elseif($assignment->status === 'submitted') bg-yellow-100 text-yellow-800
+                                                    @elseif($assignment->status === 'completed') bg-teal-100 text-teal-800
                                                     @endif">
+                                                    <i class="fas 
+                                                        @if($assignment->status === 'assigned') fa-user-check
+                                                        @elseif($assignment->status === 'submitted') fa-paper-plane
+                                                        @elseif($assignment->status === 'completed') fa-check-circle
+                                                        @endif"></i>
                                                     {{ ucfirst($assignment->status) }}
                                                 </span>
                                                 @if($assignment->user->userId !== Auth::id())
                                                     <a href="{{ route('incident-reports.create', ['reported_user' => $assignment->user->userId, 'task' => $task->taskId]) }}" 
-                                                       class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 text-xs font-medium"
+                                                       class="text-xs font-medium"
+                                                       style="color: #2B9D8D;"
+                                                       onmouseover="this.style.color='#248A7C';"
+                                                       onmouseout="this.style.color='#2B9D8D';"
                                                        title="Report this user">
-                                                        🚨 Report
+                                                        <i class="fas fa-exclamation-triangle"></i> Report
                                                     </a>
                                                 @endif
                                             </div>
                                         </div>
                                     @endforeach
                                 </div>
+                                
+                                <button type="button" onclick="openParticipantsModal()" class="w-full inline-flex justify-center items-center gap-2 px-4 py-2.5 text-sm font-semibold rounded-lg text-white shadow-md transition-all hover:shadow-lg transform hover:-translate-y-0.5"
+                                        style="background-color: #F3A261;"
+                                        onmouseover="this.style.backgroundColor='#E8944F'"
+                                        onmouseout="this.style.backgroundColor='#F3A261'">
+                                    <i class="fas fa-eye"></i>
+                                    View All ({{ $task->assignments->count() }})
+                                </button>
                             @else
-                                <p class="text-sm text-gray-500 dark:text-gray-400">No participants yet.</p>
+                                <div class="text-center py-8">
+                                    <i class="fas fa-users-slash text-gray-300 text-3xl mb-3"></i>
+                                    <p class="text-sm text-gray-500 font-medium">No participants yet.</p>
+                                </div>
                             @endif
                         </div>
                     </div>
@@ -729,31 +855,157 @@
         </div>
     </div>
 
+    @if($showAdminLayout)
+    <!-- Participants Modal for Creator Layout -->
+    <div id="participants-modal" class="fixed inset-0 z-50 hidden" aria-hidden="true" style="backdrop-filter: blur(4px);">
+        <div class="absolute inset-0 bg-black/50" onclick="closeParticipantsModal()"></div>
+        <div class="absolute inset-0 flex items-center justify-center p-4">
+            <div class="w-full max-w-3xl bg-white rounded-2xl shadow-2xl overflow-hidden border-2 border-orange-300 transform transition-all max-h-[90vh] flex flex-col">
+                <!-- Modal Header -->
+                <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between" style="background: linear-gradient(135deg, #F3A261 0%, #F3A261 100%);">
+                    <div class="flex items-center gap-3">
+                        <i class="fas fa-users text-white text-xl"></i>
+                        <h3 class="text-xl font-bold text-white">All Participants</h3>
+                        <span class="px-3 py-1 bg-white/20 text-white text-sm font-bold rounded-full">
+                            {{ $task->assignments->count() }}
+                        </span>
+                    </div>
+                    <button type="button" class="text-white hover:text-gray-200 transition-colors" onclick="closeParticipantsModal()" aria-label="Close modal">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                
+                <!-- Modal Content -->
+                <div class="flex-1 overflow-y-auto px-6 py-4">
+                    @if($task->assignments->count() > 0)
+                        <div class="space-y-3">
+                            @foreach($task->assignments as $assignment)
+                                @php
+                                    $firstName = $assignment->user->firstName ?? '';
+                                    $lastName = $assignment->user->lastName ?? '';
+                                    $initials = strtoupper(
+                                        (!empty($firstName) ? substr($firstName, 0, 1) : '') . 
+                                        (!empty($lastName) ? substr($lastName, 0, 1) : '')
+                                    );
+                                    if (empty($initials)) {
+                                        $initials = strtoupper(substr($assignment->user->name ?? 'U', 0, 1));
+                                    }
+                                @endphp
+                                <div class="flex items-center justify-between p-4 bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+                                    <div class="flex items-center space-x-3 flex-1 min-w-0">
+                                        <div class="h-12 w-12 rounded-full flex items-center justify-center flex-shrink-0 shadow-md" style="background: linear-gradient(135deg, #F3A261 0%, #F3A261 100%);">
+                                            <span class="text-base font-bold text-white">
+                                                {{ $initials }}
+                                            </span>
+                                        </div>
+                                        <div class="min-w-0 flex-1">
+                                            <p class="text-sm font-semibold text-gray-900">{{ $assignment->user->name }}</p>
+                                            <p class="text-xs text-gray-500">{{ $assignment->user->email }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center space-x-2 flex-shrink-0 ml-3 flex-wrap justify-end gap-2">
+                                        <span class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-full
+                                            @if($assignment->status === 'assigned') bg-orange-100 text-orange-800
+                                            @elseif($assignment->status === 'submitted') bg-yellow-100 text-yellow-800
+                                            @elseif($assignment->status === 'completed') bg-teal-100 text-teal-800
+                                            @endif">
+                                            <i class="fas 
+                                                @if($assignment->status === 'assigned') fa-user-check
+                                                @elseif($assignment->status === 'submitted') fa-paper-plane
+                                                @elseif($assignment->status === 'completed') fa-check-circle
+                                                @endif"></i>
+                                            {{ ucfirst($assignment->status) }}
+                                        </span>
+                                        @if(!empty($assignment->progress))
+                                        <span class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-full
+                                            @switch($assignment->progress)
+                                                @case('accepted') bg-gray-100 text-gray-800 @break
+                                                @case('on_the_way') bg-purple-100 text-purple-800 @break
+                                                @case('working') bg-indigo-100 text-indigo-800 @break
+                                                @case('done') bg-teal-100 text-teal-800 @break
+                                                @case('submitted_proof') bg-orange-100 text-orange-800 @break
+                                                @default bg-gray-100 text-gray-800
+                                            @endswitch">
+                                            <i class="fas 
+                                                @if($assignment->progress === 'accepted') fa-handshake
+                                                @elseif($assignment->progress === 'on_the_way') fa-route
+                                                @elseif($assignment->progress === 'working') fa-tools
+                                                @elseif($assignment->progress === 'done') fa-clipboard-check
+                                                @elseif($assignment->progress === 'submitted_proof') fa-file-upload
+                                                @endif"></i>
+                                            {{ ucfirst(str_replace('_',' ', $assignment->progress)) }}
+                                        </span>
+                                        @endif
+                                        @if($assignment->status === 'submitted')
+                                            <a href="{{ route('tasks.creator.show', $assignment) }}" class="text-sm text-blue-600 hover:text-blue-800">
+                                                <i class="fas fa-eye"></i> Review
+                                            </a>
+                                        @endif
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    @else
+                        <div class="text-center py-12">
+                            <i class="fas fa-users-slash text-gray-300 text-4xl mb-4"></i>
+                            <p class="text-sm text-gray-500 font-medium">No users have joined this task yet.</p>
+                        </div>
+                    @endif
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript for Participants Modal -->
+    <script>
+        function openParticipantsModal() {
+            const modal = document.getElementById('participants-modal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function closeParticipantsModal() {
+            const modal = document.getElementById('participants-modal');
+            if (modal) {
+                modal.classList.add('hidden');
+                document.body.style.overflow = '';
+            }
+        }
+
+        // Close on ESC key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeParticipantsModal();
+            }
+        });
+    </script>
+    @endif
+
     @if(!$showAdminLayout)
     <!-- Progress Confirmation Modal -->
     <div id="progressModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4" style="display: none;">
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full transform transition-all">
+        <div class="bg-white rounded-lg shadow-xl max-w-md w-full transform transition-all">
             <div class="p-6">
                 <div class="flex items-center mb-4">
-                    <div class="flex-shrink-0 w-12 h-12 bg-orange-100 dark:bg-orange-900/30 rounded-full flex items-center justify-center">
-                        <svg class="w-6 h-6 text-orange-600 dark:text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
+                    <div class="flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center shadow-lg" style="background: linear-gradient(135deg, #F3A261 0%, #F3A261 100%);">
+                        <i class="fas fa-check-circle text-white text-xl"></i>
                     </div>
-                    <h3 class="ml-4 text-lg font-semibold text-gray-900 dark:text-white">Update Task Progress</h3>
+                    <h3 class="ml-4 text-lg font-semibold text-gray-900">Update Task Progress</h3>
                 </div>
-                <p class="text-gray-700 dark:text-gray-300 mb-6">
-                    Are you sure you want to move progress to <span id="modalProgressLabel" class="font-semibold text-orange-600 dark:text-orange-400"></span>?
+                <p class="text-gray-700 mb-6">
+                    Are you sure you want to move progress to <span id="modalProgressLabel" class="font-semibold" style="color: #F3A261;"></span>?
                 </p>
                 <div class="flex justify-end space-x-3">
                     <button type="button" 
                             onclick="closeProgressModal()" 
-                            class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors font-medium">
+                            class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors font-medium">
                         Cancel
                     </button>
                     <button type="button" 
                             onclick="confirmProgressUpdate()" 
-                            class="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors font-medium">
+                            class="px-4 py-2 text-white rounded-lg shadow-md transition-colors font-medium brand-primary-btn">
                         Confirm
                     </button>
                 </div>
@@ -811,31 +1063,46 @@
             const detailsContent = document.getElementById('details-content');
             const participantsContent = document.getElementById('participants-content');
 
+            // Initialize with Details tab active
+            function setActiveTab(tab) {
+                if (tab === 'details') {
+                    detailsTab.style.borderColor = '#F3A261';
+                    detailsTab.classList.add('text-gray-900', 'font-bold');
+                    detailsTab.classList.remove('text-gray-500', 'font-semibold');
+                    
+                    participantsTab.style.borderColor = 'transparent';
+                    participantsTab.classList.remove('text-gray-900', 'font-bold');
+                    participantsTab.classList.add('text-gray-500', 'font-semibold');
+                    
+                    detailsContent.classList.remove('hidden');
+                    participantsContent.classList.add('hidden');
+                } else {
+                    participantsTab.style.borderColor = '#F3A261';
+                    participantsTab.classList.add('text-gray-900', 'font-bold');
+                    participantsTab.classList.remove('text-gray-500', 'font-semibold');
+                    
+                    detailsTab.style.borderColor = 'transparent';
+                    detailsTab.classList.remove('text-gray-900', 'font-bold');
+                    detailsTab.classList.add('text-gray-500', 'font-semibold');
+                    
+                    participantsContent.classList.remove('hidden');
+                    detailsContent.classList.add('hidden');
+                }
+            }
+
             detailsTab.addEventListener('click', function() {
-                // Update tab styles
-                detailsTab.classList.add('border-orange-500', 'text-orange-600', 'dark:text-orange-400');
-                detailsTab.classList.remove('border-transparent', 'text-gray-500', 'dark:text-gray-400');
-                
-                participantsTab.classList.remove('border-orange-500', 'text-orange-600', 'dark:text-orange-400');
-                participantsTab.classList.add('border-transparent', 'text-gray-500', 'dark:text-gray-400');
-                
-                // Show/hide content
-                detailsContent.classList.remove('hidden');
-                participantsContent.classList.add('hidden');
+                setActiveTab('details');
             });
 
             participantsTab.addEventListener('click', function() {
-                // Update tab styles
-                participantsTab.classList.add('border-orange-500', 'text-orange-600', 'dark:text-orange-400');
-                participantsTab.classList.remove('border-transparent', 'text-gray-500', 'dark:text-gray-400');
-                
-                detailsTab.classList.remove('border-orange-500', 'text-orange-600', 'dark:text-orange-400');
-                detailsTab.classList.add('border-transparent', 'text-gray-500', 'dark:text-gray-400');
-                
-                // Show/hide content
-                participantsContent.classList.remove('hidden');
-                detailsContent.classList.add('hidden');
+                setActiveTab('participants');
             });
+
+            // Check URL parameter for tab preference, default to details
+            const urlParams = new URLSearchParams(window.location.search);
+            const tabParam = urlParams.get('tab');
+            const defaultTab = tabParam === 'participants' ? 'participants' : 'details';
+            setActiveTab(defaultTab);
 
             // Photo upload functionality (limit 3 files, require min 2 client-side)
             // Support multiple upload areas elsewhere, but prioritize in-form scoped elements to prevent conflicts
@@ -860,17 +1127,20 @@
                 // Drag and drop functionality
                 areaEl.addEventListener('dragover', function(e) {
                     e.preventDefault();
-                    areaEl.classList.add('border-blue-400', 'bg-blue-50', 'dark:bg-blue-900/20');
+                    areaEl.style.borderColor = '#2B9D8D';
+                    areaEl.style.backgroundColor = 'rgba(43, 157, 141, 0.1)';
                 });
 
                 areaEl.addEventListener('dragleave', function(e) {
                     e.preventDefault();
-                    areaEl.classList.remove('border-blue-400', 'bg-blue-50', 'dark:bg-blue-900/20');
+                    areaEl.style.borderColor = '';
+                    areaEl.style.backgroundColor = '';
                 });
 
                 areaEl.addEventListener('drop', function(e) {
                     e.preventDefault();
-                    areaEl.classList.remove('border-blue-400', 'bg-blue-50', 'dark:bg-blue-900/20');
+                    areaEl.style.borderColor = '';
+                    areaEl.style.backgroundColor = '';
                     
                     let newFiles = e.dataTransfer.files;
                     if (newFiles.length > 0) {
@@ -1066,6 +1336,121 @@
         document.addEventListener('click', function(e) { const modal = document.getElementById('imageModal'); if (e.target === modal) { closeImageModal(); } });
         document.addEventListener('keydown', function(e) { const modal = document.getElementById('imageModal'); if (modal && !modal.classList.contains('hidden')) { if (e.key === 'Escape') closeImageModal(); if (e.key === 'ArrowLeft') previousImage(); if (e.key === 'ArrowRight') nextImage(); } });
     </script>
+    
+    <!-- Participants Modal for Regular User Layout -->
+    <div id="participants-modal" class="fixed inset-0 z-50 hidden" aria-hidden="true" style="backdrop-filter: blur(4px);">
+        <div class="absolute inset-0 bg-black/50" onclick="closeParticipantsModal()"></div>
+        <div class="absolute inset-0 flex items-center justify-center p-4">
+            <div class="w-full max-w-3xl bg-white rounded-2xl shadow-2xl overflow-hidden border-2 border-orange-300 transform transition-all max-h-[90vh] flex flex-col">
+                <!-- Modal Header -->
+                <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between" style="background: linear-gradient(135deg, #F3A261 0%, #F3A261 100%);">
+                    <div class="flex items-center gap-3">
+                        <i class="fas fa-users text-white text-xl"></i>
+                        <h3 class="text-xl font-bold text-white">All Participants</h3>
+                        <span class="px-3 py-1 bg-white/20 text-white text-sm font-bold rounded-full">
+                            @if($task->max_participants !== null)
+                                {{ $task->assignments->count() }} / {{ $task->max_participants }}
+                            @else
+                                {{ $task->assignments->count() }}
+                            @endif
+                        </span>
+                    </div>
+                    <button type="button" class="text-white hover:text-gray-200 transition-colors" onclick="closeParticipantsModal()" aria-label="Close modal">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                
+                <!-- Modal Content -->
+                <div class="flex-1 overflow-y-auto px-6 py-4">
+                    @if($task->assignments->count() > 0)
+                        <div class="space-y-3">
+                            @foreach($task->assignments as $assignment)
+                                @php
+                                    $firstName = $assignment->user->firstName ?? '';
+                                    $lastName = $assignment->user->lastName ?? '';
+                                    $initials = strtoupper(
+                                        (!empty($firstName) ? substr($firstName, 0, 1) : '') . 
+                                        (!empty($lastName) ? substr($lastName, 0, 1) : '')
+                                    );
+                                    if (empty($initials)) {
+                                        $initials = strtoupper(substr($assignment->user->name ?? 'U', 0, 1));
+                                    }
+                                @endphp
+                                <div class="flex items-center justify-between p-4 bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+                                    <div class="flex items-center space-x-3 flex-1 min-w-0">
+                                        <div class="h-12 w-12 rounded-full flex items-center justify-center flex-shrink-0 shadow-md" style="background: linear-gradient(135deg, #F3A261 0%, #F3A261 100%);">
+                                            <span class="text-base font-bold text-white">
+                                                {{ $initials }}
+                                            </span>
+                                        </div>
+                                        <div class="min-w-0 flex-1">
+                                            <p class="text-sm font-semibold text-gray-900 truncate">{{ $assignment->user->name ?? 'Unknown User' }}</p>
+                                            <p class="text-xs text-gray-500 truncate">{{ $assignment->user->email ?? '' }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center space-x-2 flex-shrink-0 ml-3 flex-wrap justify-end gap-2">
+                                        <span class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-full
+                                            @if($assignment->status === 'assigned') bg-orange-100 text-orange-800
+                                            @elseif($assignment->status === 'submitted') bg-yellow-100 text-yellow-800
+                                            @elseif($assignment->status === 'completed') bg-teal-100 text-teal-800
+                                            @endif">
+                                            <i class="fas 
+                                                @if($assignment->status === 'assigned') fa-user-check
+                                                @elseif($assignment->status === 'submitted') fa-paper-plane
+                                                @elseif($assignment->status === 'completed') fa-check-circle
+                                                @endif"></i>
+                                            {{ ucfirst($assignment->status) }}
+                                        </span>
+                                        @if($assignment->user->userId !== Auth::id())
+                                            <a href="{{ route('incident-reports.create', ['reported_user' => $assignment->user->userId, 'task' => $task->taskId]) }}" 
+                                               class="text-red-600 hover:text-red-800 text-xs font-medium"
+                                               title="Report this user">
+                                                <i class="fas fa-exclamation-triangle"></i> Report
+                                            </a>
+                                        @endif
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    @else
+                        <div class="text-center py-12">
+                            <i class="fas fa-users-slash text-gray-300 text-4xl mb-4"></i>
+                            <p class="text-sm text-gray-500 font-medium">No users have joined this task yet.</p>
+                        </div>
+                    @endif
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript for Participants Modal -->
+    <script>
+        function openParticipantsModal() {
+            const modal = document.getElementById('participants-modal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function closeParticipantsModal() {
+            const modal = document.getElementById('participants-modal');
+            if (modal) {
+                modal.classList.add('hidden');
+                document.body.style.overflow = '';
+            }
+        }
+
+        // Close on ESC key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                const participantsModal = document.getElementById('participants-modal');
+                if (participantsModal && !participantsModal.classList.contains('hidden')) {
+                    closeParticipantsModal();
+                }
+            }
+        });
+    </script>
     @endif
 
     <!-- Tap & Pass Nomination Modal -->
@@ -1079,27 +1464,23 @@
 
     <!-- Nomination Confirmation Modal -->
     <div id="nominationConfirmModal" class="fixed inset-0 bg-black bg-opacity-50 z-[60] hidden flex items-center justify-center p-4" style="display: none;">
-        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full transform transition-all">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full transform transition-all">
             <div class="p-6">
                 <div class="flex items-center mb-4">
-                    <div class="flex-shrink-0 w-12 h-12 rounded-full bg-gradient-to-br from-orange-500 to-teal-500 flex items-center justify-center shadow-lg">
-                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
+                    <div class="flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center shadow-lg" style="background: linear-gradient(135deg, #F3A261 0%, #F3A261 100%);">
+                        <i class="fas fa-question-circle text-white text-xl"></i>
                     </div>
-                    <h3 class="ml-4 text-xl font-bold text-gray-900 dark:text-white">Confirm Nomination</h3>
+                    <h3 class="ml-4 text-xl font-bold text-gray-900">Confirm Nomination</h3>
                 </div>
-                <p class="text-gray-700 dark:text-gray-300 mb-6">
-                    Send this nomination? You will earn <span class="font-bold text-orange-600 dark:text-orange-400">1 point</span> for using Tap & Pass.
+                <p class="text-gray-700 mb-6">
+                    Send this nomination? You will earn <span class="font-bold" style="color: #F3A261;">1 point</span> for using Tap & Pass.
                 </p>
                 <div class="flex justify-end space-x-3">
-                    <button type="button" onclick="closeNominationConfirmModal()" class="inline-flex items-center justify-center gap-2 px-6 py-2.5 text-sm font-bold rounded-xl border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200 shadow-sm hover:shadow-md">
+                    <button type="button" onclick="closeNominationConfirmModal()" class="inline-flex items-center justify-center gap-2 px-6 py-2.5 text-sm font-bold rounded-xl border-2 border-gray-300 text-gray-700 bg-white hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow-md">
                         Cancel
                     </button>
-                    <button type="button" onclick="confirmNominationSubmit()" class="inline-flex items-center justify-center gap-2 px-8 py-2.5 text-sm font-bold rounded-xl text-white bg-gradient-to-r from-orange-600 to-teal-500 hover:from-orange-700 hover:to-teal-600 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 focus:ring-2 focus:ring-orange-400 focus:ring-offset-2">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
-                        </svg>
+                    <button type="button" onclick="confirmNominationSubmit()" class="inline-flex items-center justify-center gap-2 px-8 py-2.5 text-sm font-bold rounded-xl text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 focus:ring-2 focus:ring-orange-400 focus:ring-offset-2 brand-primary-btn">
+                        <i class="fas fa-paper-plane"></i>
                         Confirm & Send
                     </button>
                 </div>
@@ -1145,14 +1526,14 @@
                 console.error('Error loading nomination form:', error);
                 modalContent.innerHTML = `
                     <div class="px-6 py-12 text-center">
-                        <div class="text-red-600 dark:text-red-400 mb-4">
+                        <div class="dark:text-red-400 mb-4" style="color: #2B9D8D;">
                             <svg class="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                             </svg>
                         </div>
                         <p class="text-gray-900 dark:text-white font-semibold mb-2">Error loading form</p>
                         <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">Unable to load the nomination form. Please try again.</p>
-                        <button onclick="closeNominationModal()" class="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg transition-colors">
+                        <button onclick="closeNominationModal()" class="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg transition-colors" style="color: white !important;">
                             Close
                         </button>
                     </div>
@@ -1219,4 +1600,48 @@
         });
 
     </script>
+
+    <!-- Custom Scrollbar Styling -->
+    <style>
+        /* Brand Primary Button */
+        .brand-primary-btn {
+            background-color: #F3A261;
+            box-shadow: 0 4px 15px rgba(243, 162, 97, 0.3);
+        }
+        .brand-primary-btn:hover {
+            background-color: #E8944F;
+            box-shadow: 0 6px 20px rgba(243, 162, 97, 0.4);
+            transform: translateY(-1px);
+        }
+        
+        /* Custom Scrollbar for Participants Section */
+        .overflow-y-auto::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .overflow-y-auto::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        
+        .overflow-y-auto::-webkit-scrollbar-thumb {
+            background-color: #F3A261;
+            border-radius: 10px;
+        }
+        
+        .overflow-y-auto::-webkit-scrollbar-thumb:hover {
+            background-color: #E8944F;
+        }
+        
+        /* Firefox Scrollbar */
+        .overflow-y-auto {
+            scrollbar-width: thin;
+            scrollbar-color: #F3A261 #f1f1f1;
+        }
+        
+        /* Smooth transitions */
+        .brand-primary-btn {
+            transition: all 0.3s ease;
+        }
+    </style>
 </x-app-layout>

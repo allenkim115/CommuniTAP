@@ -8,12 +8,15 @@
             <div class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
                 <div class="p-6 text-gray-900">
                     @if(session('status'))
-                        <div class="mb-4 text-green-600">{{ session('status') }}</div>
+                        <div class="mb-4" style="color: #2B9D8D;">{{ session('status') }}</div>
                     @endif
 
                     <div class="flex justify-between items-center mb-6">
                         <h3 class="text-lg font-semibold text-gray-900">Manage Rewards</h3>
-                        <a href="{{ route('admin.rewards.create') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors">
+                        <a href="{{ route('admin.rewards.create') }}" class="inline-flex items-center gap-2 px-4 py-2 text-white text-sm font-medium rounded-lg transition-colors"
+                           style="background-color: #F3A261;"
+                           onmouseover="this.style.backgroundColor='#E8944F'"
+                           onmouseout="this.style.backgroundColor='#F3A261'">
                             <i class="fas fa-plus"></i>
                             Create Reward
                         </a>
@@ -33,7 +36,7 @@
                                     <span class="text-gray-600">Qty left:</span>
                                     <span class="font-medium text-gray-900">{{ $reward->QTY }}</span>
                                     @if($reward->QTY === 0)
-                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">Out of stock</span>
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium" style="background-color: rgba(43, 157, 141, 0.2); color: #2B9D8D;">Out of stock</span>
                                     @endif
                                 </div>
                                 <div class="mt-4 flex gap-2">
@@ -44,7 +47,10 @@
                                     <form action="{{ route('admin.rewards.destroy', $reward) }}" method="POST" id="delete-reward-form-{{ $reward->id }}" class="inline">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="button" onclick="showConfirmModal('Delete this reward?', 'Delete Reward', 'Delete', 'Cancel', 'red').then(confirmed => { if(confirmed) document.getElementById('delete-reward-form-{{ $reward->id }}').submit(); });" class="inline-flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg transition-colors">
+                                        <button type="button" onclick="showConfirmModal('Delete this reward?', 'Delete Reward', 'Delete', 'Cancel', 'red').then(confirmed => { if(confirmed) document.getElementById('delete-reward-form-{{ $reward->id }}').submit(); });" class="inline-flex items-center gap-2 px-4 py-2 text-white text-sm font-medium rounded-lg transition-colors"
+                                                style="background-color: #2B9D8D;"
+                                                onmouseover="this.style.backgroundColor='#248A7C'"
+                                                onmouseout="this.style.backgroundColor='#2B9D8D'">
                                             <i class="fas fa-trash"></i>
                                             Delete
                                         </button>

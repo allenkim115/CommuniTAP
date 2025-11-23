@@ -16,7 +16,7 @@
         extend: {
           fontFamily: { sans: ['Inter', 'sans-serif'] },
           colors: {
-            primary: '#F53003',
+            primary: '#F3A261',
             dark: '#1B1B18',
             muted: '#706F6C',
             light: '#FDFDFC',
@@ -39,7 +39,7 @@
     .hero-illustration { view-transition-name: hero-illustration; }
     .btn-primary:hover {
       transform: translateY(-2px);
-      box-shadow: 0 8px 20px -4px rgba(245,48,3,0.25);
+      box-shadow: 0 8px 20px -4px rgba(243,162,97,0.25);
     }
   </style>
 </head>

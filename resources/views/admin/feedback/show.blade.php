@@ -18,25 +18,25 @@
                 <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">{{ $task->description }}</p>
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                     <div class="flex items-center space-x-2">
-                        <svg class="w-4 h-4 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20" style="color: #FED2B3;">
                             <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
                         </svg>
                         <span class="text-gray-600 dark:text-gray-400"><strong>Points:</strong> {{ $task->points_awarded }}</span>
                     </div>
                     <div class="flex items-center space-x-2">
-                        <svg class="w-4 h-4 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20" style="color: #2B9D8D;">
                             <path fill-rule="evenodd" d="M4 4a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2H4zm2 6a2 2 0 114 0 2 2 0 01-4 0zm8 0a2 2 0 114 0 2 2 0 01-4 0z" clip-rule="evenodd"></path>
                         </svg>
                         <span class="text-gray-600 dark:text-gray-400"><strong>Type:</strong> {{ ucfirst(str_replace('_', ' ', $task->task_type)) }}</span>
                     </div>
                     <div class="flex items-center space-x-2">
-                        <svg class="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20" style="color: #2B9D8D;">
                             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
                         </svg>
                         <span class="text-gray-600 dark:text-gray-400"><strong>Status:</strong> {{ ucfirst($task->status) }}</span>
                     </div>
                     <div class="flex items-center space-x-2">
-                        <svg class="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: #2B9D8D;">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                         </svg>
                         <span class="text-gray-600 dark:text-gray-400"><strong>Participants:</strong> {{ $task->assignments->count() }}</span>
@@ -51,7 +51,7 @@
                 <!-- User Feedback Column -->
                 <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
                     <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
-                        <svg class="w-5 h-5 mr-2 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: #2B9D8D;">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                         </svg>
                         User Feedback ({{ $userFeedback->count() }})
@@ -75,7 +75,7 @@
                                         </div>
                                         <div class="flex items-center space-x-1">
                                             @for($i = 1; $i <= 5; $i++)
-                                                <svg class="w-4 h-4 {{ $i <= $feedback->rating ? 'text-yellow-400' : 'text-gray-300' }}" fill="currentColor" viewBox="0 0 20 20">
+                                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20" style="color: {{ $i <= $feedback->rating ? '#FED2B3' : '#D1D5DB' }};">
                                                     <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
                                                 </svg>
                                             @endfor

@@ -127,6 +127,7 @@ class TaskController extends Controller
 
         // Filter user tasks based on selected filter
         $filteredTasks = collect();
+        $today = \Carbon\Carbon::today(); // Define once for use in filtering and stats
         
         switch($filter) {
             case 'available':
@@ -139,22 +140,63 @@ class TaskController extends Controller
                 $filteredTasks = $userTasks->where('pivot.status', 'submitted');
                 break;
             case 'completed':
-                $filteredTasks = $userTasks->where('pivot.status', 'completed');
+                // Only show tasks completed today
+                $filteredTasks = $userTasks->filter(function($task) use ($today) {
+                    if ($task->pivot->status !== 'completed') {
+                        return false;
+                    }
+                    if (!$task->pivot->completed_at) {
+                        return false;
+                    }
+                    $completedDate = \Carbon\Carbon::parse($task->pivot->completed_at);
+                    return $completedDate->isSameDay($today);
+                });
                 break;
             case 'all':
-                $filteredTasks = $userTasks->merge($availableTasks);
+                // For "all" tab, only show completed tasks from today
+                $filteredUserTasks = $userTasks->filter(function($task) use ($today) {
+                    // If task is completed, only include if completed today
+                    if ($task->pivot->status === 'completed') {
+                        if (!$task->pivot->completed_at) {
+                            return false;
+                        }
+                        $completedDate = \Carbon\Carbon::parse($task->pivot->completed_at);
+                        return $completedDate->isSameDay($today);
+                    }
+                    // Include all other statuses (assigned, submitted, etc.)
+                    return true;
+                });
+                $filteredTasks = $filteredUserTasks->merge($availableTasks);
                 break;
             default:
                 $filteredTasks = $availableTasks;
         }
 
         // Task statistics for display
+        // For completed tasks, only count those completed today
+        $completedTodayCount = $userTasks->filter(function($task) use ($today) {
+            if ($task->pivot->status !== 'completed') {
+                return false;
+            }
+            if (!$task->pivot->completed_at) {
+                return false;
+            }
+            $completedDate = \Carbon\Carbon::parse($task->pivot->completed_at);
+            return $completedDate->isSameDay($today);
+        })->count();
+
+        // Calculate "all" count: available + assigned + submitted + completed today
+        $allCount = $availableTasks->count() 
+            + $userTasks->where('pivot.status', 'assigned')->count()
+            + $userTasks->where('pivot.status', 'submitted')->count()
+            + $completedTodayCount;
+
         $taskStats = [
             'available' => $availableTasks->count(),
             'assigned' => $userTasks->where('pivot.status', 'assigned')->count(),
             'submitted' => $userTasks->where('pivot.status', 'submitted')->count(),
-            'completed' => $userTasks->where('pivot.status', 'completed')->count(),
-            'all' => $userTasks->count() + $availableTasks->count()
+            'completed' => $completedTodayCount,
+            'all' => $allCount
         ];
 
         return view('tasks.index', compact('userTasks', 'availableTasks', 'filteredTasks', 'filter', 'taskStats'));
@@ -171,10 +213,22 @@ class TaskController extends Controller
         $search = trim((string) $request->get('q', ''));
 
         // Base query for this user's uploaded tasks
-        // Exclude inactive tasks (they should be shown as draft/cancelled instead)
+        // Include inactive tasks that have been edited (they should be shown as pending/waiting for publishing)
         $query = Task::where('task_type', 'user_uploaded')
             ->where('FK1_userId', $user->userId)
-            ->where('status', '!=', 'inactive') // Exclude inactive tasks
+            ->where(function($q) {
+                // Include non-inactive tasks, or inactive tasks that have been edited (updated after deactivation)
+                $q->where('status', '!=', 'inactive')
+                  ->orWhere(function($subQ) {
+                      $subQ->where('status', 'inactive')
+                           ->where(function($inactiveQ) {
+                               // Include inactive tasks that have been edited (updated_at > deactivated_at)
+                               // or inactive tasks without deactivated_at (treated as edited)
+                               $inactiveQ->whereColumn('updated_at', '>', 'deactivated_at')
+                                        ->orWhereNull('deactivated_at');
+                           });
+                  });
+            })
             ->with(['assignments.user', 'assignedUser']);
 
         // Apply status filter
@@ -198,14 +252,39 @@ class TaskController extends Controller
         $uploads = $query->orderByDesc('created_at')->get();
 
         // Stats based on all tasks (ignoring current filters), used for tiles
-        // Exclude inactive tasks
+        // Include inactive tasks that have been edited (they count as pending)
         $allForStats = Task::where('task_type', 'user_uploaded')
             ->where('FK1_userId', $user->userId)
-            ->where('status', '!=', 'inactive')
+            ->where(function($q) {
+                // Include non-inactive tasks, or inactive tasks that have been edited (updated after deactivation)
+                $q->where('status', '!=', 'inactive')
+                  ->orWhere(function($subQ) {
+                      $subQ->where('status', 'inactive')
+                           ->where(function($inactiveQ) {
+                               // Include inactive tasks that have been edited (updated_at > deactivated_at)
+                               // or inactive tasks without deactivated_at (treated as edited)
+                               $inactiveQ->whereColumn('updated_at', '>', 'deactivated_at')
+                                        ->orWhereNull('deactivated_at');
+                           });
+                  });
+            })
             ->get();
 
+        // Count tasks, treating edited inactive tasks as pending
+        $pendingCount = $allForStats->filter(function($task) {
+            if ($task->status === 'pending') return true;
+            // Count inactive tasks that have been edited as pending
+            if ($task->status === 'inactive') {
+                if ($task->deactivated_at) {
+                    return $task->updated_at > $task->deactivated_at;
+                }
+                return true; // No deactivated_at means treated as edited
+            }
+            return false;
+        })->count();
+
         $stats = [
-            'pending' => $allForStats->where('status', 'pending')->count(),
+            'pending' => $pendingCount,
             'live' => $allForStats->whereIn('status', ['approved', 'published'])->count(),
             'rejected' => $allForStats->where('status', 'rejected')->count(),
             'completed' => $allForStats->where('status', 'completed')->count(),
@@ -393,6 +472,92 @@ class TaskController extends Controller
             $statusMessage .= ". Maximum attempts (3) reached - this submission is now closed.";
         }
         return redirect()->route('tasks.creator.submissions')->with('status', $statusMessage);
+    }
+
+    /**
+     * Display history of completed and rejected submissions for user-uploaded tasks
+     */
+    public function creatorHistory(Request $request)
+    {
+        $user = Auth::user();
+        $type = $request->get('type', 'completed'); // 'completed' or 'rejected'
+        $search = $request->get('search');
+        $taskType = $request->get('task_type');
+        
+        // Only show submissions for tasks created by this user and are user_uploaded
+        $query = TaskAssignment::with(['task', 'user'])
+            ->whereHas('task', function ($q) use ($user) {
+                $q->where('task_type', 'user_uploaded')
+                  ->where('FK1_userId', $user->userId);
+            });
+
+        // Apply search filter
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('task', function ($taskQuery) use ($search) {
+                    $taskQuery->where('title', 'LIKE', '%' . $search . '%')
+                              ->orWhere('description', 'LIKE', '%' . $search . '%');
+                })
+                ->orWhereHas('user', function ($userQuery) use ($search) {
+                    $userQuery->where('name', 'LIKE', '%' . $search . '%')
+                              ->orWhere('email', 'LIKE', '%' . $search . '%');
+                });
+            });
+        }
+
+        // Apply task type filter (note: user_uploaded tasks don't have different task_types, but keeping for consistency)
+        if ($taskType && $taskType !== 'all') {
+            $query->whereHas('task', function ($q) use ($taskType) {
+                $q->where('task_type', $taskType);
+            });
+        }
+
+        if ($type === 'completed') {
+            $submissions = $query->where('status', 'completed')
+                ->orderBy('completed_at', 'desc')
+                ->paginate(15)
+                ->appends($request->query());
+        } else {
+            // Rejected submissions: status is 'uncompleted' with 3+ rejections, or 'assigned' with rejection_count >= 3
+            $submissions = $query->where(function ($q) {
+                    $q->where(function ($q2) {
+                        $q2->where('status', 'uncompleted')
+                           ->where('rejection_count', '>=', 3);
+                    })->orWhere(function ($q2) {
+                        $q2->where('status', 'assigned')
+                           ->where('rejection_count', '>=', 3);
+                    });
+                })
+                ->whereNotNull('rejection_reason')
+                ->orderBy('updated_at', 'desc')
+                ->paginate(15)
+                ->appends($request->query());
+        }
+
+        // Get statistics
+        $stats = [
+            'total_completed' => TaskAssignment::where('status', 'completed')
+                ->whereHas('task', function ($q) use ($user) {
+                    $q->where('task_type', 'user_uploaded')
+                      ->where('FK1_userId', $user->userId);
+                })->count(),
+            'total_rejected' => TaskAssignment::where(function ($q) {
+                    $q->where(function ($q2) {
+                        $q2->where('status', 'uncompleted')
+                           ->where('rejection_count', '>=', 3);
+                    })->orWhere(function ($q2) {
+                        $q2->where('status', 'assigned')
+                           ->where('rejection_count', '>=', 3);
+                    });
+                })
+                ->whereNotNull('rejection_reason')
+                ->whereHas('task', function ($q) use ($user) {
+                    $q->where('task_type', 'user_uploaded')
+                      ->where('FK1_userId', $user->userId);
+                })->count(),
+        ];
+
+        return view('tasks.creator_submissions_history', compact('submissions', 'type', 'stats'));
     }
 
     /**
@@ -643,6 +808,20 @@ class TaskController extends Controller
             }
         }
 
+        // Determine status based on action
+        $isUncompleted = !in_array($task->status, ['completed']) && !in_array($task->status, ['approved', 'published']);
+        $isInactive = $task->status === 'inactive';
+        $action = $request->input('action', 'update');
+        
+        // For uncompleted or inactive tasks, allow choosing between pending and published
+        if (($isUncompleted || $isInactive) && $action === 'publish') {
+            $newStatus = 'published';
+            $message = "Task '{$task->title}' has been updated and published successfully.";
+        } else {
+            $newStatus = 'pending';
+            $message = "Task '{$task->title}' has been updated and resubmitted for admin approval. Changes will be reviewed before publishing.";
+        }
+
         $task->update([
             'title' => $request->title,
             'description' => $request->description,
@@ -651,10 +830,10 @@ class TaskController extends Controller
             'start_time' => $request->start_time,
             'end_time' => $request->end_time,
             'location' => $request->location,
-            'status' => 'pending', // Reset to pending after edit
+            'status' => $newStatus,
         ]);
 
-        return redirect()->route('tasks.my-uploads')->with('status', "Task '{$task->title}' has been updated and resubmitted for admin approval. Changes will be reviewed before publishing.");
+        return redirect()->route('tasks.my-uploads')->with('status', $message);
     }
 
     /**

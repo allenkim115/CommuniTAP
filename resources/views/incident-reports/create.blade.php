@@ -105,7 +105,10 @@
                                 Cancel
                             </a>
                             <button type="submit" 
-                                    class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                                    class="text-white font-bold py-2 px-4 rounded transition-colors"
+                                    style="background-color: #2B9D8D;"
+                                    onmouseover="this.style.backgroundColor='#248A7C'"
+                                    onmouseout="this.style.backgroundColor='#2B9D8D'"
                                     id="submit-button">
                                 Submit Report
                             </button>
@@ -133,11 +136,11 @@
             if (isValid) {
                 submitButton.disabled = false;
                 submitButton.classList.remove('opacity-50', 'cursor-not-allowed');
-                submitButton.classList.add('hover:bg-red-700');
+                submitButton.style.backgroundColor = '#248A7C';
             } else {
                 submitButton.disabled = true;
                 submitButton.classList.add('opacity-50', 'cursor-not-allowed');
-                submitButton.classList.remove('hover:bg-red-700');
+                submitButton.style.backgroundColor = '#2B9D8D';
             }
             
 			// Silent validation (no debug UI)
@@ -268,11 +271,12 @@
 			if (!area || !input) return;
 
 			area.addEventListener('click', () => input.click());
-			area.addEventListener('dragover', (e) => { e.preventDefault(); area.classList.add('border-blue-400','bg-blue-50','dark:bg-blue-900/20'); });
-			area.addEventListener('dragleave', (e) => { e.preventDefault(); area.classList.remove('border-blue-400','bg-blue-50','dark:bg-blue-900/20'); });
+			area.addEventListener('dragover', (e) => { e.preventDefault(); area.style.borderColor = '#2B9D8D'; area.style.backgroundColor = 'rgba(43, 157, 141, 0.1)'; });
+			area.addEventListener('dragleave', (e) => { e.preventDefault(); area.style.borderColor = ''; area.style.backgroundColor = ''; });
 			area.addEventListener('drop', (e) => {
 				e.preventDefault();
-				area.classList.remove('border-blue-400','bg-blue-50','dark:bg-blue-900/20');
+				area.style.borderColor = '';
+				area.style.backgroundColor = '';
 				mergeAndRender(Array.from(e.dataTransfer.files || []).filter(f => f.type.startsWith('image/')));
 			});
 

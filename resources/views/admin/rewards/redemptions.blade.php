@@ -8,10 +8,10 @@
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
                     @if(session('status'))
-                        <div class="mb-4 text-green-600">{{ session('status') }}</div>
+                        <div class="mb-4" style="color: #2B9D8D;">{{ session('status') }}</div>
                     @endif
                     @if(session('error'))
-                        <div class="mb-4 text-red-600">{{ session('error') }}</div>
+                        <div class="mb-4" style="color: #2B9D8D;">{{ session('error') }}</div>
                     @endif
 
                     <div class="mb-6 p-4 bg-orange-50 dark:bg-gray-700/40 border border-orange-200 dark:border-gray-600 rounded-lg text-sm text-orange-700 dark:text-orange-300">
@@ -35,7 +35,8 @@
                                         <td class="py-2">{{ $red->user?->name }}</td>
                                         <td class="py-2">{{ $red->reward?->reward_name }}</td>
                                         <td class="py-2 capitalize">
-                                            <span class="px-2 py-1 rounded-full text-xs font-semibold {{ $red->status === 'approved' ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-700' }}">
+                                            <span class="px-2 py-1 rounded-full text-xs font-semibold {{ $red->status === 'approved' ? '' : 'bg-gray-200 text-gray-700' }}"
+                                                  @if($red->status === 'approved') style="background-color: rgba(43, 157, 141, 0.2); color: #2B9D8D;" @endif>
                                                 {{ $red->status }}
                                             </span>
                                         </td>

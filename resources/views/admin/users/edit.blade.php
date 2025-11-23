@@ -32,7 +32,10 @@
                         </div>
                     </div>
                     <div class="pt-4">
-                        <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium">Save</button>
+                        <button class="text-white px-4 py-2 rounded-md text-sm font-medium"
+                                style="background-color: #F3A261;"
+                                onmouseover="this.style.backgroundColor='#E8944F'"
+                                onmouseout="this.style.backgroundColor='#F3A261'">Save</button>
                     </div>
                 </form>
             </div>

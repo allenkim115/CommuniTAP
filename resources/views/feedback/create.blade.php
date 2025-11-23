@@ -2,8 +2,8 @@
     <x-slot name="header">
         <div class="flex justify-between items-center">
             <div class="flex items-center gap-3">
-                <div class="p-2 bg-orange-100 dark:bg-orange-900/30 rounded-lg">
-                    <svg class="w-6 h-6 text-orange-600 dark:text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="p-2 dark:bg-orange-900/30 rounded-lg" style="background-color: rgba(243, 162, 97, 0.1);">
+                    <svg class="w-6 h-6 dark:text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: #F3A261;">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
                     </svg>
                 </div>
@@ -25,8 +25,8 @@
             <!-- Task Info Card -->
             <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-6 mb-6 transform transition-all duration-300 hover:shadow-xl">
                 <div class="flex items-start gap-4">
-                    <div class="flex-shrink-0 p-3 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-                        <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="flex-shrink-0 p-3 dark:bg-blue-900/30 rounded-lg" style="background-color: rgba(43, 157, 141, 0.1);">
+                        <svg class="w-6 h-6 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: #2B9D8D;">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
                         </svg>
                     </div>
@@ -141,7 +141,10 @@
                             </svg>
                             Cancel
                         </a>
-                        <button type="submit" class="inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold text-white bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95">
+                        <button type="submit" class="inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold text-white rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95"
+                                style="background-color: #F3A261;"
+                                onmouseover="this.style.backgroundColor='#E8944F'"
+                                onmouseout="this.style.backgroundColor='#F3A261'">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                             </svg>
@@ -230,10 +233,12 @@
                 const length = commentTextarea.value.length;
                 charCount.textContent = length;
                 if (length > 500) {
-                    charCount.classList.add('text-orange-500', 'font-semibold');
+                    charCount.style.color = '#F3A261';
+                    charCount.classList.add('font-semibold');
                     charCount.classList.remove('text-gray-400', 'dark:text-gray-500');
                 } else {
-                    charCount.classList.remove('text-orange-500', 'font-semibold');
+                    charCount.style.color = '';
+                    charCount.classList.remove('font-semibold');
                     charCount.classList.add('text-gray-400', 'dark:text-gray-500');
                 }
             };

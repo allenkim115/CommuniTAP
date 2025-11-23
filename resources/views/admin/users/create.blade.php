@@ -3,7 +3,7 @@
         <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 @if ($errors->any())
-                    <div class="m-6 rounded-md bg-red-50 border border-red-200 p-3 text-sm text-red-800">
+                    <div class="m-6 rounded-md p-3 text-sm" style="background-color: rgba(43, 157, 141, 0.1); border-color: #2B9D8D; border-width: 1px; color: #2B9D8D;">
                         <ul class="list-disc list-inside">
                             @foreach ($errors->all() as $error)
                                 <li>{{ $error }}</li>
@@ -44,7 +44,10 @@
                         </div>
                     </div>
                     <div class="pt-4">
-                        <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium">Create</button>
+                        <button class="text-white px-4 py-2 rounded-md text-sm font-medium"
+                                style="background-color: #F3A261;"
+                                onmouseover="this.style.backgroundColor='#E8944F'"
+                                onmouseout="this.style.backgroundColor='#F3A261'">Create</button>
                     </div>
                 </form>
             </div>

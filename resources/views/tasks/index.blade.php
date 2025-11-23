@@ -1,19 +1,25 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <h2 class="font-bold text-3xl bg-gradient-to-r from-orange-600 via-orange-500 to-teal-500 bg-clip-text text-transparent">
-                {{ __('Task Management') }}
+            <h2 class="font-bold text-3xl bg-clip-text text-transparent" style="background: linear-gradient(to right, #F3A261, #2B9D8D); -webkit-background-clip: text;">
+                {{ __('Tasks') }}
             </h2>
             <div class="flex items-center gap-3 flex-wrap">
                 <a href="{{ route('tasks.my-uploads') }}" 
-                   class="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-teal-600 hover:text-teal-700 bg-teal-50 hover:bg-teal-100 rounded-xl transition-all duration-200 shadow-sm hover:shadow-md">
+                   class="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-xl transition-all duration-200 shadow-sm hover:shadow-md"
+                   style="color: #2B9D8D; background-color: rgba(43, 157, 141, 0.1);"
+                   onmouseover="this.style.color='#248A7C'; this.style.backgroundColor='rgba(43, 157, 141, 0.2)';"
+                   onmouseout="this.style.color='#2B9D8D'; this.style.backgroundColor='rgba(43, 157, 141, 0.1)';">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7a2 2 0 012-2h4l2 2h6a2 2 0 012 2v7a2 2 0 01-2 2H5a2 2 0 01-2-2V7z" />
                     </svg>
                     Uploaded Tasks
                 </a>
                 <a href="{{ route('tasks.create') }}" 
-                   class="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-gradient-to-r from-orange-600 to-teal-500 hover:from-orange-700 hover:to-teal-600 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+                   class="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                   style="background-color: #F3A261;"
+                   onmouseover="this.style.backgroundColor='#E8944F'"
+                   onmouseout="this.style.backgroundColor='#F3A261'">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                     </svg>
@@ -43,23 +49,28 @@
                 <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-2 border border-gray-200 dark:border-gray-700">
                     <nav class="flex space-x-2" aria-label="Tabs">
                         <a href="{{ route('tasks.index', ['filter' => 'available']) }}" 
-                           class="flex-1 text-center px-4 py-3 text-sm font-semibold rounded-xl transition-all duration-200 {{ $filter === 'available' ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md' : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700' }}">
+                           class="flex-1 text-center px-4 py-3 text-sm font-semibold rounded-xl transition-all duration-200 {{ $filter === 'available' ? 'text-white shadow-md' : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700' }}"
+                           @if($filter === 'available') style="background-color: #F3A261;" @endif>
                             Available ({{ $taskStats['available'] }})
                         </a>
                         <a href="{{ route('tasks.index', ['filter' => 'assigned']) }}" 
-                           class="flex-1 text-center px-4 py-3 text-sm font-semibold rounded-xl transition-all duration-200 {{ $filter === 'assigned' ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md' : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700' }}">
+                           class="flex-1 text-center px-4 py-3 text-sm font-semibold rounded-xl transition-all duration-200 {{ $filter === 'assigned' ? 'text-white shadow-md' : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700' }}"
+                           @if($filter === 'assigned') style="background-color: #F3A261;" @endif>
                             Assigned ({{ $taskStats['assigned'] }})
                         </a>
                         <a href="{{ route('tasks.index', ['filter' => 'submitted']) }}" 
-                           class="flex-1 text-center px-4 py-3 text-sm font-semibold rounded-xl transition-all duration-200 {{ $filter === 'submitted' ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md' : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700' }}">
+                           class="flex-1 text-center px-4 py-3 text-sm font-semibold rounded-xl transition-all duration-200 {{ $filter === 'submitted' ? 'text-white shadow-md' : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700' }}"
+                           @if($filter === 'submitted') style="background-color: #F3A261;" @endif>
                             Submitted ({{ $taskStats['submitted'] }})
                         </a>
                         <a href="{{ route('tasks.index', ['filter' => 'completed']) }}" 
-                           class="flex-1 text-center px-4 py-3 text-sm font-semibold rounded-xl transition-all duration-200 {{ $filter === 'completed' ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md' : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700' }}">
+                           class="flex-1 text-center px-4 py-3 text-sm font-semibold rounded-xl transition-all duration-200 {{ $filter === 'completed' ? 'text-white shadow-md' : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700' }}"
+                           @if($filter === 'completed') style="background-color: #F3A261;" @endif>
                             Completed ({{ $taskStats['completed'] }})
                         </a>
                         <a href="{{ route('tasks.index', ['filter' => 'all']) }}" 
-                           class="flex-1 text-center px-4 py-3 text-sm font-semibold rounded-xl transition-all duration-200 {{ $filter === 'all' ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md' : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700' }}">
+                           class="flex-1 text-center px-4 py-3 text-sm font-semibold rounded-xl transition-all duration-200 {{ $filter === 'all' ? 'text-white shadow-md' : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700' }}"
+                           @if($filter === 'all') style="background-color: #F3A261;" @endif>
                             All ({{ $taskStats['all'] }})
                         </a>
                     </nav>
@@ -72,7 +83,7 @@
                     <div class="mb-8">
                         <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
                             <div class="flex items-center gap-3">
-                                <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-orange-500 to-teal-500 flex items-center justify-center shadow-lg">
+                                <div class="w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg" style="background-color: #F3A261;">
                                     <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
                                     </svg>
@@ -102,16 +113,40 @@
                                     <p class="text-sm text-gray-500 dark:text-gray-400">Browse and manage community tasks</p>
                                 </div>
                             </div>
-                            <!-- Task Type Filter -->
-                            <div class="px-4 py-2 bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200 dark:border-gray-700">
-                                <select id="task-type-filter" 
-                                        class="text-sm font-semibold text-gray-700 dark:text-gray-300 bg-transparent border-none focus:outline-none focus:ring-0 cursor-pointer"
-                                        onchange="if(typeof filterByTaskType === 'function') filterByTaskType();">
-                                    <option value="all">All Types</option>
-                                    <option value="daily">Daily Tasks</option>
-                                    <option value="one_time">One-Time Tasks</option>
-                                    <option value="user_uploaded">User-Uploaded Tasks</option>
-                                </select>
+                            <!-- Search and Filter Controls -->
+                            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                                <!-- Search Input -->
+                                <div class="relative flex-1 sm:flex-initial sm:w-64">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                        </svg>
+                                    </div>
+                                    <input type="text" 
+                                           id="task-search" 
+                                           placeholder="Search tasks..." 
+                                           class="block w-full pl-10 pr-3 py-2.5 text-sm bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
+                                           oninput="if(typeof applyFilters === 'function') applyFilters();">
+                                    <button type="button" 
+                                            id="clear-search" 
+                                            class="absolute inset-y-0 right-0 pr-3 flex items-center hidden"
+                                            onclick="document.getElementById('task-search').value = ''; if(typeof applyFilters === 'function') applyFilters();">
+                                        <svg class="h-5 w-5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                        </svg>
+                                    </button>
+                                </div>
+                                <!-- Task Type Filter -->
+                                <div class="px-4 py-2 bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200 dark:border-gray-700">
+                                    <select id="task-type-filter" 
+                                            class="text-sm font-semibold text-gray-700 dark:text-gray-300 bg-transparent border-none focus:outline-none focus:ring-0 cursor-pointer"
+                                            onchange="if(typeof applyFilters === 'function') applyFilters();">
+                                        <option value="all">All Types</option>
+                                        <option value="daily">Daily Tasks</option>
+                                        <option value="one_time">One-Time Tasks</option>
+                                        <option value="user_uploaded">User-Uploaded Tasks</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -123,10 +158,14 @@
                             <div class="group relative bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 border-2 border-gray-200 dark:border-gray-700 overflow-hidden cursor-pointer task-card task-type-{{ $task->task_type }}" 
                                  data-task-id="{{ $task->taskId }}" 
                                  data-task-type="{{ $task->task_type }}"
+                                 data-task-title="{{ strtolower($task->title) }}"
+                                 data-task-description="{{ strtolower($task->description) }}"
+                                 data-task-location="{{ strtolower($task->location ?? '') }}"
+                                 data-task-uploader="{{ strtolower($task->assignedUser?->name ?? 'admin') }}"
                                  onclick="openTaskModal({{ $task->taskId }})">
                                  
                                 <!-- Decorative gradient background -->
-                                <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-orange-400/10 to-teal-400/10 rounded-full -mr-16 -mt-16 blur-2xl group-hover:scale-150 transition-transform duration-500"></div>
+                                <div class="absolute top-0 right-0 w-32 h-32 rounded-full -mr-16 -mt-16 blur-2xl group-hover:scale-150 transition-transform duration-500" style="background-color: rgba(243, 162, 97, 0.1);"></div>
                                 <!-- Shine effect on hover -->
                                 <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
                                 
@@ -137,15 +176,22 @@
                                             {{ $task->title }}
                                         </h4>
                                         <div class="flex flex-col items-end gap-2 flex-shrink-0">
-                                            <span class="px-3 py-1.5 text-xs font-bold bg-gradient-to-r from-teal-500 to-teal-600 text-white rounded-lg shadow-md">
+                                            <span class="px-3 py-1.5 text-xs font-bold text-white rounded-lg shadow-md" style="background-color: #2B9D8D;">
                                                 {{ ucwords(str_replace('_', ' ', $task->task_type)) }}
                                             </span>
                                             @if(isset($task->pivot) && $task->pivot->status)
-                                                <span class="px-3 py-1.5 text-xs font-bold rounded-lg
-                                                    @if($task->pivot->status === 'assigned') bg-gradient-to-r from-blue-100 to-blue-200 text-blue-800 dark:from-blue-900/30 dark:to-blue-800/30 dark:text-blue-300
-                                                    @elseif($task->pivot->status === 'submitted') bg-gradient-to-r from-yellow-100 to-amber-100 text-yellow-800 dark:from-yellow-900/30 dark:to-amber-900/30 dark:text-yellow-300
-                                                    @elseif($task->pivot->status === 'completed') bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 dark:from-green-900/30 dark:to-emerald-900/30 dark:text-green-300
-                                                    @else bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200 @endif">
+                                                @php
+                                                    $statusBg = 'rgba(229, 231, 235, 0.5)';
+                                                    $statusColor = '#6B7280';
+                                                    if($task->pivot->status === 'assigned' || $task->pivot->status === 'completed') {
+                                                        $statusBg = 'rgba(43, 157, 141, 0.2)';
+                                                        $statusColor = '#2B9D8D';
+                                                    } elseif($task->pivot->status === 'submitted') {
+                                                        $statusBg = 'rgba(254, 210, 179, 0.2)';
+                                                        $statusColor = '#FED2B3';
+                                                    }
+                                                @endphp
+                                                <span class="px-3 py-1.5 text-xs font-bold rounded-lg dark:bg-gray-900 dark:text-gray-200" style="background-color: {{ $statusBg }}; color: {{ $statusColor }};">
                                                     {{ ucfirst($task->pivot->status) }}
                                                 </span>
                                             @endif
@@ -210,7 +256,7 @@
                         
                         <!-- No tasks available after filtering message -->
                         <div id="no-tasks-filtered" class="hidden bg-white dark:bg-gray-800 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-3xl shadow-xl p-12 text-center">
-                            <div class="mx-auto w-24 h-24 mb-6 rounded-full bg-gradient-to-br from-orange-100 to-teal-100 dark:from-orange-900/30 dark:to-teal-900/30 flex items-center justify-center">
+                            <div class="mx-auto w-24 h-24 mb-6 rounded-full dark:from-orange-900/30 dark:to-teal-900/30 flex items-center justify-center" style="background-color: rgba(243, 162, 97, 0.2);">
                                 <svg class="w-12 h-12 text-orange-500 dark:text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
                                 </svg>
@@ -219,12 +265,12 @@
                             <p class="text-gray-600 dark:text-gray-300 mb-2 text-lg">
                                 No tasks match the selected filter criteria.
                             </p>
-                            <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">Try selecting a different task type or check back later.</p>
+                            <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">Try adjusting your search query or selecting a different task type.</p>
                         </div>
                     @else
                         <!-- Empty State -->
                         <div class="bg-white dark:bg-gray-800 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-3xl shadow-xl p-12 text-center">
-                            <div class="mx-auto w-24 h-24 mb-6 rounded-full bg-gradient-to-br from-orange-100 to-teal-100 dark:from-orange-900/30 dark:to-teal-900/30 flex items-center justify-center">
+                            <div class="mx-auto w-24 h-24 mb-6 rounded-full dark:from-orange-900/30 dark:to-teal-900/30 flex items-center justify-center" style="background-color: rgba(243, 162, 97, 0.2);">
                                 <svg class="w-12 h-12 text-orange-500 dark:text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
                                 </svg>
@@ -251,14 +297,7 @@
                                         No tasks available
                                 @endswitch
                             </p>
-                            <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">Check back later or create a new task.</p>
-                            <a href="{{ route('tasks.create') }}" 
-                               class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-orange-600 to-teal-500 hover:from-orange-700 hover:to-teal-600 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                                </svg>
-                                Create New Task
-                            </a>
+                            <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">Check back later.</p>
                         </div>
                     @endif
                 </div>
@@ -277,10 +316,6 @@
                 <div id="task-modal-content" class="p-6 space-y-4">
                     <!-- Dynamic content -->
                 </div>
-                <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-700 flex items-center justify-end gap-3">
-                    <a id="task-modal-view-link" href="#" class="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-gray-600 hover:text-gray-700 dark:text-gray-300 dark:hover:text-gray-200 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 rounded-xl transition-all duration-200 shadow-sm hover:shadow-md">Open full page</a>
-                    <button type="button" class="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-gradient-to-r from-orange-600 to-teal-500 hover:from-orange-700 hover:to-teal-600 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5" onclick="closeTaskModal()">Close</button>
-                </div>
             </div>
         </div>
     </div>
@@ -288,19 +323,79 @@
     <!-- JavaScript for task details -->
     <script>
         // Store task data for JavaScript access
-        const tasks = @json($filteredTasks->keyBy('taskId'));
+        // Ensure assignments are included in serialization
+        @php
+            // Ensure all tasks have assignments loaded with users
+            $filteredTasks->loadMissing('assignments.user');
+            
+            // Build tasks array with assignments explicitly included
+            $tasksForJson = [];
+            foreach ($filteredTasks as $task) {
+                // Get assignments - ensure it's always a collection
+                $assignments = $task->assignments ?? collect();
+                
+                $taskData = [
+                    'taskId' => $task->taskId,
+                    'title' => $task->title,
+                    'description' => $task->description,
+                    'points_awarded' => $task->points_awarded,
+                    'task_type' => $task->task_type,
+                    'status' => $task->status,
+                    'location' => $task->location,
+                    'due_date' => $task->due_date,
+                    'start_time' => $task->start_time,
+                    'end_time' => $task->end_time,
+                    'published_date' => $task->published_date,
+                    'creation_date' => $task->creation_date,
+                    'FK1_userId' => $task->FK1_userId,
+                    'max_participants' => $task->max_participants,
+                    'assigned_user' => $task->assignedUser ? [
+                        'name' => $task->assignedUser->name,
+                        'firstName' => $task->assignedUser->firstName,
+                        'middleName' => $task->assignedUser->middleName,
+                        'lastName' => $task->assignedUser->lastName,
+                        'email' => $task->assignedUser->email,
+                    ] : null,
+                    'assignments' => $assignments->map(function($assignment) {
+                        return [
+                            'id' => $assignment->assignmentId ?? $assignment->id ?? null,
+                            'userId' => $assignment->userId,
+                            'taskId' => $assignment->taskId,
+                            'status' => $assignment->status,
+                            'progress' => $assignment->progress,
+                            'user' => $assignment->user ? [
+                                'userId' => $assignment->user->userId,
+                                'name' => $assignment->user->name ?? (trim(($assignment->user->firstName ?? '') . ' ' . ($assignment->user->lastName ?? ''))),
+                                'firstName' => $assignment->user->firstName ?? null,
+                                'middleName' => $assignment->user->middleName ?? null,
+                                'lastName' => $assignment->user->lastName ?? null,
+                                'email' => $assignment->user->email ?? null,
+                            ] : null,
+                        ];
+                    })->values()->toArray(),
+                ];
+                $tasksForJson[$task->taskId] = $taskData;
+            }
+        @endphp
+        const tasks = @json($tasksForJson);
         const userAssignments = @json($userTasks->keyBy('taskId'));
-        let currentActiveTab = 'details';
         
         function showTaskDetails(taskId) {
             const task = tasks[taskId];
             if (!task) return;
 
-            // Hide no-task-selected message
-            document.getElementById('no-task-selected').classList.add('hidden');
+            // Hide no-task-selected message (if it exists)
+            const noTaskSelected = document.getElementById('no-task-selected');
+            if (noTaskSelected) {
+                noTaskSelected.classList.add('hidden');
+            }
             
-            // Show task details
+            // Show task details (if it exists - for old layout)
             const taskDetails = document.getElementById('task-details');
+            if (!taskDetails) {
+                // Old layout not present, skip
+                return;
+            }
             taskDetails.classList.remove('hidden');
             
             // Update active task card
@@ -317,21 +412,9 @@
 
             // Populate task details
             taskDetails.innerHTML = `
-                <!-- Tabs -->
-                <div class="border-b border-gray-200 dark:border-gray-700">
-                    <nav class="-mb-px flex space-x-8 px-6 pt-4">
-                        <button onclick="switchTab('details')" id="details-tab" class="border-orange-500 text-orange-600 dark:text-orange-400 whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm">
-                            Details
-                        </button>
-                        <button onclick="switchTab('participants')" id="participants-tab" class="border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600 whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm">
-                            Participants
-                        </button>
-                    </nav>
-                </div>
-
                 <!-- Task Content -->
                 <div class="p-6">
-                    <!-- Details Tab Content -->
+                    <!-- Details Content -->
                     <div id="details-content">
                         <!-- Task Header -->
                         <div class="flex justify-between items-start mb-6">
@@ -514,72 +597,35 @@
                             ` : ''}
                         ` : ''}
                     </div>
-
-                    <!-- Participants Tab Content -->
-                    <div id="participants-content" class="hidden">
-                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Participants</h3>
-                        <div class="space-y-3">
-                            ${task.assignments && task.assignments.length > 0 ? 
-                                task.assignments.map(assignment => `
-                                    <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                                        <div class="flex items-center space-x-3">
-                                            <div class="h-8 w-8 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center">
-                                                <span class="text-xs font-medium text-gray-700 dark:text-gray-300">
-                                                    ${assignment.user.name ? assignment.user.name.substring(0, 2).toUpperCase() : 'U'}
-                                                </span>
-                                            </div>
-                                            <div>
-                                                <p class="text-sm font-medium text-gray-900 dark:text-white">${assignment.user.name || 'Unknown User'}</p>
-                                                <p class="text-xs text-gray-500 dark:text-gray-400">${assignment.user.email || ''}</p>
-                                            </div>
-                                        </div>
-                                        <div class="flex items-center space-x-2">
-                                            <span class="px-2 py-1 text-xs rounded-full
-                                                ${assignment.status === 'assigned' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' :
-                                                  assignment.status === 'submitted' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' :
-                                                  assignment.status === 'completed' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
-                                                  'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'}">
-                                                ${assignment.status.charAt(0).toUpperCase() + assignment.status.slice(1)}
-                                            </span>
-                                        </div>
-                                    </div>
-                                `).join('') :
-                                '<p class="text-sm text-gray-500 dark:text-gray-400 text-center py-8">No participants yet</p>'
-                            }
-                        </div>
-                    </div>
                 </div>
             `;
         }
 
-        function switchTab(tabName) {
-            currentActiveTab = tabName;
-            
-            // Update tab buttons
-            document.querySelectorAll('[id$="-tab"]').forEach(tab => {
-                tab.classList.remove('border-orange-500', 'text-orange-600', 'dark:text-orange-400');
-                tab.classList.add('border-transparent', 'text-gray-500', 'dark:text-gray-400');
-            });
-            
-            document.getElementById(tabName + '-tab').classList.remove('border-transparent', 'text-gray-500', 'dark:text-gray-400');
-            document.getElementById(tabName + '-tab').classList.add('border-orange-500', 'text-orange-600', 'dark:text-orange-400');
-            
-            // Show/hide content
-            document.getElementById('details-content').classList.toggle('hidden', tabName !== 'details');
-            document.getElementById('participants-content').classList.toggle('hidden', tabName !== 'participants');
-        }
 
-        // Task type filter function - defined immediately
-        function filterByTaskType() {
+        // Combined filter function that handles both search and task type filtering
+        function applyFilters() {
             try {
+                const searchInput = document.getElementById('task-search');
                 const filterSelect = document.getElementById('task-type-filter');
-                if (!filterSelect) {
+                const clearSearchBtn = document.getElementById('clear-search');
+                
+                if (!searchInput || !filterSelect) {
                     return;
                 }
                 
+                const searchQuery = (searchInput.value || '').toLowerCase().trim();
                 const filterValue = filterSelect.value || 'all';
                 const taskCards = document.querySelectorAll('.task-card');
                 const noTasksMessage = document.getElementById('no-tasks-filtered');
+                
+                // Show/hide clear search button
+                if (clearSearchBtn) {
+                    if (searchQuery.length > 0) {
+                        clearSearchBtn.classList.remove('hidden');
+                    } else {
+                        clearSearchBtn.classList.add('hidden');
+                    }
+                }
                 
                 if (taskCards.length === 0) {
                     return;
@@ -589,53 +635,89 @@
                 
                 taskCards.forEach(card => {
                     const taskType = card.getAttribute('data-task-type');
+                    const taskTitle = card.getAttribute('data-task-title') || '';
+                    const taskDescription = card.getAttribute('data-task-description') || '';
+                    const taskLocation = card.getAttribute('data-task-location') || '';
+                    const taskUploader = card.getAttribute('data-task-uploader') || '';
                     
                     // Normalize task type for comparison
                     const normalizedTaskType = (taskType || '').toLowerCase().trim();
                     const normalizedFilter = filterValue.toLowerCase().trim();
                     
-                    // Show or hide based on filter
-                    if (normalizedFilter === 'all' || normalizedTaskType === normalizedFilter) {
-                        // Show the card
+                    // Check task type filter
+                    const matchesTaskType = normalizedFilter === 'all' || normalizedTaskType === normalizedFilter;
+                    
+                    // Check search query
+                    const matchesSearch = searchQuery === '' || 
+                        taskTitle.includes(searchQuery) ||
+                        taskDescription.includes(searchQuery) ||
+                        taskLocation.includes(searchQuery) ||
+                        taskUploader.includes(searchQuery);
+                    
+                    // Show or hide based on both filters
+                    if (matchesTaskType && matchesSearch) {
                         card.classList.remove('hidden');
                         visibleCount++;
                     } else {
-                        // Hide the card
                         card.classList.add('hidden');
                     }
                 });
                 
                 // Show/hide the "no tasks available" message
                 if (noTasksMessage) {
-                    if (visibleCount === 0 && filterValue !== 'all') {
+                    if (visibleCount === 0 && (filterValue !== 'all' || searchQuery !== '')) {
                         noTasksMessage.classList.remove('hidden');
                     } else {
                         noTasksMessage.classList.add('hidden');
                     }
                 }
             } catch (error) {
-                console.error('Error in filterByTaskType:', error);
+                console.error('Error in applyFilters:', error);
             }
         }
 
-        // Make function globally available
+        // Legacy function for backward compatibility
+        function filterByTaskType() {
+            applyFilters();
+        }
+
+        // Make functions globally available
+        window.applyFilters = applyFilters;
         window.filterByTaskType = filterByTaskType;
 
         // Show first task by default if available
         document.addEventListener('DOMContentLoaded', function() {
+            // Initialize search input
+            const searchInput = document.getElementById('task-search');
+            if (searchInput) {
+                // Add event listeners for real-time search
+                searchInput.addEventListener('input', function(e) {
+                    e.stopPropagation();
+                    applyFilters();
+                });
+                
+                // Add event listener for Enter key
+                searchInput.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        applyFilters();
+                    }
+                });
+            }
+            
             // Initialize task type filter
             const taskTypeFilter = document.getElementById('task-type-filter');
             if (taskTypeFilter) {
                 // Add event listener for immediate filtering when dropdown changes
                 taskTypeFilter.addEventListener('change', function(e) {
                     e.stopPropagation();
-                    filterByTaskType();
+                    applyFilters();
                 });
                 
                 // Also add input event for better responsiveness
                 taskTypeFilter.addEventListener('input', function(e) {
                     e.stopPropagation();
-                    filterByTaskType();
+                    applyFilters();
                 });
                 
                 // Check if there's a task_type parameter in the URL
@@ -643,12 +725,11 @@
                 const taskType = urlParams.get('task_type');
                 if (taskType) {
                     taskTypeFilter.value = taskType;
-                    filterByTaskType();
-                } else {
-                    // Apply initial filter (show all by default)
-                    filterByTaskType();
                 }
             }
+            
+            // Apply initial filters (show all by default)
+            applyFilters();
 
             const firstTask = document.querySelector('.task-card:not(.hidden)');
             if (firstTask) {
@@ -661,17 +742,28 @@
 
             // Close on ESC key for modal
             document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape') closeTaskModal();
+                if (e.key === 'Escape') {
+                    const modal = document.getElementById('task-modal');
+                    if (modal && !modal.classList.contains('hidden')) {
+                        closeTaskModal();
+                    } else if (searchInput && searchInput === document.activeElement) {
+                        // Clear search if focused
+                        searchInput.value = '';
+                        applyFilters();
+                    }
+                }
             });
         });
 
         function openTaskModal(taskId) {
             const task = tasks[taskId];
-            if (!task) return;
+            if (!task) {
+                console.error('Task not found:', taskId);
+                return;
+            }
 
             const modal = document.getElementById('task-modal');
             const contentEl = document.getElementById('task-modal-content');
-            const viewLink = document.getElementById('task-modal-view-link');
 
             // Compute uploader name
             const uploaderName = (() => {
@@ -697,94 +789,60 @@
             const isCreator = task.FK1_userId && Number(task.FK1_userId) === Number({{ auth()->user()->userId }});
             const isFull = task.max_participants !== null && task.max_participants !== undefined && task.assignments && task.assignments.length >= task.max_participants;
 
-            viewLink.href = `/tasks/${taskId}`;
-
             contentEl.innerHTML = `
-                <div class="border-b border-gray-200 dark:border-gray-700 -mt-2 -mx-6 px-6">
+                <div class="border-b border-gray-200 dark:border-gray-700 -mt-2 -mx-6 px-6 pb-4">
                     <div class="flex items-center justify-between">
-                        <nav class="flex space-x-8" aria-label="Tabs">
-                            <button id=\"modal-details-tab\" class=\"py-4 px-1 border-b-2 border-orange-500 font-semibold text-sm text-orange-600 dark:text-orange-400\">Details</button>
-                            <button id=\"modal-participants-tab\" class=\"py-4 px-1 border-b-2 border-transparent font-semibold text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300\">Participants</button>
-                        </nav>
-                        <button type=\"button\" class=\"text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white py-4 transition-colors\" onclick=\"closeTaskModal()\" aria-label=\"Close modal\">
-                            <svg class=\"w-5 h-5\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\">
+                        <h2 class="text-2xl font-bold text-gray-900 dark:text-white">${task.title}</h2>
+                        <button type=\"button\" class=\"text-gray-400 hover:text-gray-600 dark:text-gray-400 dark:hover:text-gray-200 transition-colors\" onclick=\"closeTaskModal()\" aria-label=\"Close modal\">
+                            <svg class=\"w-6 h-6\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\">
                                 <path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M6 18L18 6M6 6l12 12\"/>
                             </svg>
                         </button>
                     </div>
+                    <p class=\"text-xs text-gray-500 dark:text-gray-400 mt-1\">by ${uploaderName}</p>
                 </div>
                 <div class=\"pt-6\">
                 <div id=\"modal-details-content\">
                     <div class=\"space-y-6\">
-                    <div>
-                        <h2 class=\"text-2xl font-bold text-gray-900 dark:text-white mb-2\">${task.title}</h2>
-                        <p class=\"text-sm text-gray-600 dark:text-gray-400\"><strong>Uploaded by:</strong> ${uploaderName}</p>
-                    </div>
                     <p class=\"text-gray-700 dark:text-gray-300 leading-relaxed\">${task.description || ''}</p>
-                    <div class=\"grid grid-cols-1 sm:grid-cols-2 gap-4\">
-                        <div class=\"flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl\">
-                            <svg class=\"w-5 h-5 text-orange-500\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z\"></path></svg>
-                            <span class=\"text-sm text-gray-700 dark:text-gray-300\"><strong>Date:</strong> ${dateText}</span>
+                    <div class=\"grid grid-cols-1 sm:grid-cols-2 gap-3\">
+                        <div class=\"flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl\">
+                            <svg class=\"w-5 h-5 text-orange-500 flex-shrink-0\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z\"></path></svg>
+                            <div class=\"min-w-0\">
+                                <p class=\"text-xs text-gray-500 dark:text-gray-400\">Date</p>
+                                <p class=\"text-sm font-medium text-gray-700 dark:text-gray-300\">${dateText}</p>
+                            </div>
                         </div>
-                        <div class=\"flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl\">
-                            <svg class=\"w-5 h-5 text-teal-500\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z\"></path></svg>
-                            <span class=\"text-sm text-gray-700 dark:text-gray-300\"><strong>Time:</strong> ${timeText}</span>
+                        <div class=\"flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl\">
+                            <svg class=\"w-5 h-5 text-teal-500 flex-shrink-0\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z\"></path></svg>
+                            <div class=\"min-w-0\">
+                                <p class=\"text-xs text-gray-500 dark:text-gray-400\">Time</p>
+                                <p class=\"text-sm font-medium text-gray-700 dark:text-gray-300\">${timeText}</p>
+                            </div>
                         </div>
-                        <div class=\"flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl\">
-                            <svg class=\"w-5 h-5 text-orange-500\" fill=\"currentColor\" viewBox=\"0 0 20 20\"><path fill-rule=\"evenodd\" d=\"M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z\" clip-rule=\"evenodd\"></path></svg>
-                            <span class=\"text-sm text-gray-700 dark:text-gray-300\"><strong>Location:</strong> ${task.location || 'Community'}</span>
+                        <div class=\"flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl\">
+                            <svg class=\"w-5 h-5 text-orange-500 flex-shrink-0\" fill=\"currentColor\" viewBox=\"0 0 20 20\"><path fill-rule=\"evenodd\" d=\"M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z\" clip-rule=\"evenodd\"></path></svg>
+                            <div class=\"min-w-0\">
+                                <p class=\"text-xs text-gray-500 dark:text-gray-400\">Location</p>
+                                <p class=\"text-sm font-medium text-gray-700 dark:text-gray-300\">${task.location || 'Community'}</p>
+                            </div>
                         </div>
-                        <div class=\"flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl\">
-                            <svg class=\"w-5 h-5 text-teal-500\" fill=\"currentColor\" viewBox=\"0 0 20 20\"><path fill-rule=\"evenodd\" d=\"M4 4a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2H4zm2 6a2 2 0 114 0 2 2 0 01-4 0zm8 0a2 2 0 114 0 2 2 0 01-4 0z\" clip-rule=\"evenodd\"></path></svg>
-                            <span class=\"text-sm text-gray-700 dark:text-gray-300\"><strong>Type:</strong> ${task.task_type ? task.task_type.replace('_',' ').replace(/\\b\\w/g, l => l.toUpperCase()) : ''}</span>
-                        </div>
-                        <div class=\"flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl\">
-                            <svg class=\"w-5 h-5 text-orange-500\" fill=\"currentColor\" viewBox=\"0 0 20 20\"><path d=\"M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z\"></path></svg>
-                            <span class=\"text-sm text-gray-700 dark:text-gray-300\"><strong>Points:</strong> ${((task.points_awarded !== undefined && task.points_awarded !== null) ? task.points_awarded : '')}</span>
-                        </div>
-                        <div class=\"flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl\">
-                            <svg class=\"w-5 h-5 text-teal-500\" fill=\"currentColor\" viewBox=\"0 0 20 20\"><path fill-rule=\"evenodd\" d=\"M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z\" clip-rule=\"evenodd\"></path></svg>
-                            <span class=\"text-sm text-gray-700 dark:text-gray-300\"><strong>Created:</strong> ${task.published_date ? (typeof task.published_date === 'string' ? new Date(task.published_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : new Date(task.published_date.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })) : (typeof task.creation_date === 'string' ? new Date(task.creation_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : new Date(task.creation_date.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }))}</span>
+                        <div class=\"flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl\">
+                            <svg class=\"w-5 h-5 text-orange-500 flex-shrink-0\" fill=\"currentColor\" viewBox=\"0 0 20 20\"><path d=\"M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z\"></path></svg>
+                            <div class=\"min-w-0\">
+                                <p class=\"text-xs text-gray-500 dark:text-gray-400\">Points</p>
+                                <p class=\"text-sm font-medium text-gray-700 dark:text-gray-300\">${((task.points_awarded !== undefined && task.points_awarded !== null) ? task.points_awarded : 'N/A')}</p>
+                            </div>
                         </div>
                     </div>
-                    <div class=\"pt-4\">
+                    <div class=\"pt-2\">
                         ${(() => {
                             if (isCreator) {
-                                return '<div class="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 border-2 border-gray-200 dark:border-gray-600 rounded-xl p-4 text-sm text-center text-gray-700 dark:text-gray-300">You created this task. You cannot join your own task.</div>';
+                                return '<div class="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 text-sm text-center text-gray-600 dark:text-gray-400">You created this task</div>';
                             }
-                            if (hasJoined) {
-                                return '<a href="/tasks/' + taskId + '" class="inline-flex items-center justify-center gap-2 w-full bg-gradient-to-r from-orange-600 to-teal-500 hover:from-orange-700 hover:to-teal-600 text-white font-bold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>Open Task</a>';
-                            }
-                            return '';
+                            return '<a href="/tasks/' + taskId + '" class="inline-flex items-center justify-center gap-2 w-full text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5" style="background-color: #F3A261;" onmouseover="this.style.backgroundColor=\'#E8944F\'" onmouseout="this.style.backgroundColor=\'#F3A261\'"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>Open Task</a>';
                         })()}
                     </div>
-                </div>
-                <div id=\"modal-participants-content\" class=\"hidden\">
-                    <h4 class=\"text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2\">
-                        <svg class=\"w-5 h-5 text-orange-500\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\">
-                            <path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z\"/>
-                        </svg>
-                        Participants ${task.assignments && task.assignments.length ? `(${task.assignments.length})` : ''}
-                    </h4>
-                    ${task.assignments && task.assignments.length > 0 ?
-                        task.assignments.map(assignment => `
-                            <div class=\\"flex items-center justify-between p-4 mb-3 last:mb-0 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800 rounded-xl border border-gray-200 dark:border-gray-600 hover:shadow-md transition-all duration-200\\">
-                                <div class=\\"flex items-center space-x-3\\">
-                                    <div class=\\"h-10 w-10 rounded-full bg-gradient-to-br from-orange-500 to-teal-500 flex items-center justify-center shadow-md\\">
-                                        <span class=\\"text-sm font-bold text-white\\">${assignment.user && assignment.user.name ? assignment.user.name.substring(0,2).toUpperCase() : 'U'}</span>
-                                    </div>
-                                    <div>
-                                        <p class=\\"text-sm font-bold text-gray-900 dark:text-white\\">${assignment.user && assignment.user.name ? assignment.user.name : 'Unknown User'}</p>
-                                        <p class=\\"text-xs text-gray-500 dark:text-gray-400\\">${assignment.user && assignment.user.email ? assignment.user.email : ''}</p>
-                                    </div>
-                                </div>
-                                <div class=\\"flex items-center space-x-2\\">
-                                    <span class=\\"px-3 py-1.5 text-xs font-bold rounded-lg ${assignment.status === 'assigned' ? 'bg-gradient-to-r from-blue-100 to-blue-200 text-blue-800 dark:from-blue-900/30 dark:to-blue-800/30 dark:text-blue-300' : assignment.status === 'submitted' ? 'bg-gradient-to-r from-yellow-100 to-amber-100 text-yellow-800 dark:from-yellow-900/30 dark:to-amber-900/30 dark:text-yellow-300' : assignment.status === 'completed' ? 'bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 dark:from-green-900/30 dark:to-emerald-900/30 dark:text-green-300' : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'}\\">${assignment.status ? assignment.status.charAt(0).toUpperCase() + assignment.status.slice(1) : ''}</span>
-                                </div>
-                            </div>
-                        `).join('') :
-                        '<div class="text-center py-8"><p class="text-sm text-gray-500 dark:text-gray-400">No participants yet.</p></div>'
-                    }
                 </div>
                 </div>
             `;
@@ -794,34 +852,6 @@
                 const tokenInput = contentEl.querySelector('input[name="_token"]');
                 if (tokenInput && csrf) tokenInput.value = csrf;
             })();
-
-            // Wire modal tabs
-            const mdTab = document.getElementById('modal-details-tab');
-            const mpTab = document.getElementById('modal-participants-tab');
-            const mdContent = document.getElementById('modal-details-content');
-            const mpContent = document.getElementById('modal-participants-content');
-            function setModalTab(tab){
-                if(tab==='details'){
-                    mdTab.classList.add('border-orange-500','text-orange-600','dark:text-orange-400');
-                    mdTab.classList.remove('border-transparent','text-gray-500','dark:text-gray-400');
-                    mpTab.classList.remove('border-orange-500','text-orange-600','dark:text-orange-400');
-                    mpTab.classList.add('border-transparent','text-gray-500','dark:text-gray-400');
-                    mdContent.classList.remove('hidden');
-                    mpContent.classList.add('hidden');
-                } else {
-                    mpTab.classList.add('border-orange-500','text-orange-600','dark:text-orange-400');
-                    mpTab.classList.remove('border-transparent','text-gray-500','dark:text-gray-400');
-                    mdTab.classList.remove('border-orange-500','text-orange-600','dark:text-orange-400');
-                    mdTab.classList.add('border-transparent','text-gray-500','dark:text-gray-400');
-                    mpContent.classList.remove('hidden');
-                    mdContent.classList.add('hidden');
-                }
-            }
-            if(mdTab && mpTab){
-                mdTab.addEventListener('click', ()=>setModalTab('details'));
-                mpTab.addEventListener('click', ()=>setModalTab('participants'));
-                setModalTab('details');
-            }
 
             modal.classList.remove('hidden');
         }

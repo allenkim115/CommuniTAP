@@ -19,7 +19,7 @@
             <div class="p-8">
                 <!-- Icon Container -->
                 <div class="flex justify-center mb-6">
-                    <div id="confirm-icon" class="flex items-center justify-center h-16 w-16 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 shadow-lg transform transition-transform duration-300">
+                    <div id="confirm-icon" class="flex items-center justify-center h-16 w-16 rounded-full shadow-lg transform transition-transform duration-300" style="background-color: #2B9D8D;">
                         <svg class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                         </svg>
@@ -45,7 +45,10 @@
                         type="button"
                         onclick="closeConfirmModal(true)"
                         id="confirm-ok"
-                        class="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-xl text-base font-semibold transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 shadow-lg hover:shadow-xl min-w-[100px]">
+                        class="px-6 py-3 text-white rounded-xl text-base font-semibold transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-offset-2 shadow-lg hover:shadow-xl min-w-[100px]"
+                        style="background-color: #F3A261;"
+                        onmouseover="this.style.backgroundColor='#E8944F'"
+                        onmouseout="this.style.backgroundColor='#F3A261'">
                         Confirm
                     </button>
                 </div>
@@ -57,28 +60,34 @@
 <script>
 const colorMap = {
     blue: {
-        iconBg: 'bg-gradient-to-br from-blue-500 to-blue-600',
-        button: 'bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 focus:ring-blue-500'
+        iconBg: '#2B9D8D',
+        buttonBg: '#2B9D8D',
+        buttonHover: '#248A7C'
     },
     red: {
-        iconBg: 'bg-gradient-to-br from-red-500 to-red-600',
-        button: 'bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 focus:ring-red-500'
+        iconBg: '#2B9D8D',
+        buttonBg: '#2B9D8D',
+        buttonHover: '#248A7C'
     },
     green: {
-        iconBg: 'bg-gradient-to-br from-green-500 to-green-600',
-        button: 'bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 focus:ring-green-500'
+        iconBg: '#2B9D8D',
+        buttonBg: '#2B9D8D',
+        buttonHover: '#248A7C'
     },
     orange: {
-        iconBg: 'bg-gradient-to-br from-orange-500 to-orange-600',
-        button: 'bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 focus:ring-orange-500'
+        iconBg: '#F3A261',
+        buttonBg: '#F3A261',
+        buttonHover: '#E8944F'
     },
     yellow: {
-        iconBg: 'bg-gradient-to-br from-yellow-400 to-yellow-500',
-        button: 'bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 focus:ring-yellow-500'
+        iconBg: '#FED2B3',
+        buttonBg: '#FED2B3',
+        buttonHover: '#E8C19F'
     },
     purple: {
-        iconBg: 'bg-gradient-to-br from-purple-500 to-purple-600',
-        button: 'bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 focus:ring-purple-500'
+        iconBg: '#2B9D8D',
+        buttonBg: '#2B9D8D',
+        buttonHover: '#248A7C'
     }
 };
 
@@ -100,9 +109,11 @@ function showConfirmModal(message, title = 'Confirm Action', confirmText = 'Conf
         
         // Set colors
         const color = colorMap[confirmColor] || colorMap.blue;
-        iconEl.className = `flex items-center justify-center h-16 w-16 rounded-full ${color.iconBg} shadow-lg transform transition-transform duration-300`;
+        iconEl.style.backgroundColor = color.iconBg;
         iconEl.querySelector('svg').className = 'h-8 w-8 text-white';
-        okButton.className = `px-6 py-3 ${color.button} text-white rounded-xl text-base font-semibold transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-offset-2 shadow-lg hover:shadow-xl min-w-[100px]`;
+        okButton.style.backgroundColor = color.buttonBg;
+        okButton.onmouseover = function() { this.style.backgroundColor = color.buttonHover; };
+        okButton.onmouseout = function() { this.style.backgroundColor = color.buttonBg; };
         
         window.confirmResolve = resolve;
         window.confirmFormId = formId;

@@ -152,7 +152,10 @@
     <button type="button" onclick="closeNominationModal()" class="inline-flex items-center justify-center gap-2 px-6 py-2.5 text-sm font-bold rounded-xl border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200 shadow-sm hover:shadow-md">
         Cancel
     </button>
-    <button type="submit" form="nomination-form" class="inline-flex items-center justify-center gap-2 px-8 py-2.5 text-sm font-bold rounded-xl text-white bg-gradient-to-r from-orange-600 to-teal-500 hover:from-orange-700 hover:to-teal-600 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 focus:ring-2 focus:ring-orange-400 focus:ring-offset-2">
+    <button type="submit" form="nomination-form" class="inline-flex items-center justify-center gap-2 px-8 py-2.5 text-sm font-bold rounded-xl text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 focus:ring-2 focus:ring-offset-2"
+            style="background-color: #F3A261;"
+            onmouseover="this.style.backgroundColor='#E8944F'"
+            onmouseout="this.style.backgroundColor='#F3A261'">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
         </svg>

@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex justify-between items-center">
-            <h2 class="font-semibold text-2xl bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            <h2 class="font-semibold text-2xl bg-clip-text text-transparent" style="background: linear-gradient(to right, #F3A261, #2B9D8D); -webkit-background-clip: text;">
                 {{ __('Rewards') }}
             </h2>
             <a href="{{ route('rewards.mine') }}" class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors shadow-sm">
@@ -19,20 +19,20 @@
             <x-session-toast />
             
             @if(session('status'))
-                <div class="mb-6 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4 flex items-center gap-3">
-                    <svg class="w-5 h-5 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="mb-6 dark:bg-green-900/20 border rounded-lg p-4 flex items-center gap-3" style="background-color: rgba(43, 157, 141, 0.1); border-color: #2B9D8D;">
+                    <svg class="w-5 h-5 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: #2B9D8D;">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
-                    <p class="text-sm font-medium text-green-800 dark:text-green-300">{{ session('status') }}</p>
+                    <p class="text-sm font-medium dark:text-green-300" style="color: #2B9D8D;">{{ session('status') }}</p>
                 </div>
             @endif
             
             @if(session('error'))
-                <div class="mb-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 flex items-center gap-3">
-                    <svg class="w-5 h-5 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="mb-6 dark:bg-red-900/20 border rounded-lg p-4 flex items-center gap-3" style="background-color: rgba(43, 157, 141, 0.1); border-color: #2B9D8D;">
+                    <svg class="w-5 h-5 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: #2B9D8D;">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                     </svg>
-                    <p class="text-sm font-medium text-red-800 dark:text-red-300">{{ session('error') }}</p>
+                    <p class="text-sm font-medium dark:text-red-300" style="color: #2B9D8D;">{{ session('error') }}</p>
                 </div>
             @endif
 
@@ -64,14 +64,14 @@
                                 <!-- Availability Badge -->
                                 <div class="absolute top-2 right-2">
                                     @if($reward->isAvailable())
-                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300">
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold dark:bg-green-900/30 dark:text-green-300" style="background-color: rgba(43, 157, 141, 0.2); color: #2B9D8D;">
                                             <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
                                                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                                             </svg>
                                             Available
                                         </span>
                                     @else
-                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300">
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold dark:bg-red-900/30 dark:text-red-300" style="background-color: rgba(43, 157, 141, 0.2); color: #2B9D8D;">
                                             <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
                                                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
                                             </svg>
@@ -82,7 +82,7 @@
 
                                 <!-- Points Badge -->
                                 <div class="absolute top-2 left-2">
-                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-orange-500 text-white shadow-md">
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold text-white shadow-md" style="background-color: #F3A261;">
                                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                         </svg>
@@ -123,7 +123,10 @@
                                     @csrf
                                     @if($reward->isAvailable())
                                         <button type="submit" 
-                                                class="w-full inline-flex items-center justify-center gap-2 px-3 py-2 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-semibold text-sm rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200"
+                                                class="w-full inline-flex items-center justify-center gap-2 px-3 py-2 text-white font-semibold text-sm rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200"
+                                                style="background-color: #F3A261;"
+                                                onmouseover="this.style.backgroundColor='#E8944F'"
+                                                onmouseout="this.style.backgroundColor='#F3A261'"
                                                 onclick="return confirm('Redeem {{ $reward->reward_name }} for {{ $reward->points_cost }} points?')">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/>

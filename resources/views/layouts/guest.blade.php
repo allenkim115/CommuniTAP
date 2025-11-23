@@ -17,9 +17,10 @@
 
     <style>
         :root {
-            --primary: #F53003;
-            --orange: #F4A261;
-            --teal: #2A9D8F;
+            --primary: #F3A261;
+            --orange: #F3A261;
+            --teal: #2B9D8D;
+            --peach: #FED2B3;
             --light: #F1F1F1;
             --card-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.15);
             --transition: all 0.3s ease;
@@ -126,21 +127,21 @@
 
         /* Primary Button */
         .btn-primary {
-            background: var(--primary);
+            background-color: #F3A261;
             color: white;
             padding: 0.875rem 2.5rem;
             border-radius: 9999px;
             font-weight: 600;
             font-size: 1.1rem;
             transition: var(--transition);
-            box-shadow: 0 6px 16px rgba(245, 48, 3, 0.3);
+            box-shadow: 0 6px 16px rgba(243, 162, 97, 0.3);
             min-width: 180px;
         }
 
         .btn-primary:hover {
-            background: #e02a00;
+            background-color: #E8944F;
             transform: translateY(-3px);
-            box-shadow: 0 10px 24px rgba(245, 48, 3, 0.4);
+            box-shadow: 0 10px 24px rgba(243, 162, 97, 0.4);
         }
 
         /* Fade In */

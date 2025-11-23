@@ -17,12 +17,20 @@
                             </p>
                         </div>
                         <div class="text-right">
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
-                                @if($incidentReport->status === 'pending') bg-yellow-100 text-yellow-800
-                                @elseif($incidentReport->status === 'under_review') bg-blue-100 text-blue-800
-                                @elseif($incidentReport->status === 'resolved') bg-green-100 text-green-800
-                                @elseif($incidentReport->status === 'dismissed') bg-gray-100 text-gray-800
-                                @endif">
+                            @php
+                                $statusBg = 'rgba(254, 210, 179, 0.2)';
+                                $statusColor = '#FED2B3';
+                                if($incidentReport->status === 'under_review' || $incidentReport->status === 'resolved') {
+                                    $statusBg = 'rgba(43, 157, 141, 0.2)';
+                                    $statusColor = '#2B9D8D';
+                                }
+                            @endphp
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium" style="background-color: {{ $statusBg }}; color: {{ $statusColor }};"
+                                @if($incidentReport->status === 'pending') 
+                                @elseif($incidentReport->status === 'under_review') 
+                                @elseif($incidentReport->status === 'resolved')
+                                @elseif($incidentReport->status === 'dismissed') 
+                                @endif>
                                 {{ ucwords(str_replace('_', ' ', $incidentReport->status)) }}
                             </span>
                         </div>
@@ -80,14 +88,22 @@
                         <!-- Incident Type -->
                         <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
                             <h4 class="text-sm font-medium text-gray-900 dark:text-gray-100 mb-2">Incident Type</h4>
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                                @if($incidentReport->incident_type === 'non_participation') bg-yellow-100 text-yellow-800
-                                @elseif($incidentReport->incident_type === 'abuse') bg-red-100 text-red-800
-                                @elseif($incidentReport->incident_type === 'spam') bg-blue-100 text-blue-800
-                                @elseif($incidentReport->incident_type === 'inappropriate_content') bg-purple-100 text-purple-800
-                                @elseif($incidentReport->incident_type === 'harassment') bg-red-100 text-red-800
-                                @else bg-gray-100 text-gray-800
-                                @endif">
+                            @php
+                                $typeBg = 'rgba(254, 210, 179, 0.2)';
+                                $typeColor = '#FED2B3';
+                                if(in_array($incidentReport->incident_type, ['abuse', 'spam', 'harassment', 'inappropriate_content'])) {
+                                    $typeBg = 'rgba(43, 157, 141, 0.2)';
+                                    $typeColor = '#2B9D8D';
+                                }
+                            @endphp
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium" style="background-color: {{ $typeBg }}; color: {{ $typeColor }};"
+                                @if($incidentReport->incident_type === 'non_participation') 
+                                @elseif($incidentReport->incident_type === 'abuse') 
+                                @elseif($incidentReport->incident_type === 'spam')
+                                @elseif($incidentReport->incident_type === 'inappropriate_content') 
+                                @elseif($incidentReport->incident_type === 'harassment') 
+                                @else 
+                                @endif>
                                 {{ ucwords(str_replace('_', ' ', $incidentReport->incident_type)) }}
                             </span>
                         </div>
@@ -98,7 +114,10 @@
                             @if($incidentReport->task)
                                 <div>
                                     <div class="text-sm font-medium text-gray-900 dark:text-gray-100">
-                                        <a href="{{ route('admin.tasks.show', $incidentReport->task) }}" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
+                                        <a href="{{ route('admin.tasks.show', $incidentReport->task) }}" class="dark:text-blue-400 dark:hover:text-blue-300"
+                                           style="color: #2B9D8D;"
+                                           onmouseover="this.style.color='#248A7C';"
+                                           onmouseout="this.style.color='#2B9D8D';">
                                             {{ $incidentReport->task->title }}
                                         </a>
                                     </div>
