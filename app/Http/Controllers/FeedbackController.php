@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Feedback;
 use App\Models\Task;
 use App\Models\User;
+use App\Rules\HalfStarRating;
 
 class FeedbackController extends Controller
 {
@@ -62,9 +63,9 @@ class FeedbackController extends Controller
                 ->with('error', 'You can only provide feedback for tasks you are assigned to.');
         }
         
-        $request->validate([
+        $validated = $request->validate([
             'comment' => 'required|string|min:10|max:1000',
-            'rating' => 'required|integer|min:1|max:5',
+            'rating' => ['required', new HalfStarRating],
         ]);
         
         // Check if user has already submitted feedback for this task
@@ -80,8 +81,8 @@ class FeedbackController extends Controller
         Feedback::create([
             'FK2_taskId' => $task->taskId,
             'FK1_userId' => $user->userId,
-            'comment' => $request->comment,
-            'rating' => $request->rating,
+            'comment' => $validated['comment'],
+            'rating' => $this->normalizeRating($validated['rating']),
             'feedback_date' => now(),
         ]);
         
@@ -131,14 +132,14 @@ class FeedbackController extends Controller
                 ->with('error', 'You can only edit your own feedback.');
         }
         
-        $request->validate([
+        $validated = $request->validate([
             'comment' => 'required|string|min:10|max:1000',
-            'rating' => 'required|integer|min:1|max:5',
+            'rating' => ['required', new HalfStarRating],
         ]);
         
         $feedback->update([
-            'comment' => $request->comment,
-            'rating' => $request->rating,
+            'comment' => $validated['comment'],
+            'rating' => $this->normalizeRating($validated['rating']),
         ]);
         
         return redirect()->route('tasks.show', $feedback->task)
@@ -165,5 +166,12 @@ class FeedbackController extends Controller
         $adminFeedback = collect(); // No separate admin feedback in this structure
         
         return view('feedback.show', compact('task', 'userFeedback', 'adminFeedback'));
+    }
+    /**
+     * Normalize incoming rating values to consistent half-star increments.
+     */
+    private function normalizeRating(mixed $value): float
+    {
+        return round(((float) $value) * 2) / 2;
     }
 }

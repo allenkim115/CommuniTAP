@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Task;
 use App\Models\User;
+use App\Models\Feedback;
 use App\Models\TaskAssignment;
 use App\Services\NotificationService;
 use Illuminate\Http\Request;
@@ -652,7 +653,7 @@ class TaskController extends Controller
     /**
      * Display the specified task
      */
-    public function show(Task $task)
+    public function show(Request $request, Task $task)
     {
         $user = Auth::user();
         
@@ -684,7 +685,36 @@ class TaskController extends Controller
         // Load necessary relationships
         $task->load(['assignments.user', 'assignedUser']);
 
-        return view('tasks.show', compact('task', 'isCreator'));
+        $feedbackEntries = collect();
+        $feedbackSummary = [
+            'average_rating' => null,
+            'total' => 0,
+            'latest' => null,
+        ];
+
+        if ($isCreator) {
+            $feedbackEntries = Feedback::where('FK2_taskId', $task->taskId)
+                ->with('user')
+                ->orderByDesc('feedback_date')
+                ->orderByDesc('created_at')
+                ->get();
+
+            if ($feedbackEntries->isNotEmpty()) {
+                $feedbackSummary['total'] = $feedbackEntries->count();
+                $feedbackSummary['average_rating'] = round($feedbackEntries->avg('rating'), 1);
+                $feedbackSummary['latest'] = $feedbackEntries->first();
+            }
+        }
+
+        $requestedTab = $request->get('tab');
+        $activeCreatorTab = match (true) {
+            $requestedTab === 'overview' => 'overview',
+            $requestedTab === 'feedback' => 'feedback',
+            $feedbackEntries->isNotEmpty() => 'feedback',
+            default => 'overview',
+        };
+
+        return view('tasks.show', compact('task', 'isCreator', 'feedbackEntries', 'feedbackSummary', 'activeCreatorTab'));
     }
 
     /**

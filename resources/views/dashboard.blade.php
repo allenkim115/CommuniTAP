@@ -177,8 +177,8 @@
                         @if(isset($ongoingTasks) && $ongoingTasks->count() > 0)
                             <div class="space-y-4">
                             @foreach($ongoingTasks->take(3) as $task)
-                                <div class="group relative rounded-2xl p-6 border-2 transition-all duration-300 hover:shadow-xl cursor-pointer transform hover:-translate-y-1" 
-                                     style="background: linear-gradient(to right, #FED2B3, transparent); border-color: #F3A261;"
+                                <div class="group relative rounded-2xl p-6 border-2 transition-all duration-300 hover:shadow-xl cursor-pointer transform hover:-translate-y-1 bg-white" 
+                                     style="border-color: #F3A261;"
                                      onmouseover="this.style.borderColor='#E8944F';"
                                      onmouseout="this.style.borderColor='#F3A261';"
                                      onclick="window.location='{{ route('tasks.show', $task) }}'">
@@ -366,8 +366,8 @@
                         <div class="space-y-4 max-h-[700px] overflow-y-auto pr-2 custom-scrollbar">
                             @if(isset($completedTasks) && $completedTasks->count() > 0)
                                 @foreach($completedTasks->take(5) as $task)
-                                <div class="group relative rounded-2xl p-6 border-2 transition-all duration-300 hover:shadow-xl cursor-pointer transform hover:-translate-y-1"
-                                     style="background: linear-gradient(to right, #FED2B3, transparent); border-color: #2B9D8D;"
+                                <div class="group relative rounded-2xl p-6 border-2 transition-all duration-300 hover:shadow-xl cursor-pointer transform hover:-translate-y-1 bg-white"
+                                     style="border-color: #2B9D8D;"
                                      onmouseover="this.style.borderColor='#248A7C';"
                                      onmouseout="this.style.borderColor='#2B9D8D';"
                                      onclick="window.location='{{ route('tasks.show', $task) }}'">

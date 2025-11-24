@@ -1,15 +1,20 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex justify-between items-center">
-            <h2 class="font-semibold text-2xl bg-clip-text text-transparent" style="background: linear-gradient(to right, #F3A261, #2B9D8D); -webkit-background-clip: text;">
-                {{ __('Rewards') }}
-            </h2>
-            <a href="{{ route('rewards.mine') }}" class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors shadow-sm">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                </svg>
-                My Redemptions
-            </a>
+        <div class="flex flex-wrap items-center justify-between gap-4">
+            <div>
+                <h2 class="font-semibold text-2xl text-gray-900 dark:text-gray-100">
+                    {{ __('Rewards') }}
+                </h2>
+                <p class="text-sm text-gray-500 dark:text-gray-400">Navigate between available and claimed coupons.</p>
+            </div>
+            <div class="flex items-center gap-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full px-1 py-1 shadow-sm">
+                <span class="px-4 py-1.5 text-xs font-semibold text-white rounded-full shadow" style="background-color: #2B9D8D;">
+                    Available Rewards
+                </span>
+                <a href="{{ route('rewards.mine') }}" class="px-4 py-1.5 text-xs font-semibold text-gray-500 dark:text-gray-400 rounded-full hover:text-gray-900 hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+                    Claimed Rewards
+                </a>
+            </div>
         </div>
     </x-slot>
 
@@ -17,25 +22,21 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <!-- Toast Notifications -->
             <x-session-toast />
-            
-            @if(session('status'))
-                <div class="mb-6 dark:bg-green-900/20 border rounded-lg p-4 flex items-center gap-3" style="background-color: rgba(43, 157, 141, 0.1); border-color: #2B9D8D;">
-                    <svg class="w-5 h-5 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: #2B9D8D;">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
-                    <p class="text-sm font-medium dark:text-green-300" style="color: #2B9D8D;">{{ session('status') }}</p>
+            @php
+                $currentUser = auth()->user();
+                $userPoints = $currentUser?->points ?? 0;
+            @endphp
+            <div class="mb-6 flex justify-start">
+                <div class="inline-flex items-center gap-3 px-4 py-2 text-base font-semibold text-amber-800 dark:text-amber-200 bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-700 rounded-full shadow-sm">
+                    <div class="flex items-center justify-center w-8 h-8 rounded-full bg-white dark:bg-gray-800 text-amber-500 shadow">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <span class="tracking-wide">Your Points: <strong class="text-lg">{{ number_format($userPoints) }}</strong></span>
                 </div>
-            @endif
+            </div>
             
-            @if(session('error'))
-                <div class="mb-6 dark:bg-red-900/20 border rounded-lg p-4 flex items-center gap-3" style="background-color: rgba(43, 157, 141, 0.1); border-color: #2B9D8D;">
-                    <svg class="w-5 h-5 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: #2B9D8D;">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                    </svg>
-                    <p class="text-sm font-medium dark:text-red-300" style="color: #2B9D8D;">{{ session('error') }}</p>
-                </div>
-            @endif
-
             @if($rewards->count() > 0)
                 <div class="mb-6 flex items-center justify-between">
                     <div>
@@ -46,6 +47,10 @@
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     @foreach($rewards as $reward)
+                        @php
+                            $user = auth()->user();
+                            $hasEnoughPoints = $user && $user->points >= $reward->points_cost;
+                        @endphp
                         <div class="group bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-md transition-all duration-300 transform hover:-translate-y-1">
                             <!-- Image Section -->
                             <div class="relative h-28 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 overflow-hidden">
@@ -62,17 +67,17 @@
                                 @endif
                                 
                                 <!-- Availability Badge -->
-                                <div class="absolute top-2 right-2">
+                                <div class="absolute top-2 right-2 drop-shadow">
                                     @if($reward->isAvailable())
-                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold dark:bg-green-900/30 dark:text-green-300" style="background-color: rgba(43, 157, 141, 0.2); color: #2B9D8D;">
-                                            <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold text-emerald-600 bg-white/95 border border-emerald-100 shadow-sm backdrop-blur dark:text-emerald-300 dark:bg-emerald-900/40 dark:border-emerald-800">
+                                            <svg class="w-3.5 h-3.5 mr-1" fill="currentColor" viewBox="0 0 20 20">
                                                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                                             </svg>
                                             Available
                                         </span>
                                     @else
-                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold dark:bg-red-900/30 dark:text-red-300" style="background-color: rgba(43, 157, 141, 0.2); color: #2B9D8D;">
-                                            <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold text-red-600 bg-white/95 border border-red-100 shadow-sm backdrop-blur dark:text-red-300 dark:bg-red-900/40 dark:border-red-800">
+                                            <svg class="w-3.5 h-3.5 mr-1" fill="currentColor" viewBox="0 0 20 20">
                                                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
                                             </svg>
                                             Out of Stock
@@ -119,15 +124,17 @@
                                 </div>
 
                                 <!-- Redeem Button -->
-                                <form method="POST" action="{{ route('rewards.redeem', $reward) }}" id="redeem-reward-form-{{ $reward->id }}">
+                                <form method="POST"
+                                      action="{{ route('rewards.redeem', $reward) }}"
+                                      id="redeem-reward-form-{{ $reward->id }}">
                                     @csrf
                                     @if($reward->isAvailable())
-                                        <button type="submit" 
+                                        <button type="button"
                                                 class="w-full inline-flex items-center justify-center gap-2 px-3 py-2 text-white font-semibold text-sm rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200"
                                                 style="background-color: #F3A261;"
                                                 onmouseover="this.style.backgroundColor='#E8944F'"
                                                 onmouseout="this.style.backgroundColor='#F3A261'"
-                                                onclick="return confirm('Redeem {{ $reward->reward_name }} for {{ $reward->points_cost }} points?')">
+                                                onclick="event.preventDefault(); const form=this.closest('form'); if(form){ const message='{{ 'Redeem ' . $reward->reward_name . ' for ' . number_format($reward->points_cost) . ' points?' }}'; Promise.resolve(window.confirm(message)).then(confirmed=>{ if(confirmed){ form.submit(); }}); }">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/>
                                             </svg>
@@ -170,5 +177,4 @@
         </div>
     </div>
 </x-app-layout>
-
 

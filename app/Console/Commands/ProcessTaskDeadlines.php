@@ -46,7 +46,6 @@ class ProcessTaskDeadlines extends Command
     protected function sendHourBeforeNotifications(NotificationService $notificationService): void
     {
         $now = now();
-        $oneHourFromNow = $now->copy()->addHour();
 
         // Get all active task assignments that haven't received a reminder yet
         $assignments = TaskAssignment::whereIn('status', ['assigned', 'submitted'])
@@ -55,6 +54,7 @@ class ProcessTaskDeadlines extends Command
             ->get();
 
         $notifiedCount = 0;
+        $checkedCount = 0;
 
         foreach ($assignments as $assignment) {
             $task = $assignment->task;
@@ -70,15 +70,44 @@ class ProcessTaskDeadlines extends Command
                 continue;
             }
 
-            // Check if the deadline is approximately 1 hour from now (within a 5-minute window)
+            // Skip if deadline has already passed
+            if ($now->gt($deadline)) {
+                continue;
+            }
+
+            $checkedCount++;
+
+            // Check if the deadline is approximately 1 hour from now
+            // Use a wider window (50-70 minutes) to account for 5-minute scheduler intervals
             $timeUntilDeadline = $now->diffInMinutes($deadline, false);
 
-            if ($timeUntilDeadline >= 55 && $timeUntilDeadline <= 65) {
+            // Debug output for tasks approaching deadline
+            if ($timeUntilDeadline <= 120) {
+                $this->line("Task '{$task->title}' (ID: {$task->taskId}) - Deadline in {$timeUntilDeadline} minutes (deadline: {$deadline->format('Y-m-d H:i')})");
+            }
+
+            $shouldSendReminder = false;
+            $reminderMessage = "";
+
+            // Send notification if deadline is between 50-70 minutes away (1-hour reminder)
+            // This wider window ensures the scheduler (running every 5 min) will catch it
+            if ($timeUntilDeadline >= 50 && $timeUntilDeadline <= 70) {
+                $shouldSendReminder = true;
+                $reminderMessage = "Reminder: Your task \"{$task->title}\" is due in 1 hour. Please complete it soon!";
+            }
+            // If user joined late and deadline is less than 1 hour but more than 15 minutes away, send a late reminder
+            elseif ($timeUntilDeadline >= 15 && $timeUntilDeadline < 50) {
+                $shouldSendReminder = true;
+                $minutes = round($timeUntilDeadline);
+                $reminderMessage = "Reminder: Your task \"{$task->title}\" is due in {$minutes} minutes. Please complete it soon!";
+            }
+
+            if ($shouldSendReminder) {
                 // Send notification
                 $notificationService->notify(
                     $assignment->user,
                     'task_deadline_reminder',
-                    "Reminder: Your task \"{$task->title}\" is due in 1 hour. Please complete it soon!",
+                    $reminderMessage,
                     [
                         'url' => route('tasks.show', $task),
                         'taskId' => $task->taskId,
@@ -91,11 +120,11 @@ class ProcessTaskDeadlines extends Command
                 $assignment->save();
 
                 $notifiedCount++;
-                $this->info("Sent reminder to user {$assignment->user->userId} for task: {$task->title}");
+                $this->info("✓ Sent reminder to user {$assignment->user->userId} ({$assignment->user->firstName} {$assignment->user->lastName}) for task: {$task->title} (deadline in {$timeUntilDeadline} min)");
             }
         }
 
-        $this->info("Sent {$notifiedCount} deadline reminder(s).");
+        $this->info("Checked {$checkedCount} task assignment(s), sent {$notifiedCount} deadline reminder(s).");
     }
 
     /**

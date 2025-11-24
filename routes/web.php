@@ -340,6 +340,7 @@ Route::middleware(['auth', 'admin', 'active'])->prefix('admin')->name('admin.')-
     Route::get('/redemptions', [App\Http\Controllers\Admin\RewardRedemptionController::class, 'index'])->name('redemptions.index');
     Route::post('/redemptions/{redemption}/approve', [App\Http\Controllers\Admin\RewardRedemptionController::class, 'approve'])->name('redemptions.approve');
     Route::post('/redemptions/{redemption}/reject', [App\Http\Controllers\Admin\RewardRedemptionController::class, 'reject'])->name('redemptions.reject');
+    Route::patch('/redemptions/{redemption}/claim', [App\Http\Controllers\Admin\RewardRedemptionController::class, 'claim'])->name('redemptions.claim');
 
     Route::get('/notifications', fn () => redirect()->route('notifications.index'))->name('notifications.index');
 

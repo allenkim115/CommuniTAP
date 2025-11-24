@@ -66,12 +66,21 @@ class RewardController extends Controller
                 'FK2_userId' => $user->userId,
                 'redemption_date' => now(),
                 'status' => 'approved',
+                'coupon_code' => $couponCode,
                 'approval_date' => now(),
                 'admin_notes' => 'Coupon: ' . $couponCode,
             ]);
 
             // Reserve quantity immediately to avoid oversubscription
             $reward->decrement('QTY');
+            $reward->refresh();
+
+            if ($reward->QTY <= 0 && $reward->status !== 'inactive') {
+                $reward->update([
+                    'status' => 'inactive',
+                    'last_update_date' => now(),
+                ]);
+            }
 
             // Deduct points immediately (can be reverted if rejected by admin)
             $user->points = max(0, $user->points - $reward->points_cost);
@@ -94,7 +103,7 @@ class RewardController extends Controller
                     'reward_claim_submitted',
                     "{$user->firstName} {$user->lastName} claimed the reward \"{$reward->reward_name}\".",
                     [
-                        'url' => route('admin.rewards.index'),
+                        'url' => route('admin.redemptions.index', ['status' => 'pending']),
                         'description' => "Coupon code: {$couponCode}. Ensure fulfilment is tracked.",
                     ]
                 );
@@ -110,7 +119,7 @@ class RewardController extends Controller
     {
         $redemptions = RewardRedemption::with('reward')
             ->where('FK2_userId', Auth::user()->userId)
-            ->where('status', 'approved')
+            ->whereIn('status', ['approved', 'claimed'])
             ->latest()
             ->get();
 

@@ -45,6 +45,7 @@ class AppServiceProvider extends ServiceProvider
                 'tap_nomination_accepted',
                 'tap_nomination_declined',
                 'reward_redeemed',
+                'reward_claimed',
                 'incident_report_update',
                 'task_proposal_approved',
                 'task_proposal_rejected',

@@ -157,7 +157,7 @@
                                 <div class="relative group">
                                     <select name="task_type" 
                                             id="task_type" 
-                                            class="block w-full px-4 py-2.5 border-2 border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 dark:bg-gray-800 dark:text-white text-sm transition-all duration-200 appearance-none bg-white hover:border-orange-400 hover:shadow-md">
+                                            class="block w-full px-4 py-2.5 pr-10 border-2 border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:outline-none focus:ring-0 focus:border-orange-500 dark:bg-gray-800 dark:text-white text-sm transition-all duration-200 appearance-none bg-white hover:border-orange-400 hover:shadow-md">
                                         <option value="all" {{ ($taskType ?? 'all') === 'all' ? 'selected' : '' }}>All Types</option>
                                         <option value="daily" {{ ($taskType ?? '') === 'daily' ? 'selected' : '' }}>Daily Tasks</option>
                                         <option value="one_time" {{ ($taskType ?? '') === 'one_time' ? 'selected' : '' }}>One-Time Tasks</option>
@@ -353,7 +353,7 @@
                             </p>
                             @if($startDate || $endDate || ($taskType && $taskType !== 'all'))
                                 <a href="{{ route('progress') }}" 
-                                   class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-orange-600 to-teal-500 hover:from-orange-700 hover:to-teal-600 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5">
+                                   class="inline-flex items-center gap-2 px-6 py-3 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 font-bold rounded-xl shadow-lg hover:bg-gray-300 dark:hover:bg-gray-500 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                                     </svg>

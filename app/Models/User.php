@@ -183,6 +183,14 @@ class User extends Authenticatable
     }
 
     /**
+     * Reward redemptions initiated by this user.
+     */
+    public function rewardRedemptions()
+    {
+        return $this->hasMany(RewardRedemption::class, 'FK2_userId', 'userId');
+    }
+
+    /**
      * Get pending nominations received by this user
      */
     public function pendingNominations()

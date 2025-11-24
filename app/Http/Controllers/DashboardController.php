@@ -1336,7 +1336,9 @@ class DashboardController extends Controller
         $completedTasksCount = $user->completedTasks()
             ->where('tasks.status', '!=', 'inactive')
             ->count();
-        $claimedRewardsCount = 0;
+        $claimedRewardsCount = $user->rewardRedemptions()
+            ->where('status', 'claimed')
+            ->count();
         
         // Preserve filter inputs for the view
         $startDate = $request->get('start_date');

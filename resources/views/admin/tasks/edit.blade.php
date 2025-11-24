@@ -179,9 +179,6 @@
                             <input type="text" value="{{ ucfirst($task->status) }}" 
                                    class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-gray-100 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed" 
                                    readonly>
-                            <p class="mt-3 text-sm text-gray-600 dark:text-gray-400">
-                                Task status is managed through specific actions (Approve, Reject, Publish, etc.) on the task details page.
-                            </p>
                         </div>
                     </div>
 

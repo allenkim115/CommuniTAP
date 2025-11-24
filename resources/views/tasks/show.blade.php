@@ -21,6 +21,15 @@
             @endphp
             
             @if($showAdminLayout)
+                @php
+                    $creatorFeedbackEntries = $feedbackEntries ?? collect();
+                    $creatorFeedbackSummary = $feedbackSummary ?? [
+                        'average_rating' => null,
+                        'total' => 0,
+                        'latest' => null,
+                    ];
+                    $creatorActiveTab = ($activeCreatorTab ?? 'overview') === 'feedback' ? 'feedback' : 'overview';
+                @endphp
                 <!-- Admin-style layout for creators of user-uploaded tasks -->
                 <div class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
                     <!-- Task Header -->
@@ -65,8 +74,36 @@
                         </div>
                     </div>
 
+                    <!-- Creator Tabs -->
+                    <div class="border-b border-gray-200 bg-white">
+                        <nav class="flex space-x-8 px-6" aria-label="Creator tabs">
+                            @php
+                                $overviewActive = $creatorActiveTab === 'overview';
+                                $feedbackActive = $creatorActiveTab === 'feedback';
+                            @endphp
+                            <a href="{{ request()->fullUrlWithQuery(['tab' => 'overview']) }}"
+                               class="py-4 px-1 border-b-2 text-sm transition-colors {{ $overviewActive ? 'font-bold text-gray-900' : 'font-semibold text-gray-500 hover:text-gray-700 border-transparent' }}"
+                               style="border-color: {{ $overviewActive ? '#F3A261' : 'transparent' }};"
+                               aria-current="{{ $overviewActive ? 'page' : 'false' }}">
+                                Overview
+                            </a>
+                            <a href="{{ request()->fullUrlWithQuery(['tab' => 'feedback']) }}"
+                               class="py-4 px-1 border-b-2 text-sm transition-colors {{ $feedbackActive ? 'font-bold text-gray-900' : 'font-semibold text-gray-500 hover:text-gray-700 border-transparent' }}"
+                               style="border-color: {{ $feedbackActive ? '#F3A261' : 'transparent' }};"
+                               aria-current="{{ $feedbackActive ? 'page' : 'false' }}">
+                                Feedback
+                                @if($creatorFeedbackSummary['total'] > 0)
+                                    <span class="ml-2 inline-flex items-center justify-center rounded-full bg-gray-100 text-gray-700 text-xs font-semibold px-2 py-0.5">
+                                        {{ $creatorFeedbackSummary['total'] }}
+                                    </span>
+                                @endif
+                            </a>
+                        </nav>
+                    </div>
+
                     <!-- Task Content Section -->
-                    <div class="px-6 py-6">
+                    @if($overviewActive)
+                    <div id="creator-overview-content" class="creator-tab-content px-6 py-6">
                         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                             <!-- Main Content Column -->
                             <div class="lg:col-span-2 space-y-4">
@@ -259,6 +296,125 @@
                             </div>
                         </div>
                     </div>
+                    @endif
+
+                    @if($feedbackActive)
+                    <div id="creator-feedback-content" class="creator-tab-content px-6 py-6">
+                        <div class="space-y-8">
+                            <div class="bg-white/95 rounded-2xl shadow-xl border border-brand-peach/40 p-6">
+                                <div class="flex flex-col gap-3">
+                                    <h3 class="text-lg font-semibold text-gray-900">Participant Sentiment</h3>
+                                    <p class="text-sm text-gray-600">A quick glance at how your volunteers feel about this task.</p>
+                                    <div class="flex flex-wrap gap-3 text-xs font-semibold text-gray-500">
+                                        <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-brand-teal/10 text-brand-teal-dark">
+                                            <i class="fas fa-wave-square"></i>
+                                            Live feedback stream
+                                        </span>
+                                        <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-brand-peach/70 text-brand-orange-dark">
+                                            <i class="fas fa-comments"></i>
+                                            {{ $creatorFeedbackSummary['total'] }} responses
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="grid gap-4 md:grid-cols-3">
+                                <div class="rounded-2xl border border-brand-peach/70 bg-white/80 p-5 shadow">
+                                    <p class="text-xs uppercase tracking-wide text-gray-500">Average Rating</p>
+                                    <div class="mt-2 flex items-baseline gap-2">
+                                        <span class="text-3xl font-bold text-brand-orange">
+                                            {{ $creatorFeedbackSummary['average_rating'] ? number_format($creatorFeedbackSummary['average_rating'], 1) : '—' }}
+                                        </span>
+                                        <span class="text-sm text-gray-500">/ 5</span>
+                                    </div>
+                                    @if($creatorFeedbackSummary['average_rating'])
+                                        <x-rating-stars :value="$creatorFeedbackSummary['average_rating']" size="sm" class="mt-2" />
+                                    @else
+                                        <p class="text-sm text-gray-500 mt-2">No ratings yet.</p>
+                                    @endif
+                                </div>
+                                <div class="rounded-2xl border border-brand-teal/50 bg-white/80 p-5 shadow">
+                                    <p class="text-xs uppercase tracking-wide text-gray-500">Total Responses</p>
+                                    <span class="mt-2 block text-3xl font-bold text-brand-teal">{{ $creatorFeedbackSummary['total'] }}</span>
+                                    <p class="text-sm text-gray-500">from task participants</p>
+                                </div>
+                                <div class="rounded-2xl border border-gray-200 bg-white/80 p-5 shadow">
+                                    <p class="text-xs uppercase tracking-wide text-gray-500">Most Recent</p>
+                                    @if($creatorFeedbackSummary['latest'])
+                                        <p class="mt-2 text-base font-semibold text-gray-900">
+                                            {{ $creatorFeedbackSummary['latest']->user->name ?? 'Unknown User' }}
+                                        </p>
+                                        <p class="text-xs text-gray-500">
+                                            {{ optional($creatorFeedbackSummary['latest']->feedback_date ?? $creatorFeedbackSummary['latest']->created_at)->format('M j, Y \\a\\t g:i A') }}
+                                        </p>
+                                    @else
+                                        <p class="mt-2 text-sm text-gray-500">No feedback submitted yet.</p>
+                                    @endif
+                                </div>
+                            </div>
+
+                            <div class="bg-white/95 rounded-2xl shadow-2xl border border-brand-peach/60 p-6">
+                                <div class="flex flex-col gap-2 mb-6 sm:flex-row sm:items-center sm:justify-between">
+                                    <div>
+                                        <h4 class="text-lg font-semibold text-gray-900">Participant Feedback</h4>
+                                        <p class="text-sm text-gray-500">Sorted by latest responses</p>
+                                    </div>
+                                    @if($creatorFeedbackSummary['total'] > 0)
+                                        <span class="inline-flex items-center gap-2 text-xs font-semibold px-3 py-1 rounded-full bg-brand-peach/70 text-brand-orange-dark">
+                                            <i class="fas fa-bolt"></i>
+                                            Fresh insights
+                                        </span>
+                                    @endif
+                                </div>
+
+                                @if($creatorFeedbackSummary['total'] > 0)
+                                    <div class="space-y-4">
+                                        @foreach($creatorFeedbackEntries as $feedback)
+                                            @php
+                                                $feedbackTimestamp = $feedback->feedback_date ?? $feedback->created_at;
+                                            @endphp
+                                            <article class="relative flex gap-4 rounded-2xl border border-gray-100 p-4 hover:border-brand-peach/70 transition bg-white/80">
+                                                <div class="flex flex-col items-center">
+                                                    <div class="w-2 h-2 rounded-full bg-brand-teal"></div>
+                                                    <div class="flex-1 w-px bg-gradient-to-b from-brand-teal/50 to-transparent mt-2"></div>
+                                                </div>
+                                                <div class="flex-1 space-y-3">
+                                                    <div class="flex flex-wrap items-center justify-between gap-3">
+                                                        <div class="flex items-center gap-3">
+                                                            <div class="h-10 w-10 rounded-full bg-brand-peach/70 text-brand-orange-dark flex items-center justify-center text-sm font-semibold">
+                                                                {{ \Illuminate\Support\Str::of($feedback->user->name ?? 'UU')->substr(0, 2)->upper() }}
+                                                            </div>
+                                                            <div>
+                                                                <p class="text-sm font-semibold text-gray-900">{{ $feedback->user->name ?? 'Unknown User' }}</p>
+                                                                <p class="text-xs text-gray-500">{{ $feedback->user->email ?? 'No email provided' }}</p>
+                                                            </div>
+                                                        </div>
+                                                        <x-rating-stars :value="$feedback->rating" size="sm">
+                                                            <span class="ml-2 text-xs font-semibold text-brand-orange-dark">{{ number_format($feedback->rating, 1) }}/5</span>
+                                                        </x-rating-stars>
+                                                    </div>
+                                                    <p class="text-sm text-gray-700 bg-brand-peach/20 rounded-xl px-4 py-3 border border-brand-peach/40">
+                                                        {{ $feedback->comment }}
+                                                    </p>
+                                                    <div class="text-xs text-gray-500 flex items-center gap-2">
+                                                        <i class="fas fa-clock text-brand-teal"></i>
+                                                        {{ optional($feedbackTimestamp)->format('M j, Y \\a\\t g:i A') }}
+                                                    </div>
+                                                </div>
+                                            </article>
+                                        @endforeach
+                                    </div>
+                                @else
+                                    <div class="text-center py-12 bg-brand-peach/20 border border-dashed border-brand-peach/70 rounded-2xl">
+                                        <i class="fas fa-comments text-brand-orange-dark text-4xl mb-4"></i>
+                                        <p class="text-sm font-medium text-gray-900">No feedback yet</p>
+                                        <p class="text-sm text-gray-600">Encourage participants to submit their experience once they finish.</p>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                    @endif
                 </div>
             @else
                 <!-- Regular user layout with tabs -->
@@ -980,6 +1136,7 @@
                 closeParticipantsModal();
             }
         });
+
     </script>
     @endif
 

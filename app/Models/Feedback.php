@@ -17,7 +17,7 @@ class Feedback extends Model
     ];
 
     protected $casts = [
-        'rating' => 'integer',
+        'rating' => 'float',
         'feedback_date' => 'datetime',
     ];
 
