@@ -50,8 +50,9 @@ class IncidentReportController extends Controller
             $task = Task::find($taskId);
         }
 
-        // Get all active users (excluding current user)
+        // Get all active non-admin users (excluding current user)
         $users = User::where('userId', '!=', Auth::user()->userId)
+            ->where('role', '!=', 'admin')
             ->where('status', 'active')
             ->orderBy('firstName')
             ->orderBy('lastName')
@@ -253,6 +254,7 @@ class IncidentReportController extends Controller
 
         try {
             $users = User::where('userId', '!=', Auth::user()->userId) // Exclude current user
+                ->where('role', '!=', 'admin') // Exclude admins from being reported
                 ->where(function ($q) use ($query) {
                     $q->where('firstName', 'like', "%{$query}%")
                       ->orWhere('lastName', 'like', "%{$query}%")

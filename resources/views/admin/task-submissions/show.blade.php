@@ -13,7 +13,10 @@
                 </p>
             </div>
             <a href="{{ route('admin.task-submissions.index') }}" 
-               class="inline-flex items-center px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white text-sm font-medium rounded-lg transition-colors">
+               class="inline-flex items-center px-4 py-2 text-white text-sm font-medium rounded-lg transition-colors"
+               style="background-color: #2B9D8D;"
+               onmouseover="this.style.backgroundColor='#248A7C'"
+               onmouseout="this.style.backgroundColor='#2B9D8D'">
                 <i class="fas fa-arrow-left mr-2"></i>
                 Back to Submissions
             </a>
@@ -31,7 +34,7 @@
                     <div class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
                         <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
                             <h3 class="text-lg font-semibold text-gray-900 flex items-center">
-                                <i class="fas fa-tasks mr-2 text-blue-600"></i>
+                                <i class="fas fa-tasks mr-2" style="color: #2B9D8D;"></i>
                                 Task Information
                             </h3>
                         </div>
@@ -48,7 +51,7 @@
                                 <div>
                                     <dt class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Points Awarded</dt>
                                     <dd class="text-sm font-medium text-gray-900">
-                                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg bg-blue-50 text-blue-700 font-semibold">
+                                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg font-semibold" style="background-color: rgba(43, 157, 141, 0.2); color: #2B9D8D;">
                                             <i class="fas fa-star mr-1 text-xs"></i>
                                             {{ $submission->task->points_awarded }}
                                         </span>
@@ -76,7 +79,7 @@
                     <div class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
                         <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
                             <h3 class="text-lg font-semibold text-gray-900 flex items-center">
-                                <i class="fas fa-file-upload mr-2 text-green-600"></i>
+                                <i class="fas fa-file-upload mr-2" style="color: #2B9D8D;"></i>
                                 User's Submission
                             </h3>
                         </div>
@@ -117,7 +120,7 @@
                                                     </div>
                                                     
                                                     <!-- Image number badge -->
-                                                    <div class="absolute top-2 left-2 bg-blue-600 text-white text-xs font-semibold px-2 py-1 rounded">
+                                                    <div class="absolute top-2 left-2 text-white text-xs font-semibold px-2 py-1 rounded" style="background-color: #2B9D8D;">
                                                         {{ $index + 1 }}
                                                     </div>
                                                 </div>
@@ -143,13 +146,13 @@
                     <div class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
                         <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
                             <h3 class="text-lg font-semibold text-gray-900 flex items-center">
-                                <i class="fas fa-user mr-2 text-blue-600"></i>
+                                <i class="fas fa-user mr-2" style="color: #2B9D8D;"></i>
                                 User Information
                             </h3>
                         </div>
                         <div class="p-6">
                             <div class="flex items-center space-x-3 mb-6">
-                                <div class="h-14 w-14 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center flex-shrink-0 shadow-md">
+                                <div class="h-14 w-14 rounded-full flex items-center justify-center flex-shrink-0 shadow-md" style="background-color: #2B9D8D;">
                                     <span class="text-lg font-bold text-white">
                                         {{ strtoupper(substr($submission->user->name, 0, 1)) }}
                                     </span>
@@ -166,21 +169,21 @@
                                 </div>
                                 <div class="flex justify-between items-center">
                                     <span class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Points to Award</span>
-                                    <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-sm font-bold bg-blue-50 text-blue-700">
+                                    <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-sm font-bold" style="background-color: rgba(43, 157, 141, 0.2); color: #2B9D8D;">
                                         <i class="fas fa-star mr-1 text-xs"></i>
                                         {{ $submission->task->points_awarded }}
                                     </span>
                                 </div>
                                 <div class="flex justify-between items-center">
                                     <span class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Rejection Count</span>
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium" style="background-color: rgba(43, 157, 141, 0.2); color: #2B9D8D;">
                                         {{ $submission->rejection_count ?? 0 }}/3
                                     </span>
                                 </div>
                                 @if($submission->rejection_reason)
-                                <div class="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-                                    <p class="text-xs font-semibold text-red-800 mb-1 uppercase tracking-wide">Last Rejection Reason</p>
-                                    <p class="text-sm text-red-700 leading-relaxed">{{ $submission->rejection_reason }}</p>
+                                <div class="mt-4 p-3 rounded-lg" style="background-color: rgba(43, 157, 141, 0.1); border-color: #2B9D8D; border-width: 1px;">
+                                    <p class="text-xs font-semibold mb-1 uppercase tracking-wide" style="color: #2B9D8D;">Last Rejection Reason</p>
+                                    <p class="text-sm leading-relaxed" style="color: #2B9D8D;">{{ $submission->rejection_reason }}</p>
                                 </div>
                                 @endif
                             </div>
@@ -191,7 +194,7 @@
                     <div class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
                         <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
                             <h3 class="text-lg font-semibold text-gray-900 flex items-center">
-                                <i class="fas fa-gavel mr-2 text-blue-600"></i>
+                                <i class="fas fa-gavel mr-2" style="color: #2B9D8D;"></i>
                                 Review Actions
                             </h3>
                         </div>
@@ -200,25 +203,26 @@
                                 $isClosed = $submission->status === 'completed' || $submission->rejection_count >= 3;
                             @endphp
 
+                            @php
+                                $statusBg = 'rgba(43, 157, 141, 0.1)';
+                                $statusBorder = '#2B9D8D';
+                            @endphp
                             @if($isClosed)
-                                <div class="p-4 rounded-lg border-2
-                                    @if($submission->status === 'completed') bg-green-50 border-green-200
-                                    @else bg-red-50 border-red-200
-                                    @endif">
+                                <div class="p-4 rounded-lg border-2" style="background-color: {{ $statusBg }}; border-color: {{ $statusBorder }};">
                                     @if($submission->status === 'completed')
                                         <div class="flex items-center text-green-700 mb-2">
                                             <i class="fas fa-check-circle mr-2"></i>
                                             <span class="font-semibold">Submission Approved</span>
                                         </div>
-                                        <p class="text-sm text-green-600">
+                                        <p class="text-sm" style="color: #2B9D8D;">
                                             This submission has been approved and is closed. No further actions can be taken.
                                         </p>
                                     @elseif($submission->rejection_count >= 3)
-                                        <div class="flex items-center text-red-700 mb-2">
+                                        <div class="flex items-center mb-2" style="color: #2B9D8D;">
                                             <i class="fas fa-times-circle mr-2"></i>
                                             <span class="font-semibold">Submission Closed</span>
                                         </div>
-                                        <p class="text-sm text-red-600">
+                                        <p class="text-sm" style="color: #2B9D8D;">
                                             This submission has reached the maximum number of rejection attempts (3) and is closed. No further actions can be taken.
                                         </p>
                                     @endif
@@ -239,7 +243,10 @@
                                             placeholder="Add notes about this approval..."></textarea>
                                     </div>
                                     <button type="submit" 
-                                            class="w-full inline-flex justify-center items-center px-4 py-2.5 border border-transparent text-sm font-semibold rounded-lg text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors shadow-sm">
+                                            class="w-full inline-flex justify-center items-center px-4 py-2.5 border border-transparent text-sm font-semibold rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors shadow-sm"
+                                            style="background-color: #2B9D8D;"
+                                            onmouseover="this.style.backgroundColor='#248A7C'"
+                                            onmouseout="this.style.backgroundColor='#2B9D8D'">
                                         <i class="fas fa-check mr-2"></i>
                                         Approve Submission
                                     </button>

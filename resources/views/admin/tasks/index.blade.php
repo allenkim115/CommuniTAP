@@ -5,7 +5,10 @@
                 {{ __('Task Management') }}
             </h2>
             
-            <a href="{{ route('admin.tasks.create') }}" class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors">
+            <a href="{{ route('admin.tasks.create') }}" class="inline-flex items-center gap-2 text-white font-medium py-2 px-4 rounded-lg transition-colors"
+               style="background-color: #F3A261;"
+               onmouseover="this.style.backgroundColor='#E8944F'"
+               onmouseout="this.style.backgroundColor='#F3A261'">
                 <i class="fas fa-plus"></i>
                 Create Task
             </a>
@@ -19,33 +22,41 @@
 
             <!-- Task Statistics -->
             <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
-                <a href="{{ route('admin.tasks.index') }}" class="bg-white rounded-lg border border-gray-200 p-4 hover:border-blue-500 hover:shadow-md transition-all {{ !request('status') || request('status') === 'all' ? 'border-blue-500 bg-blue-50' : '' }}">
+                <a href="{{ route('admin.tasks.index') }}" class="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-all {{ !request('status') || request('status') === 'all' ? '' : '' }}"
+                   @if(!request('status') || request('status') === 'all') style="border-color: #2B9D8D; background-color: rgba(43, 157, 141, 0.1);" @endif
+                   @if(!request('status') || request('status') === 'all') onmouseover="this.style.borderColor='#248A7C';" onmouseout="this.style.borderColor='#2B9D8D';" @endif>
                     <div class="flex items-center gap-2 mb-2">
-                        <i class="fas fa-tasks text-blue-600"></i>
+                        <i class="fas fa-tasks" style="color: #2B9D8D;"></i>
                         <p class="text-xs font-medium text-gray-600">Total Tasks</p>
                     </div>
                     <p class="text-2xl font-bold text-gray-900">{{ $taskStats['total'] }}</p>
                 </a>
 
-                <a href="{{ route('admin.tasks.filter', ['status' => 'pending']) }}" class="bg-white rounded-lg border border-gray-200 p-4 hover:border-yellow-500 hover:shadow-md transition-all {{ request('status') === 'pending' ? 'border-yellow-500 bg-yellow-50' : '' }}">
+                <a href="{{ route('admin.tasks.filter', ['status' => 'pending']) }}" class="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-all {{ request('status') === 'pending' ? '' : '' }}"
+                   @if(request('status') === 'pending') style="border-color: #FED2B3; background-color: rgba(254, 210, 179, 0.1);" @endif
+                   @if(request('status') === 'pending') onmouseover="this.style.borderColor='#E8C19F';" onmouseout="this.style.borderColor='#FED2B3';" @endif>
                     <div class="flex items-center gap-2 mb-2">
-                        <i class="fas fa-clock text-yellow-600"></i>
+                        <i class="fas fa-clock" style="color: #FED2B3;"></i>
                         <p class="text-xs font-medium text-gray-600">Pending</p>
                     </div>
                     <p class="text-2xl font-bold text-gray-900">{{ $taskStats['pending'] }}</p>
                 </a>
 
-                <a href="{{ route('admin.tasks.filter', ['status' => 'completed']) }}" class="bg-white rounded-lg border border-gray-200 p-4 hover:border-green-500 hover:shadow-md transition-all {{ request('status') === 'completed' ? 'border-green-500 bg-green-50' : '' }}">
+                <a href="{{ route('admin.tasks.filter', ['status' => 'completed']) }}" class="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-all {{ request('status') === 'completed' ? '' : '' }}"
+                   @if(request('status') === 'completed') style="border-color: #2B9D8D; background-color: rgba(43, 157, 141, 0.1);" @endif
+                   @if(request('status') === 'completed') onmouseover="this.style.borderColor='#248A7C';" onmouseout="this.style.borderColor='#2B9D8D';" @endif>
                     <div class="flex items-center gap-2 mb-2">
-                        <i class="fas fa-check-circle text-green-600"></i>
+                        <i class="fas fa-check-circle" style="color: #2B9D8D;"></i>
                         <p class="text-xs font-medium text-gray-600">Completed</p>
                     </div>
                     <p class="text-2xl font-bold text-gray-900">{{ $taskStats['completed'] }}</p>
                 </a>
 
-                <a href="{{ route('admin.tasks.filter', ['status' => 'published']) }}" class="bg-white rounded-lg border border-gray-200 p-4 hover:border-blue-500 hover:shadow-md transition-all {{ request('status') === 'published' ? 'border-blue-500 bg-blue-50' : '' }}">
+                <a href="{{ route('admin.tasks.filter', ['status' => 'published']) }}" class="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-all {{ request('status') === 'published' ? '' : '' }}"
+                   @if(request('status') === 'published') style="border-color: #2B9D8D; background-color: rgba(43, 157, 141, 0.1);" @endif
+                   @if(request('status') === 'published') onmouseover="this.style.borderColor='#248A7C';" onmouseout="this.style.borderColor='#2B9D8D';" @endif>
                     <div class="flex items-center gap-2 mb-2">
-                        <i class="fas fa-rocket text-blue-600"></i>
+                        <i class="fas fa-rocket" style="color: #2B9D8D;"></i>
                         <p class="text-xs font-medium text-gray-600">Published</p>
                     </div>
                     <p class="text-2xl font-bold text-gray-900">{{ $taskStats['published'] }}</p>
@@ -72,7 +83,7 @@
             <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-6 mb-6">
                 <div class="mb-4">
                     <h3 class="text-lg font-semibold text-gray-900 mb-1 flex items-center gap-2">
-                        <i class="fas fa-filter text-blue-600"></i>
+                        <i class="fas fa-filter" style="color: #2B9D8D;"></i>
                         Filter Tasks
                     </h3>
                     <p class="text-sm text-gray-600">Refine your task list by type and progress</p>
@@ -85,7 +96,7 @@
                     <!-- Search Input -->
                     <div class="mb-4">
                         <label for="search" class="block text-sm font-medium text-gray-700 mb-2">
-                            <i class="fas fa-search text-blue-600"></i> Search Tasks
+                            <i class="fas fa-search" style="color: #2B9D8D;"></i> Search Tasks
                         </label>
                         <div class="relative">
                             <input type="text" 
@@ -149,18 +160,18 @@
                     <div class="flex flex-wrap items-center gap-2">
                         <span class="text-sm font-medium text-gray-700">Active Filters:</span>
                         @if(request('search'))
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium" style="background-color: rgba(254, 210, 179, 0.2); color: #FED2B3;">
                                 <i class="fas fa-search mr-1"></i>
                                 Search: "{{ request('search') }}"
                             </span>
                         @endif
                         @if(request('status') && request('status') !== 'all')
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium" style="background-color: rgba(43, 157, 141, 0.2); color: #2B9D8D;">
                                 Status: {{ ucfirst(request('status')) }}
                             </span>
                         @endif
                         @if(request('task_type') && request('task_type') !== 'all')
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium" style="background-color: rgba(43, 157, 141, 0.2); color: #2B9D8D;">
                                 Type: {{ ucfirst(str_replace('_', ' ', request('task_type'))) }}
                             </span>
                         @endif
@@ -170,7 +181,7 @@
                             </span>
                         @endif
                         @if(request('date_from') || request('date_to'))
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium" style="background-color: rgba(243, 162, 97, 0.2); color: #F3A261;">
                                 @if(request('date_from') && request('date_to'))
                                     {{ \Carbon\Carbon::parse(request('date_from'))->format('M d, Y') }} - {{ \Carbon\Carbon::parse(request('date_to'))->format('M d, Y') }}
                                 @elseif(request('date_from'))
@@ -203,7 +214,7 @@
                             @endif">
                             <!-- Card Header -->
                             <div class="mb-3">
-                                <h3 class="text-base font-semibold text-gray-900 line-clamp-2 group-hover:text-blue-600 transition-colors mb-2">
+                                <h3 class="text-base font-semibold text-gray-900 line-clamp-2 transition-colors mb-2 group-hover:text-blue-600" style="--hover-color: #2B9D8D;">
                                     {{ $task->title }}
                                 </h3>
                                 <p class="text-sm text-gray-600 line-clamp-2">
@@ -213,7 +224,7 @@
 
                             <!-- Badges Row -->
                             <div class="flex flex-wrap gap-2 mb-3">
-                                <span class="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded bg-blue-100 text-blue-800">
+                                <span class="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded" style="background-color: rgba(43, 157, 141, 0.2); color: #2B9D8D;">
                                     @if($task->task_type === 'daily')
                                         <i class="fas fa-calendar-day"></i>
                                     @elseif($task->task_type === 'one_time')
@@ -224,12 +235,18 @@
                                     {{ ucfirst(str_replace('_', ' ', $task->task_type)) }}
                                 </span>
                                 <span class="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded
-                                    @if($task->status === 'pending') bg-yellow-100 text-yellow-800
-                                    @elseif($task->status === 'approved') bg-green-100 text-green-800
-                                    @elseif($task->status === 'published') bg-blue-100 text-blue-800
-                                    @elseif($task->status === 'assigned') bg-purple-100 text-purple-800
-                                    @elseif($task->status === 'submitted') bg-indigo-100 text-indigo-800
-                                    @elseif($task->status === 'completed') bg-green-100 text-green-800
+                                    @if($task->status === 'pending') 
+                                    @php $statusBg = 'rgba(254, 210, 179, 0.2)'; $statusColor = '#FED2B3'; @endphp
+                                    @elseif($task->status === 'approved') 
+                                    @php $statusBg = 'rgba(43, 157, 141, 0.2)'; $statusColor = '#2B9D8D'; @endphp
+                                    @elseif($task->status === 'published') 
+                                    @php $statusBg = 'rgba(43, 157, 141, 0.2)'; $statusColor = '#2B9D8D'; @endphp
+                                    @elseif($task->status === 'assigned') 
+                                    @php $statusBg = 'rgba(43, 157, 141, 0.2)'; $statusColor = '#2B9D8D'; @endphp
+                                    @elseif($task->status === 'submitted') 
+                                    @php $statusBg = 'rgba(254, 210, 179, 0.2)'; $statusColor = '#FED2B3'; @endphp
+                                    @elseif($task->status === 'completed') 
+                                    @php $statusBg = 'rgba(43, 157, 141, 0.2)'; $statusColor = '#2B9D8D'; @endphp
                                     @elseif($task->status === 'rejected') bg-red-100 text-red-800
                                     @elseif($task->status === 'uncompleted') bg-orange-100 text-orange-800
                                     @elseif($task->status === 'inactive') bg-gray-100 text-gray-800

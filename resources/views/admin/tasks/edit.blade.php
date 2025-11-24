@@ -5,7 +5,10 @@
                 {{ __('Edit Task') }}
             </h2>
             <a href="{{ route('admin.tasks.index') }}"
-                class="inline-flex items-center gap-2 bg-gray-600 hover:bg-gray-700 text-white text-sm font-medium py-2 px-4 rounded-lg transition-colors">
+                class="inline-flex items-center gap-2 text-white text-sm font-medium py-2 px-4 rounded-lg transition-colors"
+                style="background-color: #2B9D8D;"
+                onmouseover="this.style.backgroundColor='#248A7C'"
+                onmouseout="this.style.backgroundColor='#2B9D8D'">
                 <i class="fas fa-arrow-left"></i>
                 Back
             </a>
@@ -176,22 +179,43 @@
                             <input type="text" value="{{ ucfirst($task->status) }}" 
                                    class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-gray-100 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed" 
                                    readonly>
-                            <p class="mt-3 text-sm text-gray-600 dark:text-gray-400">
-                                Task status is managed through specific actions (Approve, Reject, Publish, etc.) on the task details page.
-                            </p>
                         </div>
                     </div>
 
                     <!-- Action Buttons -->
+                    @php
+                        $isUncompleted = !in_array($task->status, ['completed']) && !in_array($task->status, ['approved', 'published']);
+                        $showTwoButtons = $isUncompleted || $task->status === 'inactive';
+                    @endphp
                     <div class="flex justify-end gap-4 pt-6 border-t border-gray-200 dark:border-gray-700">
                         <a href="{{ route('admin.tasks.index') }}"
                             class="px-5 py-2.5 rounded-md text-sm font-medium border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition">
                             Cancel
                         </a>
-                        <button type="submit"
-                            class="px-6 py-2.5 text-sm font-semibold rounded-md text-white bg-blue-600 hover:bg-blue-700 shadow-md transition focus:ring-2 focus:ring-blue-400 focus:ring-offset-2">
-                            {{ $task->status === 'inactive' ? 'Update & Publish' : 'Update Task' }}
-                        </button>
+                        @if($showTwoButtons)
+                            <button type="submit" name="action" value="update"
+                                class="px-6 py-2.5 text-sm font-semibold rounded-md text-white shadow-md transition focus:ring-2 focus:ring-orange-400 focus:ring-offset-2"
+                                style="background-color: #F3A261;"
+                                onmouseover="this.style.backgroundColor='#E8944F'"
+                                onmouseout="this.style.backgroundColor='#F3A261'">
+                                Update Task
+                            </button>
+                            <button type="submit" name="action" value="publish"
+                                class="px-6 py-2.5 text-sm font-semibold rounded-md text-white shadow-md transition focus:ring-2 focus:ring-orange-400 focus:ring-offset-2"
+                                style="background-color: #F3A261;"
+                                onmouseover="this.style.backgroundColor='#E8944F'"
+                                onmouseout="this.style.backgroundColor='#F3A261'">
+                                Update & Publish
+                            </button>
+                        @else
+                            <button type="submit" name="action" value="update"
+                                class="px-6 py-2.5 text-sm font-semibold rounded-md text-white shadow-md transition focus:ring-2 focus:ring-orange-400 focus:ring-offset-2"
+                                style="background-color: #F3A261;"
+                                onmouseover="this.style.backgroundColor='#E8944F'"
+                                onmouseout="this.style.backgroundColor='#F3A261'">
+                                {{ $task->status === 'inactive' ? 'Update & Publish' : 'Update Task' }}
+                            </button>
+                        @endif
                     </div>
                 </form>
             </div>

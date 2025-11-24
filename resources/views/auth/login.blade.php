@@ -16,7 +16,7 @@
                     onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"
                 >
                 <!-- Fallback -->
-                <div style="display:none;" class="bg-gradient-to-br from-orange-200 to-teal-200 rounded-full w-40 h-40 flex items-center justify-center">
+                <div style="display:none;" class="rounded-full w-40 h-40 flex items-center justify-center" style="background: linear-gradient(to bottom right, rgba(243, 162, 97, 0.8), rgba(43, 157, 141, 0.8));">
                     <span class="text-3xl font-bold text-white">CT</span>
                 </div>
             </div>

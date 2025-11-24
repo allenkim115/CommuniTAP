@@ -1,14 +1,14 @@
 <x-guest-layout>
     <!-- First User Admin Notice -->
     @if(App\Models\User::count() === 0)
-        <div class="mb-6 p-5 bg-white/80 backdrop-blur-sm border border-orange-200 rounded-2xl shadow-sm animate-fade-in">
+        <div class="mb-6 p-5 bg-white/80 backdrop-blur-sm rounded-2xl shadow-sm animate-fade-in" style="border-color: #F3A261; border-width: 1px;">
             <div class="flex items-center gap-3">
-                <svg class="h-6 w-6 text-orange-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="h-6 w-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: #F3A261;">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
                           d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
-                <p class="text-sm font-medium text-orange-800">
-                    <strong>First User:</strong> You’ll become the <span class="text-primary font-bold">Administrator</span>.
+                <p class="text-sm font-medium" style="color: #F3A261;">
+                    <strong>First User:</strong> You'll become the <span class="text-primary font-bold">Administrator</span>.
                 </p>
             </div>
         </div>
@@ -28,7 +28,7 @@
                     class="w-32 h-32 sm:w-40 sm:h-40 drop-shadow-lg"
                     onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"
                 >
-                <div style="display:none;" class="bg-gradient-to-br from-orange-200 to-teal-200 rounded-full w-40 h-40 flex items-center justify-center">
+                <div style="display:none;" class="rounded-full w-40 h-40 flex items-center justify-center" style="background: linear-gradient(to bottom right, rgba(243, 162, 97, 0.8), rgba(43, 157, 141, 0.8));">
                     <span class="text-3xl font-bold text-white">CT</span>
                 </div>
             </div>
@@ -36,7 +36,7 @@
 
         <!-- Heading -->
         <h2 class="text-3xl sm:text-4xl font-bold text-center text-gray-800 mb-10">
-            Create Your Account
+            Create Account
         </h2>
 
         <!-- Form Container -->

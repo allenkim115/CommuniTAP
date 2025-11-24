@@ -5,17 +5,10 @@
                 {{ __('Task Details') }}
             </h2>
             <div class="flex space-x-2">
-                @if($task->task_type !== 'user_uploaded' && $task->status !== 'completed' && $task->status !== 'published')
-                    <a href="{{ route('admin.tasks.edit', $task) }}" class="inline-flex items-center gap-2 text-white font-medium py-2 px-4 rounded-lg transition-colors brand-primary-btn">
-                        <i class="fas fa-edit"></i>
-                        @if($task->status === 'inactive')
-                            Edit Task (Required)
-                        @else
-                            Edit Task
-                        @endif
-                    </a>
-                @endif
-                <a href="{{ route('admin.tasks.index') }}" class="inline-flex items-center gap-2 bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-lg transition-colors">
+                <a href="{{ route('admin.tasks.index') }}" class="inline-flex items-center gap-2 text-white font-medium py-2 px-4 rounded-lg transition-colors"
+                   style="background-color: #2B9D8D;"
+                   onmouseover="this.style.backgroundColor='#248A7C'"
+                   onmouseout="this.style.backgroundColor='#2B9D8D'">
                     <i class="fas fa-arrow-left"></i>
                     Back to Tasks
                 </a>
@@ -28,7 +21,7 @@
             <!-- Main Card Container -->
             <div class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
                 <!-- Task Header -->
-                <div class="px-6 py-6" style="background: linear-gradient(135deg, #F53003 0%, #F4A261 50%, #2A9D8F 100%);">
+                <div class="px-6 py-6" style="background: linear-gradient(135deg, #F3A261 0%, #2B9D8D 100%);">
                     <div class="flex flex-col lg:flex-row justify-between items-start gap-4">
                         <div class="flex-1">
                             <h1 class="text-2xl lg:text-3xl font-bold text-white mb-3">
@@ -89,7 +82,7 @@
                                 @if($task->creation_date)
                                 <div class="bg-white rounded-lg p-4 border border-gray-200 shadow-sm">
                                     <div class="flex items-center gap-2 mb-2">
-                                        <i class="fas fa-calendar-alt" style="color: #F4A261;"></i>
+                                        <i class="fas fa-calendar-alt" style="color: #F3A261;"></i>
                                         <h4 class="text-xs font-semibold text-gray-600 uppercase">Created</h4>
                                     </div>
                                     <p class="text-sm font-medium text-gray-900">
@@ -101,7 +94,7 @@
                                 @if($task->approval_date)
                                 <div class="bg-white rounded-lg p-4 border border-gray-200 shadow-sm">
                                     <div class="flex items-center gap-2 mb-2">
-                                        <i class="fas fa-check-square text-green-600"></i>
+                                        <i class="fas fa-check-square" style="color: #2B9D8D;"></i>
                                         <h4 class="text-xs font-semibold text-gray-600 uppercase">Approved</h4>
                                     </div>
                                     <p class="text-sm font-medium text-gray-900">
@@ -113,7 +106,7 @@
                                 @if($task->published_date)
                                 <div class="bg-white rounded-lg p-4 border border-gray-200 shadow-sm">
                                     <div class="flex items-center gap-2 mb-2">
-                                        <i class="fas fa-bullhorn" style="color: #2A9D8F;"></i>
+                                        <i class="fas fa-bullhorn" style="color: #2B9D8D;"></i>
                                         <h4 class="text-xs font-semibold text-gray-600 uppercase">Published</h4>
                                     </div>
                                     <p class="text-sm font-medium text-gray-900">
@@ -125,7 +118,7 @@
                                 @if($task->due_date)
                                 <div class="bg-white rounded-lg p-4 border border-gray-200 shadow-sm">
                                     <div class="flex items-center gap-2 mb-2">
-                                        <i class="fas fa-play-circle" style="color: #F53003;"></i>
+                                        <i class="fas fa-play-circle" style="color: #F3A261;"></i>
                                         <h4 class="text-xs font-semibold text-gray-600 uppercase">Start Date</h4>
                                     </div>
                                     <p class="text-sm font-medium text-gray-900">
@@ -165,7 +158,7 @@
                                 @if($task->location)
                                 <div class="bg-white rounded-lg p-4 border border-gray-200 shadow-sm">
                                     <div class="flex items-center gap-2 mb-2">
-                                        <i class="fas fa-map-marker-alt" style="color: #2A9D8F;"></i>
+                                        <i class="fas fa-map-marker-alt" style="color: #2B9D8D;"></i>
                                         <h4 class="text-xs font-semibold text-gray-600 uppercase">Location</h4>
                                     </div>
                                     <p class="text-sm font-medium text-gray-900">
@@ -182,36 +175,63 @@
                             <div class="bg-white rounded-lg p-6 border border-gray-200 shadow-sm">
                                 <div class="flex items-center justify-between mb-4">
                                     <h3 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                                        <i class="fas fa-users" style="color: #F53003;"></i>
+                                        <i class="fas fa-users" style="color: #F3A261;"></i>
                                         Participants
                                     </h3>
-                                    <span class="px-3 py-1 text-white text-sm font-bold rounded-full" style="background: linear-gradient(135deg, #F53003 0%, #F4A261 100%);">
+                                    <span class="px-3 py-1 text-white text-sm font-bold rounded-full" style="background: linear-gradient(135deg, #F3A261 0%, #F3A261 100%);">
                                         {{ $task->assignments->count() }}
                                     </span>
                                 </div>
 
                                 @if($task->assignments->count() > 0)
-                                    <!-- Scrollable Participants List -->
-                                    <div class="space-y-3 max-h-80 overflow-y-auto pr-2">
-                                        @foreach($task->assignments as $assignment)
+                                    @php
+                                        $displayLimit = 3;
+                                        $displayedParticipants = $task->assignments->take($displayLimit);
+                                        $hasMore = $task->assignments->count() > $displayLimit;
+                                    @endphp
+                                    <!-- Limited Participants List -->
+                                    <div class="space-y-3 mb-4">
+                                        @foreach($displayedParticipants as $assignment)
+                                            @php
+                                                $firstName = $assignment->user->firstName ?? '';
+                                                $lastName = $assignment->user->lastName ?? '';
+                                                $initials = strtoupper(
+                                                    (!empty($firstName) ? substr($firstName, 0, 1) : '') . 
+                                                    (!empty($lastName) ? substr($lastName, 0, 1) : '')
+                                                );
+                                                if (empty($initials)) {
+                                                    $initials = strtoupper(substr($assignment->user->name ?? 'U', 0, 1));
+                                                }
+                                            @endphp
                                             <div class="flex items-center justify-between p-4 bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
                                                 <div class="flex items-center space-x-3 flex-1 min-w-0">
-                                                    <div class="h-10 w-10 rounded-full flex items-center justify-center flex-shrink-0 shadow-md" style="background: linear-gradient(135deg, #F53003 0%, #F4A261 100%);">
+                                                    <div class="h-10 w-10 rounded-full flex items-center justify-center flex-shrink-0 shadow-md" style="background: linear-gradient(135deg, #F3A261 0%, #F3A261 100%);">
                                                         <span class="text-sm font-bold text-white">
-                                                            {{ strtoupper(substr($assignment->user->name, 0, 1)) }}
+                                                            {{ $initials }}
                                                         </span>
                                                     </div>
                                                     <div class="min-w-0 flex-1">
-                                                        <p class="text-sm font-semibold text-gray-900 truncate">{{ $assignment->user->name }}</p>
+                                                        <p class="text-sm font-semibold text-gray-900 truncate">{{ $initials }}</p>
                                                         <p class="text-xs text-gray-500 truncate">{{ $assignment->user->email }}</p>
                                                     </div>
                                                 </div>
+                                                @php
+                                                    $assignBg = 'rgba(243, 162, 97, 0.2)';
+                                                    $assignColor = '#F3A261';
+                                                    if($assignment->status === 'submitted') {
+                                                        $assignBg = 'rgba(254, 210, 179, 0.2)';
+                                                        $assignColor = '#FED2B3';
+                                                    } elseif($assignment->status === 'completed') {
+                                                        $assignBg = 'rgba(43, 157, 141, 0.2)';
+                                                        $assignColor = '#2B9D8D';
+                                                    }
+                                                @endphp
                                                 <div class="flex items-center space-x-2 flex-shrink-0 ml-3">
-                                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-full
-                                                        @if($assignment->status === 'assigned') bg-orange-100 text-orange-800
-                                                        @elseif($assignment->status === 'submitted') bg-yellow-100 text-yellow-800
-                                                        @elseif($assignment->status === 'completed') bg-teal-100 text-teal-800
-                                                        @endif">
+                                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-full" style="background-color: {{ $assignBg }}; color: {{ $assignColor }};"
+                                                        @if($assignment->status === 'assigned') 
+                                                        @elseif($assignment->status === 'submitted') 
+                                                        @elseif($assignment->status === 'completed') 
+                                                        @endif>
                                                         <i class="fas 
                                                             @if($assignment->status === 'assigned') fa-user-check
                                                             @elseif($assignment->status === 'submitted') fa-paper-plane
@@ -220,15 +240,26 @@
                                                         {{ ucfirst($assignment->status) }}
                                                     </span>
                                                     @if(!empty($assignment->progress))
-                                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-full
+                                                    @php
+                                                        $progressBg = 'rgba(229, 231, 235, 0.5)';
+                                                        $progressColor = '#6B7280';
+                                                        if(in_array($assignment->progress, ['on_the_way', 'working', 'done', 'submitted_proof'])) {
+                                                            $progressBg = 'rgba(43, 157, 141, 0.2)';
+                                                            $progressColor = '#2B9D8D';
+                                                        } elseif($assignment->progress === 'accepted') {
+                                                            $progressBg = 'rgba(243, 162, 97, 0.2)';
+                                                            $progressColor = '#F3A261';
+                                                        }
+                                                    @endphp
+                                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-full" style="background-color: {{ $progressBg }}; color: {{ $progressColor }};"
                                                         @switch($assignment->progress)
-                                                            @case('accepted') bg-gray-100 text-gray-800 @break
-                                                            @case('on_the_way') bg-purple-100 text-purple-800 @break
-                                                            @case('working') bg-indigo-100 text-indigo-800 @break
-                                                            @case('done') bg-teal-100 text-teal-800 @break
-                                                            @case('submitted_proof') bg-orange-100 text-orange-800 @break
-                                                            @default bg-gray-100 text-gray-800
-                                                        @endswitch">
+                                                            @case('accepted') @break
+                                                            @case('on_the_way') @break
+                                                            @case('working') @break
+                                                            @case('done') @break
+                                                            @case('submitted_proof') @break
+                                                            @default 
+                                                        @endswitch>
                                                         <i class="fas 
                                                             @if($assignment->progress === 'accepted') fa-handshake
                                                             @elseif($assignment->progress === 'on_the_way') fa-route
@@ -243,6 +274,14 @@
                                             </div>
                                         @endforeach
                                     </div>
+                                    
+                                    <button type="button" onclick="openParticipantsModal()" class="w-full inline-flex justify-center items-center gap-2 px-4 py-2.5 text-sm font-semibold rounded-lg text-white shadow-md transition-all hover:shadow-lg transform hover:-translate-y-0.5"
+                                            style="background-color: #F3A261;"
+                                            onmouseover="this.style.backgroundColor='#E8944F'"
+                                            onmouseout="this.style.backgroundColor='#F3A261'">
+                                        <i class="fas fa-eye"></i>
+                                        View All ({{ $task->assignments->count() }})
+                                    </button>
                                 @else
                                     <div class="text-center py-8">
                                         <i class="fas fa-users-slash text-gray-300 text-3xl mb-3"></i>
@@ -254,26 +293,49 @@
                             <!-- Admin Actions Section -->
                             <div class="bg-white rounded-lg p-6 border border-gray-200 shadow-sm">
                                 <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                                    <i class="fas fa-cogs" style="color: #F53003;"></i>
+                                    <i class="fas fa-cogs" style="color: #F3A261;"></i>
                                     Admin Actions
                                 </h3>
                                 <div class="space-y-3">
+                                    {{-- Edit Task button for non-user_uploaded tasks (except completed, published, and inactive which are handled separately) --}}
+                                    @if($task->task_type !== 'user_uploaded' && $task->status !== 'completed' && $task->status !== 'published' && $task->status !== 'inactive')
+                                        <a href="{{ route('admin.tasks.edit', $task) }}" 
+                                           class="w-full inline-flex justify-center items-center gap-2 px-4 py-3 border border-transparent text-sm font-bold rounded-lg text-white shadow-md transition-colors brand-primary-btn">
+                                            <i class="fas fa-edit"></i> Edit Task
+                                        </a>
+                                    @endif
+                                    
                                     @if($task->status === 'pending')
-                                        <form action="{{ route('admin.tasks.approve', $task) }}" method="POST" class="w-full">
-                                            @csrf
-                                            <button type="submit" 
-                                                    class="w-full inline-flex justify-center items-center gap-2 px-4 py-3 border border-transparent text-sm font-bold rounded-lg text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 shadow-md transition-colors">
-                                                <i class="fas fa-check"></i> Approve Task
-                                            </button>
-                                        </form>
-                                        <form action="{{ route('admin.tasks.reject', $task) }}" method="POST" class="w-full" id="reject-task-form">
-                                            @csrf
-                                            <button type="button" 
-                                                    onclick="showConfirmModal('Are you sure you want to reject this task?', 'Reject Task', 'Reject', 'Cancel', 'red').then(confirmed => { if(confirmed) document.getElementById('reject-task-form').submit(); });"
-                                                    class="w-full inline-flex justify-center items-center gap-2 px-4 py-3 border border-transparent text-sm font-bold rounded-lg text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 shadow-md transition-colors">
-                                                <i class="fas fa-times"></i> Reject Task
-                                            </button>
-                                        </form>
+                                        {{-- For admin-created tasks (daily, one_time), show Edit and Publish only --}}
+                                        @if($task->task_type !== 'user_uploaded')
+                                            <form action="{{ route('admin.tasks.publish', $task) }}" method="POST" class="w-full">
+                                                @csrf
+                                                <button type="submit" 
+                                                        class="w-full inline-flex justify-center items-center gap-2 px-4 py-3 border border-transparent text-sm font-bold rounded-lg text-white shadow-md transition-colors brand-primary-btn">
+                                                    <i class="fas fa-bullhorn"></i> Publish Task
+                                                </button>
+                                            </form>
+                                        @else
+                                            {{-- For user-uploaded tasks, show Approve and Reject --}}
+                                            <form action="{{ route('admin.tasks.approve', $task) }}" method="POST" class="w-full">
+                                                @csrf
+                                                <button type="submit" 
+                                                        class="w-full inline-flex justify-center items-center gap-2 px-4 py-3 border border-transparent text-sm font-bold rounded-lg text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 shadow-md transition-colors">
+                                                    <i class="fas fa-check"></i> Approve Task
+                                                </button>
+                                            </form>
+                                            <form action="{{ route('admin.tasks.reject', $task) }}" method="POST" class="w-full" id="reject-task-form">
+                                                @csrf
+                                                <button type="button" 
+                                                        onclick="showConfirmModal('Are you sure you want to reject this task?', 'Reject Task', 'Reject', 'Cancel', 'red').then(confirmed => { if(confirmed) document.getElementById('reject-task-form').submit(); });"
+                                                        class="w-full inline-flex justify-center items-center gap-2 px-4 py-3 border border-transparent text-sm font-bold rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-offset-2 shadow-md transition-colors"
+                                                        style="background-color: #2B9D8D;"
+                                                        onmouseover="this.style.backgroundColor='#248A7C'"
+                                                        onmouseout="this.style.backgroundColor='#2B9D8D'">
+                                                    <i class="fas fa-times"></i> Reject Task
+                                                </button>
+                                            </form>
+                                        @endif
                                     @elseif($task->status === 'approved' && $task->task_type !== 'user_uploaded')
                                         <form action="{{ route('admin.tasks.publish', $task) }}" method="POST" class="w-full">
                                             @csrf
@@ -293,14 +355,18 @@
                                     @endif
                                     
                                     {{-- Only show deactivate/reactivate for non-user-uploaded tasks (admin-created tasks) --}}
+                                    {{-- Deactivate should only be available for published/live tasks that are visible to users --}}
                                     @if($task->task_type !== 'user_uploaded')
-                                        @if($task->status !== 'completed' && $task->status !== 'inactive')
+                                        @if(in_array($task->status, ['published', 'approved']) && $task->status !== 'inactive')
                                             <form action="{{ route('admin.tasks.destroy', $task) }}" method="POST" class="w-full" id="deactivate-task-form">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="button" 
                                                         onclick="showConfirmModal('Are you sure you want to deactivate this task?', 'Deactivate Task', 'Deactivate', 'Cancel', 'red').then(confirmed => { if(confirmed) document.getElementById('deactivate-task-form').submit(); });"
-                                                        class="w-full inline-flex justify-center items-center gap-2 px-4 py-3 border border-transparent text-sm font-bold rounded-lg text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 shadow-md transition-colors">
+                                                        class="w-full inline-flex justify-center items-center gap-2 px-4 py-3 border border-transparent text-sm font-bold rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-offset-2 shadow-md transition-colors"
+                                                        style="background-color: #2B9D8D;"
+                                                        onmouseover="this.style.backgroundColor='#248A7C'"
+                                                        onmouseout="this.style.backgroundColor='#2B9D8D'">
                                                     <i class="fas fa-pause"></i> Deactivate Task
                                                 </button>
                                             </form>
@@ -327,13 +393,53 @@
                                                     </button>
                                                 </form>
                                             @else
-                                                <div class="w-full mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                                                    <p class="text-sm text-yellow-800 font-medium">
+                                                <div class="w-full mt-3 p-3 rounded-lg" style="background-color: rgba(254, 210, 179, 0.2); border-color: #F3A261; border-width: 1px;">
+                                                    <p class="text-sm font-medium" style="color: #C9732A;">
                                                         ⚠️ This task must be edited before it can be reactivated.
                                                     </p>
                                                 </div>
                                             @endif
                                         @endif
+                                    @endif
+                                    
+                                    {{-- Show message if no actions are available --}}
+                                    @php
+                                        $hasAction = false;
+                                        // Check if any action buttons were rendered above
+                                        if ($task->status === 'pending') {
+                                            if ($task->task_type !== 'user_uploaded') {
+                                                $hasAction = true; // Edit and Publish buttons for admin-created tasks
+                                            } else {
+                                                $hasAction = true; // Approve/Reject buttons for user-uploaded tasks
+                                            }
+                                        } elseif ($task->status === 'approved' && $task->task_type !== 'user_uploaded') {
+                                            $hasAction = true; // Publish button
+                                        } elseif ($task->status === 'submitted') {
+                                            $hasAction = true; // Complete button
+                                        } elseif ($task->task_type !== 'user_uploaded') {
+                                            // Check for Edit button (shown for non-inactive, non-completed, non-published tasks)
+                                            if ($task->status !== 'completed' && $task->status !== 'published' && $task->status !== 'inactive') {
+                                                $hasAction = true; // Edit button
+                                            }
+                                            // For admin-created tasks, check deactivate/reactivate section
+                                            if (in_array($task->status, ['published', 'approved']) && $task->status !== 'inactive') {
+                                                $hasAction = true; // Deactivate button
+                                            } elseif ($task->status === 'inactive') {
+                                                $hasAction = true; // Edit button (always shown for inactive)
+                                            }
+                                        }
+                                    @endphp
+                                    
+                                    @if(!$hasAction)
+                                        <div class="w-full p-4 bg-gray-50 border border-gray-200 rounded-lg text-center">
+                                            <i class="fas fa-info-circle text-gray-400 text-xl mb-2"></i>
+                                            <p class="text-sm text-gray-600 font-medium">
+                                                No actions available for this task in its current state.
+                                            </p>
+                                            <p class="text-xs text-gray-500 mt-1">
+                                                Status: <span class="font-semibold">{{ ucfirst($task->status) }}</span>
+                                            </p>
+                                        </div>
                                     @endif
                                 </div>
                             </div>
@@ -344,16 +450,150 @@
         </div>
     </div>
 
+    <!-- Participants Modal -->
+    <div id="participants-modal" class="fixed inset-0 z-50 hidden" aria-hidden="true" style="backdrop-filter: blur(4px);">
+        <div class="absolute inset-0 bg-black/50" onclick="closeParticipantsModal()"></div>
+        <div class="absolute inset-0 flex items-center justify-center p-4">
+            <div class="w-full max-w-3xl bg-white rounded-2xl shadow-2xl overflow-hidden border-2 border-orange-300 transform transition-all max-h-[90vh] flex flex-col">
+                <!-- Modal Header -->
+                <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between" style="background: linear-gradient(135deg, #F3A261 0%, #F3A261 100%);">
+                    <div class="flex items-center gap-3">
+                        <i class="fas fa-users text-white text-xl"></i>
+                        <h3 class="text-xl font-bold text-white">All Participants</h3>
+                        <span class="px-3 py-1 bg-white/20 text-white text-sm font-bold rounded-full">
+                            {{ $task->assignments->count() }}
+                        </span>
+                    </div>
+                    <button type="button" class="text-white hover:text-gray-200 transition-colors" onclick="closeParticipantsModal()" aria-label="Close modal">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+                
+                <!-- Modal Content -->
+                <div class="flex-1 overflow-y-auto px-6 py-4">
+                    @if($task->assignments->count() > 0)
+                        <div class="space-y-3">
+                            @foreach($task->assignments as $assignment)
+                                <div class="flex items-center justify-between p-4 bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+                                    <div class="flex items-center space-x-3 flex-1 min-w-0">
+                                        <div class="h-12 w-12 rounded-full flex items-center justify-center flex-shrink-0 shadow-md" style="background: linear-gradient(135deg, #F3A261 0%, #2B9D8D 100%);">
+                                            <span class="text-base font-bold text-white">
+                                                {{ strtoupper(substr($assignment->user->name, 0, 1)) }}
+                                            </span>
+                                        </div>
+                                        <div class="min-w-0 flex-1">
+                                            <p class="text-sm font-semibold text-gray-900">{{ $assignment->user->name }}</p>
+                                            <p class="text-xs text-gray-500">{{ $assignment->user->email }}</p>
+                                        </div>
+                                    </div>
+                                    @php
+                                        $assignBg2 = 'rgba(243, 162, 97, 0.2)';
+                                        $assignColor2 = '#F3A261';
+                                        if($assignment->status === 'submitted') {
+                                            $assignBg2 = 'rgba(254, 210, 179, 0.2)';
+                                            $assignColor2 = '#FED2B3';
+                                        } elseif($assignment->status === 'completed') {
+                                            $assignBg2 = 'rgba(43, 157, 141, 0.2)';
+                                            $assignColor2 = '#2B9D8D';
+                                        }
+                                    @endphp
+                                    <div class="flex items-center space-x-2 flex-shrink-0 ml-3 flex-wrap justify-end gap-2">
+                                        <span class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-full" style="background-color: {{ $assignBg2 }}; color: {{ $assignColor2 }};"
+                                            @if($assignment->status === 'assigned') 
+                                            @elseif($assignment->status === 'submitted') 
+                                            @elseif($assignment->status === 'completed') 
+                                            @endif>
+                                            <i class="fas 
+                                                @if($assignment->status === 'assigned') fa-user-check
+                                                @elseif($assignment->status === 'submitted') fa-paper-plane
+                                                @elseif($assignment->status === 'completed') fa-check-circle
+                                                @endif"></i>
+                                            {{ ucfirst($assignment->status) }}
+                                        </span>
+                                        @if(!empty($assignment->progress))
+                                        @php
+                                            $progressBg2 = 'rgba(229, 231, 235, 0.5)';
+                                            $progressColor2 = '#6B7280';
+                                            if(in_array($assignment->progress ?? '', ['on_the_way', 'working', 'done'])) {
+                                                $progressBg2 = 'rgba(43, 157, 141, 0.2)';
+                                                $progressColor2 = '#2B9D8D';
+                                            } elseif(($assignment->progress ?? '') === 'accepted' || ($assignment->progress ?? '') === 'submitted_proof') {
+                                                $progressBg2 = 'rgba(243, 162, 97, 0.2)';
+                                                $progressColor2 = '#F3A261';
+                                            }
+                                        @endphp
+                                        <span class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-full" style="background-color: {{ $progressBg2 }}; color: {{ $progressColor2 }};"
+                                            @switch($assignment->progress ?? '')
+                                                @case('accepted') @break
+                                                @case('on_the_way') @break
+                                                @case('working') @break
+                                                @case('done') @break
+                                                @case('submitted_proof') @break
+                                                @default 
+                                            @endswitch">
+                                            <i class="fas 
+                                                @if($assignment->progress === 'accepted') fa-handshake
+                                                @elseif($assignment->progress === 'on_the_way') fa-route
+                                                @elseif($assignment->progress === 'working') fa-tools
+                                                @elseif($assignment->progress === 'done') fa-clipboard-check
+                                                @elseif($assignment->progress === 'submitted_proof') fa-file-upload
+                                                @endif"></i>
+                                            {{ ucfirst(str_replace('_',' ', $assignment->progress)) }}
+                                        </span>
+                                        @endif
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    @else
+                        <div class="text-center py-12">
+                            <i class="fas fa-users-slash text-gray-300 text-4xl mb-4"></i>
+                            <p class="text-sm text-gray-500 font-medium">No users have joined this task yet.</p>
+                        </div>
+                    @endif
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript for Participants Modal -->
+    <script>
+        function openParticipantsModal() {
+            const modal = document.getElementById('participants-modal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function closeParticipantsModal() {
+            const modal = document.getElementById('participants-modal');
+            if (modal) {
+                modal.classList.add('hidden');
+                document.body.style.overflow = '';
+            }
+        }
+
+        // Close on ESC key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeParticipantsModal();
+            }
+        });
+    </script>
+
     <!-- Custom Scrollbar Styling -->
     <style>
-        /* Brand Primary Button with Gradient */
+        /* Brand Primary Button */
         .brand-primary-btn {
-            background: linear-gradient(135deg, #F53003 0%, #F4A261 100%);
-            box-shadow: 0 4px 15px rgba(245, 48, 3, 0.3);
+            background-color: #F3A261;
+            box-shadow: 0 4px 15px rgba(243, 162, 97, 0.3);
         }
         .brand-primary-btn:hover {
-            background: linear-gradient(135deg, #d42802 0%, #e68a4a 100%);
-            box-shadow: 0 6px 20px rgba(245, 48, 3, 0.4);
+            background-color: #E8944F;
+            box-shadow: 0 6px 20px rgba(243, 162, 97, 0.4);
             transform: translateY(-1px);
         }
         
@@ -368,18 +608,18 @@
         }
         
         .overflow-y-auto::-webkit-scrollbar-thumb {
-            background: linear-gradient(135deg, #F53003 0%, #F4A261 100%);
+            background-color: #F3A261;
             border-radius: 10px;
         }
         
         .overflow-y-auto::-webkit-scrollbar-thumb:hover {
-            background: linear-gradient(135deg, #d42802 0%, #e68a4a 100%);
+            background-color: #E8944F;
         }
         
         /* Firefox Scrollbar */
         .overflow-y-auto {
             scrollbar-width: thin;
-            scrollbar-color: #F53003 #f1f1f1;
+            scrollbar-color: #F3A261 #f1f1f1;
         }
         
         /* Smooth transitions */

@@ -5,275 +5,221 @@
         </h2>
     </x-slot>
 
-    <div class="py-8">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <!-- Statistics Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
-                <div class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
-                    <div class="p-5">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0">
-                                <svg class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                </svg>
+    @php
+        $summaryCards = [
+            [
+                'label' => 'Total Reports',
+                'value' => $stats['total'],
+                'context' => 'All incident submissions to date',
+                'icon' => 'fas fa-folder-open',
+                'accent' => 'text-slate-600 bg-slate-100'
+            ],
+            [
+                'label' => 'Pending Review',
+                'value' => $stats['pending'],
+                'context' => 'Awaiting moderator triage',
+                'icon' => 'fas fa-clock',
+                'accent' => 'text-brand-orange-dark bg-brand-peach/60'
+            ],
+            [
+                'label' => 'Under Review',
+                'value' => $stats['under_review'],
+                'context' => 'Actively being investigated',
+                'icon' => 'fas fa-eye',
+                'accent' => 'text-brand-teal-dark bg-brand-teal/10'
+            ],
+            [
+                'label' => 'Resolved',
+                'value' => $stats['resolved'],
+                'context' => 'Successfully actioned',
+                'icon' => 'fas fa-circle-check',
+                'accent' => 'text-brand-teal-dark bg-brand-teal/10'
+            ],
+            [
+                'label' => 'Dismissed',
+                'value' => $stats['dismissed'],
+                'context' => 'No action required',
+                'icon' => 'fas fa-ban',
+                'accent' => 'text-slate-600 bg-slate-100'
+            ],
+        ];
+
+        $statusStyles = [
+            'pending' => 'badge-soft badge-soft-orange',
+            'under_review' => 'badge-soft badge-soft-teal',
+            'resolved' => 'badge-soft badge-soft-teal',
+            'dismissed' => 'badge-soft badge-soft-slate',
+        ];
+
+        $typeStyles = [
+            'abuse' => 'badge-soft badge-soft-teal',
+            'harassment' => 'badge-soft badge-soft-teal',
+            'spam' => 'badge-soft badge-soft-teal',
+            'inappropriate_content' => 'badge-soft badge-soft-teal',
+            'non_participation' => 'badge-soft badge-soft-orange',
+        ];
+    @endphp
+
+    <div class="py-10">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                @foreach($summaryCards as $card)
+                    <div class="stat-card">
+                        <div class="flex items-start justify-between gap-4">
+                            <div>
+                                <p class="text-sm font-medium text-gray-500">{{ $card['label'] }}</p>
+                                <p class="mt-2 text-2xl font-semibold text-gray-900">{{ $card['value'] }}</p>
+                                <p class="text-xs text-gray-500 mt-1">{{ $card['context'] }}</p>
                             </div>
-                            <div class="ml-5 w-0 flex-1">
-                                <dl>
-                                    <dt class="text-sm font-medium text-gray-600 truncate">Total Reports</dt>
-                                    <dd class="text-lg font-medium text-gray-900">{{ $stats['total'] }}</dd>
-                                </dl>
-                            </div>
+                            <span class="inline-flex h-10 w-10 items-center justify-center rounded-xl {{ $card['accent'] }}">
+                                <i class="{{ $card['icon'] }} text-base"></i>
+                            </span>
                         </div>
                     </div>
+                @endforeach
                 </div>
 
-                <div class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
-                    <div class="p-5">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0">
-                                <svg class="h-6 w-6 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                            </div>
-                            <div class="ml-5 w-0 flex-1">
-                                <dl>
-                                    <dt class="text-sm font-medium text-gray-600 truncate">Pending</dt>
-                                    <dd class="text-lg font-medium text-yellow-600">{{ $stats['pending'] }}</dd>
-                                </dl>
-                            </div>
+            <div class="card-surface">
+                <div class="p-6 space-y-6">
+                    <div class="flex flex-wrap items-center justify-between gap-4">
+                        <div>
+                            <p class="text-sm font-semibold text-gray-900">Filter reports</p>
+                            <p class="text-sm text-gray-500">Refine the moderation queue. Filters update the table automatically.</p>
                         </div>
-                    </div>
-                </div>
-
-                <div class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
-                    <div class="p-5">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0">
-                                <svg class="h-6 w-6 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                </svg>
-                            </div>
-                            <div class="ml-5 w-0 flex-1">
-                                <dl>
-                                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Under Review</dt>
-                                    <dd class="text-lg font-medium text-blue-600">{{ $stats['under_review'] }}</dd>
-                                </dl>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
-                    <div class="p-5">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0">
-                                <svg class="h-6 w-6 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                            </div>
-                            <div class="ml-5 w-0 flex-1">
-                                <dl>
-                                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Resolved</dt>
-                                    <dd class="text-lg font-medium text-green-600">{{ $stats['resolved'] }}</dd>
-                                </dl>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
-                    <div class="p-5">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0">
-                                <svg class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                                </svg>
-                            </div>
-                            <div class="ml-5 w-0 flex-1">
-                                <dl>
-                                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Dismissed</dt>
-                                    <dd class="text-lg font-medium text-gray-600">{{ $stats['dismissed'] }}</dd>
-                                </dl>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                        <a href="{{ route('admin.incident-reports.index') }}" class="btn-muted text-sm">
+                            Reset filters
+                        </a>
             </div>
 
-            <!-- Filters and Search -->
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg mb-6">
-                <div class="p-6">
-                    <form method="GET" action="{{ route('admin.incident-reports.index') }}" class="space-y-4">
-                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                            <div>
-                                <label for="status" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Status</label>
-                                <select id="status" name="status" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-red-500 focus:ring-red-500 sm:text-sm">
-                                    <option value="">All Statuses</option>
+                    <form id="filters-form" method="GET" action="{{ route('admin.incident-reports.index') }}" class="space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+                            <label class="flex flex-col text-sm font-medium text-gray-700">
+                                <span>Status</span>
+                            <select id="status" name="status" class="mt-2 block w-full rounded-xl border-gray-200 focus:border-brand-teal focus:ring-brand-teal sm:text-sm" onchange="this.form.requestSubmit ? this.form.requestSubmit() : this.form.submit()">
+                                    <option value="">All statuses</option>
                                     @foreach($statuses as $key => $label)
                                         <option value="{{ $key }}" {{ request('status') == $key ? 'selected' : '' }}>{{ $label }}</option>
                                     @endforeach
                                 </select>
-                            </div>
+                            </label>
 
-                            <div>
-                                <label for="incident_type" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Incident Type</label>
-                                <select id="incident_type" name="incident_type" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-red-500 focus:ring-red-500 sm:text-sm">
-                                    <option value="">All Types</option>
+                            <label class="flex flex-col text-sm font-medium text-gray-700">
+                                <span>Incident type</span>
+                            <select id="incident_type" name="incident_type" class="mt-2 block w-full rounded-xl border-gray-200 focus:border-brand-teal focus:ring-brand-teal sm:text-sm" onchange="this.form.requestSubmit ? this.form.requestSubmit() : this.form.submit()">
+                                    <option value="">All types</option>
                                     @foreach($incidentTypes as $key => $label)
                                         <option value="{{ $key }}" {{ request('incident_type') == $key ? 'selected' : '' }}>{{ $label }}</option>
                                     @endforeach
                                 </select>
+                            </label>
+    
+                            <label class="flex flex-col text-sm font-medium text-gray-700">
+                                <span>From date</span>
+                                <input type="date" id="date_from" name="date_from" value="{{ request('date_from') }}" class="mt-2 block w-full rounded-xl border-gray-200 focus:border-brand-teal focus:ring-brand-teal sm:text-sm" onchange="this.form.requestSubmit ? this.form.requestSubmit() : this.form.submit()">
+                            </label>
+    
+                            <label class="flex flex-col text-sm font-medium text-gray-700">
+                                <span>To date</span>
+                                <input type="date" id="date_to" name="date_to" value="{{ request('date_to') }}" class="mt-2 block w-full rounded-xl border-gray-200 focus:border-brand-teal focus:ring-brand-teal sm:text-sm" onchange="this.form.requestSubmit ? this.form.requestSubmit() : this.form.submit()">
+                            </label>
                             </div>
 
-                            <div>
-                                <label for="date_from" class="block text-sm font-medium text-gray-700 dark:text-gray-300">From Date</label>
-                                <input type="date" id="date_from" name="date_from" value="{{ request('date_from') }}" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-red-500 focus:ring-red-500 sm:text-sm">
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6 items-end">
+                            <label class="flex flex-col text-sm font-medium text-gray-700 lg:col-span-2">
+                                <span>Search</span>
+                                <div class="mt-2 relative">
+                                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+                                        <i class="fas fa-search text-xs"></i>
+                                    </span>
+                                    <input type="text" id="search" name="search" value="{{ request('search') }}" placeholder="Reporter or reported name, email, task title…" class="block w-full rounded-xl border-gray-200 pl-10 focus:border-brand-teal focus:ring-brand-teal sm:text-sm">
                             </div>
-
-                            <div>
-                                <label for="date_to" class="block text-sm font-medium text-gray-700 dark:text-gray-300">To Date</label>
-                                <input type="date" id="date_to" name="date_to" value="{{ request('date_to') }}" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-red-500 focus:ring-red-500 sm:text-sm">
-                            </div>
+                            </label>
                         </div>
-
-                        <div>
-                            <label for="search" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Search</label>
-                            <input type="text" id="search" name="search" value="{{ request('search') }}" placeholder="Search by reporter or reported user name/email..." class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-red-500 focus:ring-red-500 sm:text-sm">
-                        </div>
-
-                        <div class="flex justify-end space-x-2">
-                            <a href="{{ route('admin.incident-reports.index') }}" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">
-                                Clear Filters
-                            </a>
-                        </div>
+                        <button type="submit" class="hidden" aria-hidden="true"></button>
                     </form>
                 </div>
             </div>
 
             <!-- Reports Table -->
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg" id="reports-table-container">
-                <div class="p-6">
-                    <div id="reports-content">
+            <div class="card-surface" id="reports-table-container">
+                <div class="p-6" id="reports-content">
                     @if($reports->count() > 0)
-                        <form id="bulk-form" method="POST" action="{{ route('admin.incident-reports.bulk-update') }}">
-                            @csrf
-                            <div class="flex justify-between items-center mb-4">
-                                <div class="flex items-center space-x-2">
-                                    <select id="bulk-action" name="action" class="rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-red-500 focus:ring-red-500 sm:text-sm">
-                                        <option value="">Bulk Actions</option>
-                                        <option value="mark_pending">Mark as Pending</option>
-                                        <option value="mark_under_review">Mark as Under Review</option>
-                                        <option value="mark_resolved">Mark as Resolved</option>
-                                        <option value="mark_dismissed">Mark as Dismissed</option>
-                                        <option value="delete">Delete Selected</option>
-                                    </select>
-                                    <button type="submit" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded text-sm">
-                                        Apply
-                                    </button>
-                                </div>
-                                <div class="text-sm text-gray-500 dark:text-gray-400">
-                                    {{ $reports->total() }} total reports
-                                </div>
-                            </div>
-
-                            <div class="overflow-x-auto">
-                                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                                    <thead class="bg-gray-50 dark:bg-gray-700">
-                                        <tr>
-                                            <th class="px-6 py-3 text-left">
-                                                <input type="checkbox" id="select-all" class="rounded border-gray-300 text-red-600 shadow-sm focus:border-red-300 focus:ring focus:ring-red-200 focus:ring-opacity-50">
-                                            </th>
-                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                                ID
-                                            </th>
-                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                                Reporter
-                                            </th>
-                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                                Reported User
-                                            </th>
-                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                                Type
-                                            </th>
-                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                                Status
-                                            </th>
-                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                                Date
-                                            </th>
-                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                                Actions
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                                        @foreach($reports as $report)
-                                            <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
-                                                <td class="px-6 py-4 whitespace-nowrap">
-                                                    <input type="checkbox" name="report_ids[]" value="{{ $report->reportId }}" class="report-checkbox rounded border-gray-300 text-red-600 shadow-sm focus:border-red-300 focus:ring focus:ring-red-200 focus:ring-opacity-50">
-                                                </td>
-                                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
+                        <div class="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                            {{ $reports->total() }} total reports
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                                <thead class="bg-gray-50 dark:bg-gray-700">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                            ID
+                                        </th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                            Reporter
+                                        </th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                            Reported User
+                                        </th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                            Type
+                                        </th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                            Status
+                                        </th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                            Date
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                                    @foreach($reports as $report)
+                                        <tr class="hover:bg-brand-teal/5 cursor-pointer" onclick="window.location='{{ route('admin.incident-reports.show', $report) }}'">
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
+                                                <span class="inline-flex items-center gap-2">
+                                                    <i class="fas fa-file-signature text-brand-teal-dark"></i>
                                                     #{{ $report->reportId }}
-                                                </td>
-                                                <td class="px-6 py-4 whitespace-nowrap">
-                                                    <div class="text-sm font-medium text-gray-900 dark:text-gray-100">
-                                                        {{ $report->reporter->fullName }}
-                                                    </div>
-                                                    <div class="text-sm text-gray-500 dark:text-gray-400">
-                                                        {{ $report->reporter->email }}
-                                                    </div>
-                                                </td>
-                                                <td class="px-6 py-4 whitespace-nowrap">
-                                                    <div class="text-sm font-medium text-gray-900 dark:text-gray-100">
-                                                        {{ $report->reportedUser->fullName }}
-                                                    </div>
-                                                    <div class="text-sm text-gray-500 dark:text-gray-400">
-                                                        {{ $report->reportedUser->email }}
-                                                    </div>
-                                                </td>
-                                                <td class="px-6 py-4 whitespace-nowrap">
-                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                                                        @if($report->incident_type === 'non_participation') bg-yellow-100 text-yellow-800
-                                                        @elseif($report->incident_type === 'abuse') bg-red-100 text-red-800
-                                                        @elseif($report->incident_type === 'spam') bg-blue-100 text-blue-800
-                                                        @elseif($report->incident_type === 'inappropriate_content') bg-purple-100 text-purple-800
-                                                        @elseif($report->incident_type === 'harassment') bg-red-100 text-red-800
-                                                        @else bg-gray-100 text-gray-800
-                                                        @endif">
-                                                        {{ ucwords(str_replace('_', ' ', $report->incident_type)) }}
-                                                    </span>
-                                                </td>
-                                                <td class="px-6 py-4 whitespace-nowrap">
-                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                                                        @if($report->status === 'pending') bg-yellow-100 text-yellow-800
-                                                        @elseif($report->status === 'under_review') bg-blue-100 text-blue-800
-                                                        @elseif($report->status === 'resolved') bg-green-100 text-green-800
-                                                        @elseif($report->status === 'dismissed') bg-gray-100 text-gray-800
-                                                        @endif">
-                                                        {{ ucwords(str_replace('_', ' ', $report->status)) }}
-                                                    </span>
-                                                </td>
-                                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                                                    {{ $report->report_date->format('M d, Y') }}
-                                                </td>
-                                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                                                    <a href="{{ route('admin.incident-reports.show', $report) }}" 
-                                                       class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">
-                                                        View
-                                                    </a>
-                                                    <a href="{{ route('admin.incident-reports.edit', $report) }}" 
-                                                       class="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300">
-                                                        Edit
-                                                    </a>
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
-                        </form>
-
+                                                </span>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <div class="text-sm font-medium text-gray-900 dark:text-gray-100">
+                                                    {{ $report->reporter->fullName }}
+                                                </div>
+                                                <div class="text-sm text-gray-500 dark:text-gray-400">
+                                                    {{ $report->reporter->email }}
+                                                </div>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <div class="text-sm font-medium text-gray-900 dark:text-gray-100">
+                                                    {{ $report->reportedUser->fullName }}
+                                                </div>
+                                                <div class="text-sm text-gray-500 dark:text-gray-400">
+                                                    {{ $report->reportedUser->email }}
+                                                </div>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                @php
+                                                    $typeClass = $typeStyles[$report->incident_type] ?? 'badge-soft badge-soft-slate';
+                                                @endphp
+                                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold tracking-wide {{ $typeClass }}">
+                                                    {{ ucwords(str_replace('_', ' ', $report->incident_type)) }}
+                                                </span>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                @php
+                                                    $statusClass = $statusStyles[$report->status] ?? 'badge-soft badge-soft-slate';
+                                                @endphp
+                                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold tracking-wide {{ $statusClass }}">
+                                                    {{ ucwords(str_replace('_', ' ', $report->status)) }}
+                                                </span>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                                                {{ $report->report_date->format('M d, Y') }}
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
                         <div class="mt-6">
                             {{ $reports->appends(request()->query())->links() }}
                         </div>
@@ -286,7 +232,6 @@
                             <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">No reports match your current filters.</p>
                         </div>
                     @endif
-                    </div>
                 </div>
             </div>
         </div>
@@ -294,137 +239,114 @@
 
     @push('scripts')
     <script>
-        // Auto-update reports via AJAX when filters change (no page refresh)
-        document.addEventListener('DOMContentLoaded', function() {
-            const filterForm = document.querySelector('form[action="{{ route('admin.incident-reports.index') }}"]');
-            const statusSelect = document.getElementById('status');
-            const incidentTypeSelect = document.getElementById('incident_type');
-            const dateFromInput = document.getElementById('date_from');
-            const dateToInput = document.getElementById('date_to');
+        (function initIncidentFilters() {
+            const run = () => {
+            const filterForm = document.getElementById('filters-form');
             const searchInput = document.getElementById('search');
-
-            function updateReports() {
-                const reportsContainer = document.getElementById('reports-table-container');
+                const tableContainer = document.getElementById('reports-table-container');
                 const reportsContent = document.getElementById('reports-content');
-                
-                if (reportsContent) {
-                    reportsContent.innerHTML = '<div class="p-8 text-center"><div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div><p class="mt-2 text-gray-600 dark:text-gray-400">Loading reports...</p></div>';
-                }
 
-                const formData = new FormData(filterForm);
-                const params = new URLSearchParams(formData);
-
-                fetch(`{{ route('admin.incident-reports.index') }}?${params.toString()}`, {
-                    method: 'GET',
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'Accept': 'text/html',
-                    }
-                })
-                .then(response => response.text())
-                .then(html => {
-                    const parser = new DOMParser();
-                    const doc = parser.parseFromString(html, 'text/html');
-                    
-                    const newReportsContent = doc.getElementById('reports-content');
-                    
-                    if (newReportsContent && reportsContent) {
-                        reportsContent.innerHTML = newReportsContent.innerHTML;
-                    }
-                    
-                    // Re-initialize select all functionality
-                    const selectAll = document.getElementById('select-all');
-                    if (selectAll) {
-                        selectAll.addEventListener('change', function() {
-                            const checkboxes = document.querySelectorAll('.report-checkbox');
-                            checkboxes.forEach(checkbox => {
-                                checkbox.checked = this.checked;
-                            });
-                        });
-                    }
-                    
-                    const newUrl = `{{ route('admin.incident-reports.index') }}?${params.toString()}`;
-                    window.history.pushState({path: newUrl}, '', newUrl);
-                })
-                .catch(error => {
-                    console.error('Error updating reports:', error);
-                    if (reportsContent) {
-                        reportsContent.innerHTML = '<div class="p-8 text-center text-red-600">Error loading reports. Please refresh the page.</div>';
-                    }
-                });
+                if (!filterForm || !tableContainer || !reportsContent) {
+                return;
             }
 
-            // Debounce search input
-            let searchTimeout;
+                const loadingClass = 'opacity-60';
+                const disableClass = 'pointer-events-none';
+
+                const setLoading = (state) => {
+                    if (!tableContainer) {
+                        return;
+                    }
+                    tableContainer.classList.toggle(loadingClass, state);
+                    tableContainer.classList.toggle(disableClass, state);
+                };
+
+                const buildUrlWithParams = () => {
+                    const url = new URL(filterForm.action, window.location.origin);
+                    const formData = new FormData(filterForm);
+
+                    formData.forEach((value, key) => {
+                        if (value) {
+                            url.searchParams.set(key, value);
+                } else {
+                            url.searchParams.delete(key);
+                        }
+                    });
+
+                    return url;
+                };
+
+                const ajaxUpdate = (url) => {
+                    setLoading(true);
+
+                    return fetch(url.toString(), {
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'text/html',
+                        },
+                        credentials: 'same-origin',
+                    })
+                        .then(response => response.text())
+                        .then(html => {
+                            const parser = new DOMParser();
+                            const nextDoc = parser.parseFromString(html, 'text/html');
+                            const nextContent = nextDoc.getElementById('reports-content');
+
+                            if (nextContent) {
+                                reportsContent.innerHTML = nextContent.innerHTML;
+                                window.history.replaceState({}, '', url);
+                            }
+                        })
+                        .catch(() => {
+                            window.location.href = url;
+                        })
+                        .finally(() => setLoading(false));
+                };
+
+                const handleSubmit = (event) => {
+                    event.preventDefault();
+                    const url = buildUrlWithParams();
+
+                    ajaxUpdate(url);
+                };
+
+                filterForm.addEventListener('submit', handleSubmit);
+
+            const autoInputs = filterForm.querySelectorAll('select, input[type="date"]');
+            autoInputs.forEach(input => {
+                    input.addEventListener('change', () => filterForm.requestSubmit());
+            });
+
             if (searchInput) {
+                let searchTimeout;
                 searchInput.addEventListener('input', function() {
                     clearTimeout(searchTimeout);
-                    searchTimeout = setTimeout(updateReports, 500);
-                });
-            }
-
-            if (statusSelect) {
-                statusSelect.addEventListener('change', updateReports);
-            }
-            
-            if (incidentTypeSelect) {
-                incidentTypeSelect.addEventListener('change', updateReports);
-            }
-            
-            if (dateFromInput) {
-                dateFromInput.addEventListener('change', updateReports);
-            }
-            
-            if (dateToInput) {
-                dateToInput.addEventListener('change', updateReports);
-            }
-        });
-
-        // Select all functionality
-        document.addEventListener('DOMContentLoaded', function() {
-            const selectAll = document.getElementById('select-all');
-            if (selectAll) {
-                selectAll.addEventListener('change', function() {
-                    const checkboxes = document.querySelectorAll('.report-checkbox');
-                    checkboxes.forEach(checkbox => {
-                        checkbox.checked = this.checked;
+                        searchTimeout = setTimeout(() => filterForm.requestSubmit(), 500);
                     });
-                });
-            }
+                }
 
-        // Bulk form submission
-        document.getElementById('bulk-form').addEventListener('submit', function(e) {
-            const action = document.getElementById('bulk-action').value;
-            const checkedBoxes = document.querySelectorAll('.report-checkbox:checked');
-            
-            if (!action) {
-                e.preventDefault();
-                showAlertModal('Please select a bulk action.', 'Action Required', 'warning');
-                return;
-            }
-            
-            if (checkedBoxes.length === 0) {
-                e.preventDefault();
-                showAlertModal('Please select at least one report.', 'Selection Required', 'warning');
-                return;
-            }
-            
-            if (action === 'delete') {
-                e.preventDefault();
-                showConfirmModal(
-                    `Are you sure you want to delete ${checkedBoxes.length} report(s)? This action cannot be undone.`,
-                    'Confirm Deletion',
-                    'Delete',
-                    'Cancel',
-                    'red'
-                ).then(confirmed => {
-                    if (confirmed) {
-                        document.getElementById('bulk-form').submit();
+                reportsContent.addEventListener('click', (event) => {
+                    const link = event.target.closest('a');
+                    if (!link || !reportsContent.contains(link)) {
+                        return;
                     }
+
+                    const isPaginationLink = !!link.closest('.pagination');
+                    if (!isPaginationLink) {
+                        return;
+                    }
+
+                    event.preventDefault();
+                    ajaxUpdate(new URL(link.href, window.location.origin));
                 });
-                return;
+            };
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', run, { once: true });
+            } else {
+                run();
             }
-        });
+        })();
     </script>
     @endpush
 </x-admin-layout>

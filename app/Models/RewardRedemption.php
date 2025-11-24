@@ -18,6 +18,7 @@ class RewardRedemption extends Model
         'FK2_userId',
         'redemption_date',
         'status',
+        'coupon_code',
         'approval_date',
         'admin_notes',
     ];

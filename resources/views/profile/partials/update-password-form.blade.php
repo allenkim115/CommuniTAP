@@ -62,7 +62,10 @@
                     </div>
                 @endif
             </div>
-            <button type="submit" class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform transition-all duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2">
+            <button type="submit" class="inline-flex items-center px-6 py-3 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform transition-all duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2"
+                    style="background-color: #2B9D8D;"
+                    onmouseover="this.style.backgroundColor='#248A7C'"
+                    onmouseout="this.style.backgroundColor='#2B9D8D'">
                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                 </svg>

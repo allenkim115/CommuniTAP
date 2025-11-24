@@ -56,6 +56,7 @@ Route::middleware(['auth', 'user', 'active'])->group(function () {
     Route::get('/tasks/my-uploads', [TaskController::class, 'myUploads'])->name('tasks.my-uploads');
     // Creator review of submissions for their user-uploaded tasks
     Route::get('/tasks/creator/submissions', [TaskController::class, 'creatorSubmissions'])->name('tasks.creator.submissions');
+    Route::get('/tasks/creator/submissions/history', [TaskController::class, 'creatorHistory'])->name('tasks.creator.history');
     Route::get('/tasks/submissions/{submission}', [TaskController::class, 'creatorShow'])->name('tasks.creator.show');
     Route::post('/tasks/submissions/{submission}/approve', [TaskController::class, 'creatorApprove'])->name('tasks.creator.approve');
     Route::post('/tasks/submissions/{submission}/reject', [TaskController::class, 'creatorReject'])->name('tasks.creator.reject');
@@ -339,6 +340,7 @@ Route::middleware(['auth', 'admin', 'active'])->prefix('admin')->name('admin.')-
     Route::get('/redemptions', [App\Http\Controllers\Admin\RewardRedemptionController::class, 'index'])->name('redemptions.index');
     Route::post('/redemptions/{redemption}/approve', [App\Http\Controllers\Admin\RewardRedemptionController::class, 'approve'])->name('redemptions.approve');
     Route::post('/redemptions/{redemption}/reject', [App\Http\Controllers\Admin\RewardRedemptionController::class, 'reject'])->name('redemptions.reject');
+    Route::patch('/redemptions/{redemption}/claim', [App\Http\Controllers\Admin\RewardRedemptionController::class, 'claim'])->name('redemptions.claim');
 
     Route::get('/notifications', fn () => redirect()->route('notifications.index'))->name('notifications.index');
 

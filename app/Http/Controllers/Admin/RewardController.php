@@ -33,6 +33,7 @@ class RewardController extends Controller
         ]);
 
         $data['status'] = $data['status'] ?? 'active';
+        $data = $this->enforceInventoryStatus($data);
         $data['created_date'] = now();
         $data['last_update_date'] = now();
 
@@ -63,6 +64,7 @@ class RewardController extends Controller
             'status' => ['required','in:active,inactive'],
         ]);
 
+        $data = $this->enforceInventoryStatus($data);
         $data['last_update_date'] = now();
         if ($request->hasFile('image')) {
             if ($reward->image_path) {
@@ -82,6 +84,15 @@ class RewardController extends Controller
         $reward->delete();
         $rewardName = $reward->reward_name;
         return redirect()->route('admin.rewards.index')->with('status', "Reward '{$rewardName}' has been deleted successfully from the system.");
+    }
+
+    private function enforceInventoryStatus(array $data): array
+    {
+        if (array_key_exists('QTY', $data) && (int) $data['QTY'] === 0) {
+            $data['status'] = 'inactive';
+        }
+
+        return $data;
     }
 }
 

@@ -62,41 +62,49 @@ function showAlertModal(message, title = 'Alert', type = 'info', buttonText = 'O
         info: { 
             bg: 'blue', 
             bgLight: 'bg-blue-50',
-            iconBg: 'bg-gradient-to-br from-blue-500 to-blue-600',
+            iconBg: '#2B9D8D',
             iconColor: 'text-white',
-            button: 'bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white focus:ring-blue-500',
+            buttonBg: '#2B9D8D',
+            buttonHover: '#248A7C',
             icon: '<svg class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>' 
         },
         warning: { 
             bg: 'yellow', 
             bgLight: 'bg-yellow-50',
-            iconBg: 'bg-gradient-to-br from-yellow-400 to-yellow-500',
+            iconBg: '#FED2B3',
             iconColor: 'text-white',
-            button: 'bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white focus:ring-yellow-500',
+            buttonBg: '#FED2B3',
+            buttonHover: '#E8C19F',
             icon: '<svg class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>' 
         },
         error: { 
             bg: 'red', 
             bgLight: 'bg-red-50',
-            iconBg: 'bg-gradient-to-br from-red-500 to-red-600',
+            iconBg: '#2B9D8D',
             iconColor: 'text-white',
-            button: 'bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white focus:ring-red-500',
+            buttonBg: '#2B9D8D',
+            buttonHover: '#248A7C',
             icon: '<svg class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>' 
         },
         success: { 
             bg: 'green', 
             bgLight: 'bg-green-50',
-            iconBg: 'bg-gradient-to-br from-green-500 to-green-600',
+            iconBg: '#2B9D8D',
             iconColor: 'text-white',
-            button: 'bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white focus:ring-green-500',
+            buttonBg: '#2B9D8D',
+            buttonHover: '#248A7C',
             icon: '<svg class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>' 
         }
     };
     
     const color = colors[type] || colors.info;
-    iconEl.className = `flex items-center justify-center h-16 w-16 rounded-full ${color.iconBg} shadow-lg transform transition-transform duration-300`;
+    iconEl.className = `flex items-center justify-center h-16 w-16 rounded-full shadow-lg transform transition-transform duration-300`;
+    iconEl.style.backgroundColor = color.iconBg;
     iconEl.innerHTML = color.icon;
-    buttonEl.className = `px-8 py-3 rounded-xl text-base font-semibold transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-offset-2 ${color.button} shadow-lg hover:shadow-xl min-w-[120px]`;
+    buttonEl.className = `px-8 py-3 rounded-xl text-base font-semibold text-white transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-offset-2 shadow-lg hover:shadow-xl min-w-[120px]`;
+    buttonEl.style.backgroundColor = color.buttonBg;
+    buttonEl.onmouseover = function() { this.style.backgroundColor = color.buttonHover; };
+    buttonEl.onmouseout = function() { this.style.backgroundColor = color.buttonBg; };
     
     window.alertCallback = callback;
     

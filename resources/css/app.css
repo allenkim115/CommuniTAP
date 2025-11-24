@@ -6,3 +6,58 @@
 .rounded-2xl.shadow-sm { @apply border border-gray-200 dark:border-gray-700; }
 .rounded-xl.shadow-sm { @apply border border-gray-200 dark:border-gray-700; }
 .rounded-lg.shadow-sm { @apply border border-gray-200 dark:border-gray-700; }
+
+@layer components {
+    .card-surface {
+        @apply bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-sm;
+    }
+
+    .section-heading {
+        @apply text-sm font-semibold tracking-wide uppercase text-gray-500 dark:text-gray-400;
+    }
+
+    .page-heading h1,
+    .page-heading h2,
+    .page-heading h3,
+    .page-heading h4,
+    .page-heading h5,
+    .page-heading h6 {
+        @apply text-3xl leading-tight;
+    }
+
+    .btn-brand {
+        @apply inline-flex items-center justify-center rounded-xl bg-brand-teal text-white font-semibold px-5 py-2.5 shadow-sm transition hover:bg-brand-teal-dark focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-brand-teal;
+    }
+
+    .btn-brand-muted {
+        @apply inline-flex items-center justify-center rounded-xl bg-brand-peach text-brand-orange font-semibold px-4 py-2.5 shadow-sm transition hover:bg-brand-peach-dark/80 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-brand-peach;
+    }
+
+    .btn-muted {
+        @apply inline-flex items-center justify-center rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-200 font-semibold px-4 py-2.5 shadow-sm transition hover:bg-gray-50 dark:hover:bg-gray-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-300;
+    }
+
+    .badge-soft {
+        @apply inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold tracking-wide uppercase;
+    }
+
+    .badge-soft-teal {
+        @apply text-brand-teal-dark bg-brand-teal/10;
+    }
+
+    .badge-soft-orange {
+        @apply text-brand-orange-dark bg-brand-orange/10;
+    }
+
+    .badge-soft-amber {
+        @apply text-yellow-700 bg-yellow-100 dark:bg-yellow-900/30 dark:text-yellow-200;
+    }
+
+    .badge-soft-slate {
+        @apply text-gray-700 bg-gray-100 dark:bg-gray-700/60 dark:text-gray-100;
+    }
+
+    .stat-card {
+        @apply rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 shadow-sm;
+    }
+}

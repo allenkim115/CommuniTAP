@@ -308,10 +308,24 @@ class TaskController extends Controller
             'max_participants' => $request->max_participants,
         ];
 
-        // If task is inactive and publish_after_update is set, publish it
-        $shouldPublish = $task->status === 'inactive' && $request->boolean('publish_after_update');
+        // Determine status based on action for uncompleted or inactive tasks
+        $isUncompleted = !in_array($task->status, ['completed']) && !in_array($task->status, ['approved', 'published']);
+        $isInactive = $task->status === 'inactive';
+        $action = $request->input('action', 'update');
         
-        if ($shouldPublish) {
+        // If task is inactive and publish_after_update is set, publish it (legacy support)
+        $shouldPublish = $isInactive && $request->boolean('publish_after_update');
+        
+        // For uncompleted or inactive tasks, allow choosing between pending and published
+        if (($isUncompleted || $isInactive) && $action === 'publish') {
+            $updateData['status'] = 'published';
+            $updateData['published_date'] = now();
+            $updateData['deactivated_at'] = null; // Clear deactivated_at on publishing
+            $shouldPublish = true;
+        } elseif (($isUncompleted || $isInactive) && $action === 'update') {
+            $updateData['status'] = 'pending';
+        } elseif ($shouldPublish) {
+            // Legacy support for inactive tasks
             $updateData['status'] = 'published';
             $updateData['published_date'] = now();
             $updateData['deactivated_at'] = null; // Clear deactivated_at on publishing
@@ -324,7 +338,9 @@ class TaskController extends Controller
 
         $message = "Task '{$task->title}' has been updated successfully. All changes have been saved.";
         
-        if ($shouldPublish) {
+        if (($isUncompleted || $isInactive) && $action === 'update') {
+            $message = "Task '{$task->title}' has been updated and set to pending status.";
+        } elseif ($shouldPublish) {
             // Notify task creator if it's a user-uploaded task
             if ($task->task_type === 'user_uploaded' && $task->FK1_userId && $task->assignedUser) {
                 $this->notificationService->notify(
@@ -373,6 +389,14 @@ class TaskController extends Controller
         // Do not allow deactivation of completed tasks
         if ($task->status === 'completed') {
             return redirect()->route('admin.tasks.show', $task)->with('error', "Cannot deactivate '{$task->title}': Completed tasks are final and cannot be deactivated.");
+        }
+        // Only allow deactivation of published/approved tasks (live tasks visible to users)
+        if (!in_array($task->status, ['published', 'approved'])) {
+            return redirect()->route('admin.tasks.show', $task)->with('error', "Cannot deactivate '{$task->title}': Only published or approved tasks can be deactivated. Tasks in '{$task->status}' status should be managed through other actions (approve, reject, publish, etc.).");
+        }
+        // Do not allow deactivation of already inactive tasks
+        if ($task->status === 'inactive') {
+            return redirect()->route('admin.tasks.show', $task)->with('error', "Cannot deactivate '{$task->title}': This task is already inactive.");
         }
 
         $task->update([
@@ -526,7 +550,7 @@ class TaskController extends Controller
     }
 
     /**
-     * Publish an approved task
+     * Publish a task (can be pending for admin-created tasks or approved for user-uploaded tasks)
      */
     public function publish(Task $task)
     {

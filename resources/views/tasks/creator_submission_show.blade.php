@@ -5,7 +5,7 @@
     <x-slot name="header">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
-                <h2 class="font-bold text-3xl bg-gradient-to-r from-orange-600 via-orange-500 to-teal-500 bg-clip-text text-transparent">
+                <h2 class="font-bold text-3xl bg-clip-text text-transparent" style="background: linear-gradient(to right, #F3A261, #2B9D8D); -webkit-background-clip: text;">
                     {{ __('Review Task Submission') }}
                 </h2>
                 <p class="text-sm font-semibold text-gray-600 dark:text-gray-400 mt-2">
@@ -148,7 +148,10 @@
                                         <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Notes (optional)</label>
                                         <textarea name="notes" rows="3" class="w-full px-4 py-2 border-2 border-gray-300 dark:border-gray-600 rounded-xl shadow-sm dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all"></textarea>
                                     </div>
-                                    <button type="button" onclick="showConfirmModal('Approve this submission?', 'Approve Submission', 'Approve', 'Cancel', 'green').then(confirmed => { if(confirmed) document.getElementById('approve-submission-form').submit(); });" class="w-full px-4 py-3 rounded-xl bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-bold shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5">Approve Submission</button>
+                                    <button type="button" onclick="showConfirmModal('Approve this submission?', 'Approve Submission', 'Approve', 'Cancel', 'green').then(confirmed => { if(confirmed) document.getElementById('approve-submission-form').submit(); });" class="w-full px-4 py-3 rounded-xl text-white font-bold shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5"
+                                            style="background-color: #2B9D8D;"
+                                            onmouseover="this.style.backgroundColor='#248A7C'"
+                                            onmouseout="this.style.backgroundColor='#2B9D8D'">Approve Submission</button>
                                 </form>
                                 <form action="{{ route('tasks.creator.reject', $submission) }}" method="POST" id="reject-submission-form">
                                     @csrf
@@ -156,7 +159,10 @@
                                         <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Rejection Reason *</label>
                                         <textarea name="rejection_reason" required rows="3" class="w-full px-4 py-2 border-2 border-gray-300 dark:border-gray-600 rounded-xl shadow-sm dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all"></textarea>
                                     </div>
-                                    <button type="button" onclick="showConfirmModal('Reject this submission?', 'Reject Submission', 'Reject', 'Cancel', 'red').then(confirmed => { if(confirmed) document.getElementById('reject-submission-form').submit(); });" class="w-full px-4 py-3 rounded-xl bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 text-white font-bold shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5">Reject Submission</button>
+                                    <button type="button" onclick="showConfirmModal('Reject this submission?', 'Reject Submission', 'Reject', 'Cancel', 'red').then(confirmed => { if(confirmed) document.getElementById('reject-submission-form').submit(); });" class="w-full px-4 py-3 rounded-xl text-white font-bold shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5"
+                                            style="background-color: #2B9D8D;"
+                                            onmouseover="this.style.backgroundColor='#248A7C'"
+                                            onmouseout="this.style.backgroundColor='#2B9D8D'">Reject Submission</button>
                                 </form>
                             @endif
                         </div>

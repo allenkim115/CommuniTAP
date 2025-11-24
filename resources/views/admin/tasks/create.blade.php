@@ -5,7 +5,10 @@
                 {{ __('Create Task') }}
             </h2>
             <a href="{{ route('admin.tasks.index') }}"
-                class="inline-flex items-center gap-2 bg-gray-600 hover:bg-gray-700 text-white text-sm font-medium py-2 px-4 rounded-lg transition-colors">
+                class="inline-flex items-center gap-2 text-white text-sm font-medium py-2 px-4 rounded-lg transition-colors"
+                style="background-color: #2B9D8D;"
+                onmouseover="this.style.backgroundColor='#248A7C'"
+                onmouseout="this.style.backgroundColor='#2B9D8D'">
                 <i class="fas fa-arrow-left"></i>
                 Back
             </a>
@@ -17,7 +20,7 @@
             <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-6 lg:p-8 space-y-6">
                 
                 <!-- Guidelines Section -->
-                <div class="bg-blue-50 rounded-lg border-l-4 border-blue-600 p-4">
+                <div class="rounded-lg border-l-4 p-4" style="background-color: rgba(43, 157, 141, 0.1); border-color: #2B9D8D;">
                     <h3 class="text-lg font-semibold text-gray-900 mb-2">Admin Task Creation Guidelines</h3>
                     <ul class="list-disc list-inside text-sm text-gray-700 space-y-1">
                         <li><strong>Daily Tasks:</strong> Recurring tasks that appear daily</li>
@@ -207,7 +210,10 @@
                             Cancel
                         </a>
                         <button type="submit"
-                            class="px-6 py-2.5 text-sm font-semibold rounded-md text-white bg-blue-600 hover:bg-blue-700 shadow-md transition focus:ring-2 focus:ring-blue-400 focus:ring-offset-2">
+                            class="px-6 py-2.5 text-sm font-semibold rounded-md text-white shadow-md transition focus:ring-2 focus:ring-orange-400 focus:ring-offset-2"
+                            style="background-color: #F3A261;"
+                            onmouseover="this.style.backgroundColor='#E8944F'"
+                            onmouseout="this.style.backgroundColor='#F3A261'">
                             Create Task
                         </button>
                     </div>

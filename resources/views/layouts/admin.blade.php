@@ -29,7 +29,7 @@
 
             @isset($header)
                 <header class="shadow" style="background-color:#f1f1f1">
-                    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+                    <div class="page-heading max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
                         {{ $header }}
                     </div>
                 </header>

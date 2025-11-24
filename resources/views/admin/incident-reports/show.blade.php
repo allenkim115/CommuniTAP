@@ -5,38 +5,46 @@
         </h2>
     </x-slot>
 
-    <div class="py-12">
+    @php
+        $statusClasses = [
+            'pending' => 'badge-soft badge-soft-orange',
+            'under_review' => 'badge-soft badge-soft-teal',
+            'resolved' => 'badge-soft badge-soft-teal',
+            'dismissed' => 'badge-soft badge-soft-slate',
+        ];
+
+        $actionTagClasses = [
+            'warning' => 'bg-yellow-100 text-yellow-800',
+            'suspension' => 'bg-red-100 text-red-800',
+            'no_action' => 'bg-green-100 text-green-800',
+            'dismissed' => 'bg-gray-100 text-gray-800',
+        ];
+    @endphp
+
+    <div class="py-10">
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900 dark:text-gray-100">
-                    <div class="flex justify-between items-start mb-6">
+            <div class="card-surface">
+                <div class="p-6 lg:p-8 text-gray-900 dark:text-gray-100">
+                    <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between mb-6">
                         <div>
-                            <h3 class="text-lg font-medium">Incident Report #{{ $incidentReport->reportId }}</h3>
-                            <p class="text-sm text-gray-600 dark:text-gray-400">
-                                Submitted on {{ $incidentReport->report_date->format('F d, Y \a\t g:i A') }}
+                            <p class="text-sm uppercase tracking-wide text-gray-500">Incident Report</p>
+                            <h3 class="mt-1 text-2xl font-semibold text-gray-900">#{{ $incidentReport->reportId }}</h3>
+                            <p class="text-sm text-gray-500">
+                                Submitted {{ $incidentReport->report_date->format('F d, Y \a\t g:i A') }}
                             </p>
                         </div>
-                        <div class="text-right">
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
-                                @if($incidentReport->status === 'pending') bg-yellow-100 text-yellow-800
-                                @elseif($incidentReport->status === 'under_review') bg-blue-100 text-blue-800
-                                @elseif($incidentReport->status === 'resolved') bg-green-100 text-green-800
-                                @elseif($incidentReport->status === 'dismissed') bg-gray-100 text-gray-800
-                                @endif">
+                        <span class="inline-flex items-center px-4 py-1.5 rounded-full text-sm font-semibold {{ $statusClasses[$incidentReport->status] ?? 'badge-soft badge-soft-slate' }}">
                                 {{ ucwords(str_replace('_', ' ', $incidentReport->status)) }}
                             </span>
-                        </div>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                         <!-- Reporter -->
-                        <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-                            <h4 class="text-sm font-medium text-gray-900 dark:text-gray-100 mb-2">Reporter</h4>
-                            <div class="flex items-center">
-                                <div class="h-10 w-10 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center mr-3">
-                                    <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        <div class="rounded-2xl border border-gray-100 bg-gray-50 dark:bg-gray-700/40 p-5">
+                            <h4 class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">Reporter</h4>
+                            <div class="flex items-center gap-3">
+                                <div class="h-12 w-12 bg-brand-teal/10 text-brand-teal-dark rounded-full flex items-center justify-center font-semibold">
                                         {{ substr($incidentReport->reporter->firstName, 0, 1) }}{{ substr($incidentReport->reporter->lastName, 0, 1) }}
-                                    </span>
                                 </div>
                                 <div>
                                     <div class="text-sm font-medium text-gray-900 dark:text-gray-100">
@@ -53,13 +61,11 @@
                         </div>
 
                         <!-- Reported User -->
-                        <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-                            <h4 class="text-sm font-medium text-gray-900 dark:text-gray-100 mb-2">Reported User</h4>
-                            <div class="flex items-center">
-                                <div class="h-10 w-10 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center mr-3">
-                                    <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        <div class="rounded-2xl border border-gray-100 bg-gray-50 dark:bg-gray-700/40 p-5">
+                            <h4 class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">Reported User</h4>
+                            <div class="flex items-center gap-3">
+                                <div class="h-12 w-12 bg-brand-orange/20 text-brand-orange-dark rounded-full flex items-center justify-center font-semibold">
                                         {{ substr($incidentReport->reportedUser->firstName, 0, 1) }}{{ substr($incidentReport->reportedUser->lastName, 0, 1) }}
-                                    </span>
                                 </div>
                                 <div>
                                     <div class="text-sm font-medium text-gray-900 dark:text-gray-100">
@@ -78,27 +84,25 @@
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                         <!-- Incident Type -->
-                        <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-                            <h4 class="text-sm font-medium text-gray-900 dark:text-gray-100 mb-2">Incident Type</h4>
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                                @if($incidentReport->incident_type === 'non_participation') bg-yellow-100 text-yellow-800
-                                @elseif($incidentReport->incident_type === 'abuse') bg-red-100 text-red-800
-                                @elseif($incidentReport->incident_type === 'spam') bg-blue-100 text-blue-800
-                                @elseif($incidentReport->incident_type === 'inappropriate_content') bg-purple-100 text-purple-800
-                                @elseif($incidentReport->incident_type === 'harassment') bg-red-100 text-red-800
-                                @else bg-gray-100 text-gray-800
-                                @endif">
+                        <div class="rounded-2xl border border-gray-100 bg-white dark:bg-gray-800/50 p-5">
+                            <h4 class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">Incident Type</h4>
+                            @php
+                                $typeClass = in_array($incidentReport->incident_type, ['abuse', 'spam', 'harassment', 'inappropriate_content'])
+                                    ? 'badge-soft badge-soft-teal'
+                                    : 'badge-soft badge-soft-orange';
+                            @endphp
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold tracking-wide {{ $typeClass }}">
                                 {{ ucwords(str_replace('_', ' ', $incidentReport->incident_type)) }}
                             </span>
                         </div>
 
                         <!-- Related Task -->
-                        <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-                            <h4 class="text-sm font-medium text-gray-900 dark:text-gray-100 mb-2">Related Task</h4>
+                        <div class="rounded-2xl border border-gray-100 bg-white dark:bg-gray-800/50 p-5">
+                            <h4 class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">Related Task</h4>
                             @if($incidentReport->task)
                                 <div>
                                     <div class="text-sm font-medium text-gray-900 dark:text-gray-100">
-                                        <a href="{{ route('admin.tasks.show', $incidentReport->task) }}" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
+                                        <a href="{{ route('admin.tasks.show', $incidentReport->task) }}" class="text-brand-teal-dark hover:text-brand-teal">
                                             {{ $incidentReport->task->title }}
                                         </a>
                                     </div>
@@ -114,8 +118,8 @@
 
                     <!-- Description -->
                     <div class="mb-6">
-                        <h4 class="text-sm font-medium text-gray-900 dark:text-gray-100 mb-2">Description</h4>
-                        <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                        <h4 class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-2">Description</h4>
+                        <div class="rounded-2xl border border-gray-100 bg-white dark:bg-gray-800/50 p-5">
                             <p class="text-sm text-gray-900 dark:text-gray-100 whitespace-pre-wrap">{{ $incidentReport->description }}</p>
                         </div>
                     </div>
@@ -123,8 +127,8 @@
                     <!-- Evidence -->
                     @if($incidentReport->evidence)
                         <div class="mb-6">
-                            <h4 class="text-sm font-medium text-gray-900 dark:text-gray-100 mb-2">Additional Evidence</h4>
-                            <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg space-y-3">
+                            <h4 class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-2">Additional Evidence</h4>
+                            <div class="rounded-2xl border border-gray-100 bg-white dark:bg-gray-800/50 p-5 space-y-3">
                                 @php
                                     $evidenceLines = preg_split("/\r?\n/", (string) $incidentReport->evidence);
                                 @endphp
@@ -149,8 +153,8 @@
                     <!-- Moderation Details -->
                     @if($incidentReport->moderator)
                         <div class="mb-6">
-                            <h4 class="text-sm font-medium text-gray-900 dark:text-gray-100 mb-2">Moderation Details</h4>
-                            <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                            <h4 class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-2">Moderation Details</h4>
+                            <div class="rounded-2xl border border-gray-100 bg-white dark:bg-gray-800/50 p-5">
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                                     <div>
                                         <h5 class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Moderator</h5>
@@ -165,12 +169,7 @@
                                 @if($incidentReport->action_taken)
                                     <div class="mb-4">
                                         <h5 class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Action Taken</h5>
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                                            @if($incidentReport->action_taken === 'warning') bg-yellow-100 text-yellow-800
-                                            @elseif($incidentReport->action_taken === 'suspension') bg-red-100 text-red-800
-                                            @elseif($incidentReport->action_taken === 'no_action') bg-green-100 text-green-800
-                                            @elseif($incidentReport->action_taken === 'dismissed') bg-gray-100 text-gray-800
-                                            @endif">
+                                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold {{ $actionTagClasses[$incidentReport->action_taken] ?? 'bg-gray-100 text-gray-800' }}">
                                             {{ ucwords(str_replace('_', ' ', $incidentReport->action_taken)) }}
                                         </span>
                                     </div>
@@ -187,29 +186,17 @@
                     @endif
 
                     <!-- Actions -->
-                    <div class="flex items-center justify-between pt-6 border-t border-gray-200 dark:border-gray-600">
+                    <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between pt-6 border-t border-gray-200 dark:border-gray-600">
                         <a href="{{ route('admin.incident-reports.index') }}" 
-                           class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">
+                           class="btn-muted">
                             Back to Reports
                         </a>
                         
-                        <div class="flex space-x-2">
+                        <div class="flex flex-wrap gap-3">
                             <a href="{{ route('admin.incident-reports.edit', $incidentReport) }}" 
-                               class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                               class="btn-brand">
                                 {{ $incidentReport->isPending() ? 'Moderate Report' : 'Edit Report' }}
                             </a>
-                            
-                            <form method="POST" action="{{ route('admin.incident-reports.destroy', $incidentReport) }}" 
-                                  class="inline" 
-                                  id="delete-report-form">
-                                @csrf
-                                @method('DELETE')
-                                <button type="button" 
-                                        onclick="showConfirmModal('Are you sure you want to delete this incident report? This action cannot be undone.', 'Delete Incident Report', 'Delete', 'Cancel', 'red').then(confirmed => { if(confirmed) document.getElementById('delete-report-form').submit(); });"
-                                        class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
-                                    Delete Report
-                                </button>
-                            </form>
                         </div>
                     </div>
                 </div>
