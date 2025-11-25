@@ -208,24 +208,15 @@
                                     <!-- Limited Participants List -->
                                     <div class="space-y-3 mb-4">
                                         @foreach($displayedParticipants as $assignment)
-                                            @php
-                                                $firstName = $assignment->user->firstName ?? '';
-                                                $lastName = $assignment->user->lastName ?? '';
-                                                $initials = strtoupper(
-                                                    (!empty($firstName) ? substr($firstName, 0, 1) : '') . 
-                                                    (!empty($lastName) ? substr($lastName, 0, 1) : '')
-                                                );
-                                                if (empty($initials)) {
-                                                    $initials = strtoupper(substr($assignment->user->name ?? 'U', 0, 1));
-                                                }
-                                            @endphp
                                             <div class="flex items-center justify-between p-4 bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
                                                 <div class="flex items-center space-x-3 flex-1 min-w-0">
-                                                    <div class="h-10 w-10 rounded-full flex items-center justify-center flex-shrink-0 shadow-md" style="background: linear-gradient(135deg, #F3A261 0%, #F3A261 100%);">
-                                                        <span class="text-sm font-bold text-white">
-                                                            {{ $initials }}
-                                                        </span>
-                                                    </div>
+                                                    <x-user-avatar
+                                                        :user="$assignment->user"
+                                                        size="h-10 w-10"
+                                                        text-size="text-sm"
+                                                        class="shadow-md flex-shrink-0"
+                                                        style="background: linear-gradient(135deg, #F3A261 0%, #F3A261 100%);"
+                                                    />
                                                     <div class="min-w-0 flex-1">
                                                         <p class="text-sm font-semibold text-gray-900 truncate">{{ $assignment->user->name }}</p>
                                                         <p class="text-xs text-gray-500 truncate">{{ $assignment->user->email }}</p>
@@ -381,9 +372,12 @@
                                                 <div class="flex-1 space-y-3">
                                                     <div class="flex flex-wrap items-center justify-between gap-3">
                                                         <div class="flex items-center gap-3">
-                                                            <div class="h-10 w-10 rounded-full bg-brand-peach/70 text-brand-orange-dark flex items-center justify-center text-sm font-semibold">
-                                                                {{ \Illuminate\Support\Str::of($feedback->user->name ?? 'UU')->substr(0, 2)->upper() }}
-                                                            </div>
+                                                            <x-user-avatar
+                                                                :user="$feedback->user"
+                                                                size="h-10 w-10"
+                                                                text-size="text-sm"
+                                                                class="bg-brand-peach/70 text-brand-orange-dark flex-shrink-0"
+                                                            />
                                                             <div>
                                                                 <p class="text-sm font-semibold text-gray-900">{{ $feedback->user->name ?? 'Unknown User' }}</p>
                                                                 <p class="text-xs text-gray-500">{{ $feedback->user->email ?? 'No email provided' }}</p>
@@ -940,24 +934,15 @@
                                 <!-- Limited Participants List -->
                                 <div class="space-y-3 mb-4">
                                     @foreach($displayedParticipants as $assignment)
-                                        @php
-                                            $firstName = $assignment->user->firstName ?? '';
-                                            $lastName = $assignment->user->lastName ?? '';
-                                            $initials = strtoupper(
-                                                (!empty($firstName) ? substr($firstName, 0, 1) : '') . 
-                                                (!empty($lastName) ? substr($lastName, 0, 1) : '')
-                                            );
-                                            if (empty($initials)) {
-                                                $initials = strtoupper(substr($assignment->user->name ?? 'U', 0, 1));
-                                            }
-                                        @endphp
                                         <div class="flex items-center justify-between p-4 bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
                                             <div class="flex items-center space-x-3 flex-1 min-w-0">
-                                                <div class="h-10 w-10 rounded-full flex items-center justify-center flex-shrink-0 shadow-md" style="background: linear-gradient(135deg, #F3A261 0%, #F3A261 100%);">
-                                                    <span class="text-sm font-bold text-white">
-                                                        {{ $initials }}
-                                                    </span>
-                                                </div>
+                                                <x-user-avatar
+                                                    :user="$assignment->user"
+                                                    size="h-10 w-10"
+                                                    text-size="text-sm"
+                                                    class="shadow-md flex-shrink-0"
+                                                    style="background: linear-gradient(135deg, #F3A261 0%, #F3A261 100%);"
+                                                />
                                                 <div class="min-w-0 flex-1">
                                                     <p class="text-sm font-semibold text-gray-900 truncate">{{ $assignment->user->name ?? 'Unknown User' }}</p>
                                                     <p class="text-xs text-gray-500 truncate">{{ $assignment->user->email ?? '' }}</p>
@@ -1036,24 +1021,15 @@
                     @if($task->assignments->count() > 0)
                         <div class="space-y-3">
                             @foreach($task->assignments as $assignment)
-                                @php
-                                    $firstName = $assignment->user->firstName ?? '';
-                                    $lastName = $assignment->user->lastName ?? '';
-                                    $initials = strtoupper(
-                                        (!empty($firstName) ? substr($firstName, 0, 1) : '') . 
-                                        (!empty($lastName) ? substr($lastName, 0, 1) : '')
-                                    );
-                                    if (empty($initials)) {
-                                        $initials = strtoupper(substr($assignment->user->name ?? 'U', 0, 1));
-                                    }
-                                @endphp
                                 <div class="flex items-center justify-between p-4 bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
                                     <div class="flex items-center space-x-3 flex-1 min-w-0">
-                                        <div class="h-12 w-12 rounded-full flex items-center justify-center flex-shrink-0 shadow-md" style="background: linear-gradient(135deg, #F3A261 0%, #F3A261 100%);">
-                                            <span class="text-base font-bold text-white">
-                                                {{ $initials }}
-                                            </span>
-                                        </div>
+                                        <x-user-avatar
+                                            :user="$assignment->user"
+                                            size="h-12 w-12"
+                                            text-size="text-base"
+                                            class="shadow-md flex-shrink-0"
+                                            style="background: linear-gradient(135deg, #F3A261 0%, #F3A261 100%);"
+                                        />
                                         <div class="min-w-0 flex-1">
                                             <p class="text-sm font-semibold text-gray-900">{{ $assignment->user->name }}</p>
                                             <p class="text-xs text-gray-500">{{ $assignment->user->email }}</p>
@@ -1522,24 +1498,15 @@
                     @if($task->assignments->count() > 0)
                         <div class="space-y-3">
                             @foreach($task->assignments as $assignment)
-                                @php
-                                    $firstName = $assignment->user->firstName ?? '';
-                                    $lastName = $assignment->user->lastName ?? '';
-                                    $initials = strtoupper(
-                                        (!empty($firstName) ? substr($firstName, 0, 1) : '') . 
-                                        (!empty($lastName) ? substr($lastName, 0, 1) : '')
-                                    );
-                                    if (empty($initials)) {
-                                        $initials = strtoupper(substr($assignment->user->name ?? 'U', 0, 1));
-                                    }
-                                @endphp
                                 <div class="flex items-center justify-between p-4 bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
                                     <div class="flex items-center space-x-3 flex-1 min-w-0">
-                                        <div class="h-12 w-12 rounded-full flex items-center justify-center flex-shrink-0 shadow-md" style="background: linear-gradient(135deg, #F3A261 0%, #F3A261 100%);">
-                                            <span class="text-base font-bold text-white">
-                                                {{ $initials }}
-                                            </span>
-                                        </div>
+                                        <x-user-avatar
+                                            :user="$assignment->user"
+                                            size="h-12 w-12"
+                                            text-size="text-base"
+                                            class="shadow-md flex-shrink-0"
+                                            style="background: linear-gradient(135deg, #F3A261 0%, #F3A261 100%);"
+                                        />
                                         <div class="min-w-0 flex-1">
                                             <p class="text-sm font-semibold text-gray-900 truncate">{{ $assignment->user->name ?? 'Unknown User' }}</p>
                                             <p class="text-xs text-gray-500 truncate">{{ $assignment->user->email ?? '' }}</p>

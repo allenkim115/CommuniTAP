@@ -43,9 +43,12 @@
                         <div class="rounded-2xl border border-gray-100 bg-gray-50 dark:bg-gray-700/40 p-5">
                             <h4 class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">Reporter</h4>
                             <div class="flex items-center gap-3">
-                                <div class="h-12 w-12 bg-brand-teal/10 text-brand-teal-dark rounded-full flex items-center justify-center font-semibold">
-                                        {{ substr($incidentReport->reporter->firstName, 0, 1) }}{{ substr($incidentReport->reporter->lastName, 0, 1) }}
-                                </div>
+                                <x-user-avatar
+                                    :user="$incidentReport->reporter"
+                                    size="h-12 w-12"
+                                    text-size="text-base"
+                                    class="bg-brand-teal/10 text-brand-teal-dark font-semibold"
+                                />
                                 <div>
                                     <div class="text-sm font-medium text-gray-900 dark:text-gray-100">
                                         {{ $incidentReport->reporter->fullName }}
@@ -64,9 +67,12 @@
                         <div class="rounded-2xl border border-gray-100 bg-gray-50 dark:bg-gray-700/40 p-5">
                             <h4 class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">Reported User</h4>
                             <div class="flex items-center gap-3">
-                                <div class="h-12 w-12 bg-brand-orange/20 text-brand-orange-dark rounded-full flex items-center justify-center font-semibold">
-                                        {{ substr($incidentReport->reportedUser->firstName, 0, 1) }}{{ substr($incidentReport->reportedUser->lastName, 0, 1) }}
-                                </div>
+                                <x-user-avatar
+                                    :user="$incidentReport->reportedUser"
+                                    size="h-12 w-12"
+                                    text-size="text-base"
+                                    class="bg-brand-orange/20 text-brand-orange-dark font-semibold"
+                                />
                                 <div>
                                     <div class="text-sm font-medium text-gray-900 dark:text-gray-100">
                                         {{ $incidentReport->reportedUser->fullName }}

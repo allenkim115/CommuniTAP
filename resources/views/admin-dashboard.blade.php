@@ -591,9 +591,12 @@
                                     </td>
                                     <td class="px-6 py-5 whitespace-nowrap">
                                         <div class="flex items-center gap-3">
-                                            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-orange-400 to-red-500 flex items-center justify-center text-white font-semibold text-sm">
-                                                {{ strtoupper(substr($user->fullName, 0, 1)) }}
-                                            </div>
+                                            <x-user-avatar
+                                                :user="$user"
+                                                size="h-10 w-10"
+                                                text-size="text-sm"
+                                                class="bg-gradient-to-br from-orange-400 to-red-500 text-white font-semibold"
+                                            />
                                             <span class="text-gray-900 font-semibold group-hover:text-orange-600 transition-colors">{{ $user->fullName }}</span>
                                         </div>
                                     </td>

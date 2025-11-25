@@ -355,7 +355,7 @@
                                 </div>
                             </div>
                             @if(isset($completedTasks) && $completedTasks->count() > 0)
-                                <a href="{{ route('tasks.index', ['filter' => 'completed']) }}" class="text-sm font-semibold px-4 py-2 rounded-lg transition-colors duration-200"
+                                <a href="{{ route('progress') }}" class="text-sm font-semibold px-4 py-2 rounded-lg transition-colors duration-200"
                                    style="color: #2B9D8D;"
                                    onmouseover="this.style.color='#248A7C'; this.style.backgroundColor='#FED2B3';"
                                    onmouseout="this.style.color='#2B9D8D'; this.style.backgroundColor='transparent';">

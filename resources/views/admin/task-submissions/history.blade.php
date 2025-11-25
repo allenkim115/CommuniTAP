@@ -188,11 +188,13 @@
                                     <tr onclick="window.location='{{ route('admin.task-submissions.show', $submission) }}'" class="hover:bg-blue-50 transition-colors cursor-pointer">
                                         <td class="px-6 py-4">
                                                 <div class="flex items-center">
-                                                <div class="h-10 w-10 bg-gradient-to-br @if($type === 'completed') from-green-500 to-green-600 @else from-red-500 to-red-600 @endif rounded-full flex items-center justify-center flex-shrink-0">
-                                                    <span class="text-sm font-semibold text-white">
-                                                        {{ strtoupper(substr($submission->user->name, 0, 1)) }}
-                                                        </span>
-                                                    </div>
+                                                <x-user-avatar
+                                                    :user="$submission->user"
+                                                    size="h-10 w-10"
+                                                    text-size="text-sm"
+                                                    class="flex-shrink-0 text-white font-semibold"
+                                                    style="background-image: linear-gradient(to bottom right, {{ $type === 'completed' ? '#22c55e' : '#ef4444' }}, {{ $type === 'completed' ? '#16a34a' : '#dc2626' }}); color: #fff;"
+                                                />
                                                 <div class="ml-3">
                                                     <div class="text-sm font-medium text-gray-900">{{ $submission->user->name }}</div>
                                                     <div class="text-sm text-gray-500">{{ Str::limit($submission->user->email, 25) }}</div>

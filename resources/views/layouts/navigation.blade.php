@@ -45,6 +45,7 @@
 
                         $unreadNotificationsCount = $notificationSummary['unreadCount'];
                         $recentNotifications = $notificationSummary['recentNotifications'];
+                        $profilePictureUrl = Auth::user()?->profile_picture_url;
                     @endphp
                     
                     <x-nav-link :href="route('tap-nominations.index')" :active="request()->routeIs('tap-nominations.*')">
@@ -132,8 +133,12 @@
                         <x-slot name="trigger">
                             <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-300 focus:outline-none transition ease-in-out duration-150">
                                 <!-- User Avatar -->
-                                <div class="h-8 w-8 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center mr-2">
-                                    <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ substr(Auth::user()->firstName, 0, 1) }}{{ substr(Auth::user()->lastName, 0, 1) }}</span>
+                                <div class="h-8 w-8 rounded-full flex items-center justify-center mr-2 overflow-hidden bg-gray-300 dark:bg-gray-600">
+                                    @if($profilePictureUrl)
+                                        <img src="{{ $profilePictureUrl }}" alt="{{ Auth::user()->firstName }}'s avatar" class="w-full h-full object-cover">
+                                    @else
+                                        <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ substr(Auth::user()->firstName, 0, 1) }}{{ substr(Auth::user()->lastName, 0, 1) }}</span>
+                                    @endif
                                 </div>
                                 <div>{{ Auth::user()->firstName }}</div>
 
@@ -270,8 +275,12 @@
         <div class="pt-4 pb-1 border-t border-gray-200 dark:border-gray-600">
             <div class="px-4">
                 <div class="flex items-center">
-                    <div class="h-10 w-10 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center mr-3">
-                        <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ substr(Auth::user()->firstName, 0, 1) }}{{ substr(Auth::user()->lastName, 0, 1) }}</span>
+                    <div class="h-10 w-10 rounded-full flex items-center justify-center mr-3 overflow-hidden bg-gray-300 dark:bg-gray-600">
+                        @if($profilePictureUrl)
+                            <img src="{{ $profilePictureUrl }}" alt="{{ Auth::user()->firstName }}'s avatar" class="w-full h-full object-cover">
+                        @else
+                            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ substr(Auth::user()->firstName, 0, 1) }}{{ substr(Auth::user()->lastName, 0, 1) }}</span>
+                        @endif
                     </div>
                     <div>
                         <div class="font-medium text-base text-gray-800 dark:text-gray-200">{{ Auth::user()->firstName }}</div>

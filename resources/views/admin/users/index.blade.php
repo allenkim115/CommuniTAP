@@ -143,22 +143,16 @@
                                         @php
                                             $fullName = $user->full_name ?? ($user->firstName.' '.$user->lastName);
                                             $searchBlob = strtolower($fullName . ' ' . $user->email . ' ' . ($user->role ?? '') . ' ' . ($user->status ?? ''));
-                                            $initials = strtoupper(
-                                                collect(explode(' ', $fullName))
-                                                    ->filter()
-                                                    ->map(function ($part) {
-                                                        return mb_substr($part, 0, 1);
-                                                    })
-                                                    ->take(2)
-                                                    ->implode('')
-                                            );
                                         @endphp
                                         <tr data-user-row data-search="{{ $searchBlob }}" class="group cursor-pointer transition-colors hover:bg-brand-teal/5" onclick="window.location='{{ route('admin.users.show', $user) }}'">
                                             <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">
                                                 <div class="flex items-center gap-3">
-                                                    <div class="h-10 w-10 rounded-full bg-brand-teal/10 text-brand-teal-dark flex items-center justify-center font-semibold shadow-inner">
-                                                        {{ $initials ?: 'NA' }}
-                                                    </div>
+                                                    <x-user-avatar
+                                                        :user="$user"
+                                                        size="h-10 w-10"
+                                                        text-size="text-sm"
+                                                        class="bg-brand-teal/10 text-brand-teal-dark font-semibold shadow-inner"
+                                                    />
                                                     <div>
                                                         <p>{{ $fullName }}</p>
                                                         @if($user->role)
