@@ -2,113 +2,46 @@
     <div class="py-6 lg:py-8 bg-gradient-to-br from-gray-50 via-white to-orange-50/30 min-h-screen">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6 lg:space-y-8">
             
-            <!-- Page Header -->
+            <!-- Page Header with Filters -->
             <div class="bg-gradient-to-r from-red-600 via-orange-600 to-orange-500 rounded-2xl shadow-lg border border-orange-200 overflow-hidden">
                 <div class="bg-white/10 backdrop-blur-sm p-6 lg:p-8">
-                    <div class="flex items-start gap-4">
-                        <div class="bg-white/20 rounded-xl p-3 backdrop-blur-sm">
-                            <i class="fas fa-chart-line text-white text-2xl"></i>
+                    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                        <div class="flex items-start gap-4">
+                            <div class="bg-white/20 rounded-xl p-3 backdrop-blur-sm">
+                                <i class="fas fa-chart-line text-white text-2xl"></i>
+                            </div>
+                            <div>
+                                <h1 class="text-3xl lg:text-4xl font-bold text-white mb-2">Admin Dashboard</h1>
+                                <p class="text-white/90 text-sm lg:text-base">Comprehensive overview of your platform metrics and insights</p>
+                            </div>
                         </div>
-                        <div>
-                            <h1 class="text-3xl lg:text-4xl font-bold text-white mb-2">Admin Dashboard</h1>
-                            <p class="text-white/90 text-sm lg:text-base">Comprehensive overview of your platform metrics and insights</p>
-                        </div>
+                        
+                        <!-- Filters Section - Right Side -->
+                        <form method="GET" action="{{ route('admin.dashboard') }}" id="filter-form" class="flex flex-col sm:flex-row items-start sm:items-end gap-3">
+                            <div class="w-full sm:w-auto">
+                                <label for="period-select" class="block text-xs font-semibold text-white mb-1.5 flex items-center gap-2">
+                                    <i class="fas fa-calendar-alt text-white/90 text-xs"></i>
+                                    Time Period
+                                </label>
+                                <select id="period-select" name="period" 
+                                        class="w-full sm:w-auto min-w-[180px] rounded-lg border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 text-sm px-3 py-2 font-medium bg-white hover:border-orange-400 transition-colors">
+                                    @foreach($periodOptions as $key => $label)
+                                        <option value="{{ $key }}" @selected($selectedPeriod === $key)>{{ $label }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="w-full sm:w-auto">
+                                <a href="{{ route('admin.dashboard') }}" 
+                                   class="px-4 py-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white rounded-lg font-semibold text-sm transition-all duration-200 flex items-center gap-2 justify-center border border-white/30">
+                                    <i class="fas fa-redo text-xs"></i>
+                                    Reset
+                                </a>
+                            </div>
+                            <input type="hidden" name="segment" value="{{ $selectedSegment }}">
+                        </form>
                     </div>
                 </div>
             </div>
-
-            <!-- Filters Section -->
-            <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 lg:p-8">
-                <div class="flex items-center gap-3 mb-6">
-                    <div class="bg-orange-100 rounded-lg p-2">
-                        <i class="fas fa-filter text-orange-600"></i>
-                    </div>
-                    <h2 class="text-lg font-bold text-gray-900">Filter Options</h2>
-                </div>
-                <form method="GET" action="{{ route('admin.dashboard') }}" id="filter-form" class="space-y-5">
-                    <div class="flex flex-col lg:flex-row gap-4 items-start lg:items-end">
-                        <div class="flex-1 w-full lg:w-auto">
-                            <label for="period-select" class="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-                                <i class="fas fa-calendar-alt text-orange-500 text-xs"></i>
-                                Time Period
-                            </label>
-                            <select id="period-select" name="period" 
-                                    class="w-full lg:w-auto min-w-[200px] rounded-lg border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 text-sm px-4 py-2.5 font-medium bg-white hover:border-orange-400 transition-colors">
-                                @foreach($periodOptions as $key => $label)
-                                    <option value="{{ $key }}" @selected($selectedPeriod === $key)>{{ $label }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div id="custom-range-fields" class="flex-1 w-full lg:w-auto flex gap-4 hidden">
-                            <div class="flex-1">
-                                <label for="start_date" class="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-                                    <i class="fas fa-calendar text-orange-500 text-xs"></i>
-                                    Start Date
-                                </label>
-                                <input type="date" id="start_date" name="start_date" value="{{ $filterStartDate }}" 
-                                       class="w-full rounded-lg border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 text-sm px-4 py-2.5 font-medium bg-white hover:border-orange-400 transition-colors">
-                            </div>
-                            <div class="flex-1">
-                                <label for="end_date" class="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-                                    <i class="fas fa-calendar text-orange-500 text-xs"></i>
-                                    End Date
-                                </label>
-                                <input type="date" id="end_date" name="end_date" value="{{ $filterEndDate }}" 
-                                       class="w-full rounded-lg border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 text-sm px-4 py-2.5 font-medium bg-white hover:border-orange-400 transition-colors">
-                            </div>
-                        </div>
-                        <div class="flex gap-3 w-full lg:w-auto">
-                            <a href="{{ route('admin.dashboard') }}" 
-                               class="px-6 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-semibold transition-all duration-200 flex items-center gap-2 w-full lg:w-auto justify-center">
-                                <i class="fas fa-redo text-sm"></i>
-                                Reset
-                            </a>
-                        </div>
-                        <input type="hidden" name="segment" value="{{ $selectedSegment }}">
-                    </div>
-                    <div class="bg-gradient-to-r from-orange-50 to-red-50 rounded-lg p-4 border border-orange-100">
-                        <p class="text-sm text-gray-700" id="range-summary">
-                            <span class="font-bold text-gray-900 flex items-center gap-2">
-                                <i class="fas fa-info-circle text-orange-600"></i>
-                                Showing:
-                            </span> 
-                            <span class="font-semibold text-gray-800">{{ $rangeSummary['label'] }}</span>
-                            <span class="text-gray-600">({{ $rangeSummary['current_start']->format('M d, Y') }} – {{ $rangeSummary['current_end']->format('M d, Y') }})</span>
-                            <span class="text-gray-500 block mt-1">Compared with: {{ $rangeSummary['previous_start']->format('M d, Y') }} – {{ $rangeSummary['previous_end']->format('M d, Y') }}</span>
-                        </p>
-                    </div>
-                </form>
-            </div>
-
-            <!-- Alerts Section -->
-            @if(!empty($alerts))
-                <div class="grid grid-cols-1 md:grid-cols-{{ min(count($alerts), 3) }} gap-4">
-                    @foreach($alerts as $alert)
-                        @php
-                            $alertStyles = [
-                                'critical' => 'bg-gradient-to-br from-red-50 to-red-100 border-red-300 text-red-900 shadow-red-100',
-                                'warning' => 'bg-gradient-to-br from-amber-50 to-amber-100 border-amber-300 text-amber-900 shadow-amber-100',
-                                'info' => 'bg-gradient-to-br from-orange-50 to-orange-100 border-orange-300 text-orange-900 shadow-orange-100',
-                                'success' => 'bg-gradient-to-br from-emerald-50 to-emerald-100 border-emerald-300 text-emerald-900 shadow-emerald-100',
-                            ];
-                            $iconStyles = [
-                                'critical' => 'fa-triangle-exclamation text-red-600 bg-red-200',
-                                'warning' => 'fa-circle-exclamation text-amber-600 bg-amber-200',
-                                'info' => 'fa-info-circle text-orange-600 bg-orange-200',
-                                'success' => 'fa-circle-check text-emerald-600 bg-emerald-200',
-                            ];
-                            $style = $alertStyles[$alert['level']] ?? $alertStyles['info'];
-                            $icon = $iconStyles[$alert['level']] ?? $iconStyles['info'];
-                        @endphp
-                        <div class="bg-white rounded-xl border-2 {{ $style }} p-5 flex items-start gap-4 shadow-md hover:shadow-lg transition-all duration-200">
-                            <div class="bg-white rounded-lg p-2.5 flex-shrink-0">
-                                <i class="fas {{ $icon }} text-xl"></i>
-                            </div>
-                            <p class="text-sm font-semibold flex-1 leading-relaxed">{{ $alert['message'] }}</p>
-                        </div>
-                    @endforeach
-                </div>
-            @endif
 
             <!-- Key Metrics Cards -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -209,62 +142,41 @@
                 </div>
             </div>
 
-            <!-- Performance Metrics -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md hover:border-green-300 transition-all duration-200 group">
-                    <div class="flex items-center justify-between mb-4">
-                        <span class="text-sm font-semibold text-gray-700">Task Completion Rate</span>
-                        <div class="bg-green-100 rounded-xl p-2.5 group-hover:bg-green-200 transition-colors">
-                            <i class="fas fa-check-circle text-green-600 text-lg"></i>
-                        </div>
+            <!-- KPI Row -->
+            @php
+                $engagedUsers = $usersWithTasks ?? 0;
+                $engagedPercent = ($totalUsers ?? 0) > 0 ? round(($engagedUsers / $totalUsers) * 100, 1) : 0;
+            @endphp
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 mt-8 overflow-hidden">
+                <div class="grid grid-cols-1 md:grid-cols-5 divide-y md:divide-y-0 md:divide-x divide-slate-200">
+                    <div class="p-5">
+                        <div class="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Total Users</div>
+                    <div class="text-3xl font-bold text-slate-900 mt-2">{{ number_format($totalUsers ?? 0) }}</div>
+                        <div class="text-xs text-slate-500 mt-1">Total registered accounts</div>
                     </div>
-                    <div class="text-4xl font-bold text-gray-900 mb-2 group-hover:text-green-600 transition-colors">{{ $taskCompletionRate ?? 0 }}%</div>
-                    <p class="text-xs text-gray-500 flex items-center gap-1">
-                        <i class="fas fa-info-circle text-gray-400"></i>
-                        Based on all assignments
-                    </p>
-                </div>
-
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md hover:border-blue-300 transition-all duration-200 group">
-                    <div class="flex items-center justify-between mb-4">
-                        <span class="text-sm font-semibold text-gray-700">Active Volunteers</span>
-                        <div class="bg-blue-100 rounded-xl p-2.5 group-hover:bg-blue-200 transition-colors">
-                            <i class="fas fa-user-check text-blue-600 text-lg"></i>
-                        </div>
+                    <div class="p-5">
+                        <div class="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Task Completion Rate</div>
+                    <div class="text-3xl font-bold text-slate-900 mt-2">{{ number_format($taskCompletionRate ?? 0, 1) }}%</div>
+                    <div class="text-xs text-slate-500 mt-1">Based on all assignments</div>
                     </div>
-                    <div class="text-4xl font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">{{ $activeVolunteers ?? 0 }}</div>
-                    <p class="text-xs text-gray-500 flex items-center gap-1">
-                        <i class="fas fa-info-circle text-gray-400"></i>
-                        Completed at least 1 task
-                    </p>
-                </div>
-
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md hover:border-orange-300 transition-all duration-200 group">
-                    <div class="flex items-center justify-between mb-4">
-                        <span class="text-sm font-semibold text-gray-700">Engagement Rate</span>
-                        <div class="bg-orange-100 rounded-xl p-2.5 group-hover:bg-orange-200 transition-colors">
-                            <i class="fas fa-chart-line text-orange-600 text-lg"></i>
-                        </div>
+                    <div class="p-5">
+                        <div class="text-[11px] font-semibold uppercase tracking-wider text-slate-500">User Engagement</div>
+                    <div class="text-3xl font-bold text-slate-900 mt-2">{{ number_format($engagementRate ?? 0, 1) }}%</div>
+                    <div class="text-xs text-slate-500 mt-1">Users with assigned tasks</div>
                     </div>
-                    <div class="text-4xl font-bold text-gray-900 mb-2 group-hover:text-orange-600 transition-colors">{{ $engagementRate ?? 0 }}%</div>
-                    <p class="text-xs text-gray-500 flex items-center gap-1">
-                        <i class="fas fa-info-circle text-gray-400"></i>
-                        Users with assigned tasks
-                    </p>
-                </div>
-
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md hover:border-orange-300 transition-all duration-200 group">
-                    <div class="flex items-center justify-between mb-4">
-                        <span class="text-sm font-semibold text-gray-700">Points Awarded</span>
-                        <div class="bg-orange-100 rounded-xl p-2.5 group-hover:bg-orange-200 transition-colors">
-                            <i class="fas fa-star text-orange-600 text-lg"></i>
-                        </div>
+                    <div class="p-5">
+                        <div class="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Total Points Awarded</div>
+                        <div class="text-3xl font-bold text-slate-900 mt-2">{{ number_format($totalPointsAwarded ?? 0) }}</div>
+                        @php
+                            $avgPointsPerUser = ($totalUsers ?? 0) > 0 ? number_format(($totalPointsAwarded ?? 0) / max($totalUsers, 1), 1) : 0;
+                        @endphp
+                        <div class="text-xs text-slate-500 mt-1">From completed tasks</div>
                     </div>
-                    <div class="text-4xl font-bold text-gray-900 mb-2 group-hover:text-orange-600 transition-colors">{{ number_format($totalPointsAwarded ?? 0) }}</div>
-                    <p class="text-xs text-gray-500 flex items-center gap-1">
-                        <i class="fas fa-info-circle text-gray-400"></i>
-                        From completed tasks
-                    </p>
+                    <div class="p-5">
+                        <div class="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Active Volunteers</div>
+                    <div class="text-3xl font-bold text-slate-900 mt-2">{{ number_format($activeVolunteers ?? 0) }}</div>
+                    <div class="text-xs text-slate-500 mt-1">Completed at least 1 task</div>
+                    </div>
                 </div>
             </div>
 
@@ -467,290 +379,167 @@
                                 <p class="text-sm text-gray-600 mt-1">Key performance indicators from generated reports</p>
                             </div>
                         </div>
-                        <a href="{{ route('admin.dashboard.pdf', ['period' => $selectedPeriod, 'start_date' => $filterStartDate, 'end_date' => $filterEndDate]) }}"
-                           class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
-                           title="Download summary report with key metrics (charts and detailed insights not included)">
-                            <i class="fas fa-file-pdf text-lg"></i>
-                            <span>Download Summary Report</span>
-                        </a>
                     </div>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <!-- Volunteer Report -->
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                    <!-- User Accounts -->
                     <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl border-2 border-blue-200 p-6 hover:shadow-lg hover:border-blue-300 transition-all duration-200 group">
                         <div class="flex items-center gap-3 mb-5">
                             <div class="bg-blue-600 rounded-xl p-3 group-hover:scale-110 transition-transform">
                                 <i class="fas fa-users text-white text-lg"></i>
                             </div>
                             <div>
-                                <h4 class="font-bold text-gray-900 text-lg">Volunteer Report</h4>
-                                <p class="text-xs text-gray-600 font-medium">Analytics</p>
+                                <h4 class="font-bold text-gray-900 text-lg">User Accounts List</h4>
+                                <p class="text-xs text-gray-600 font-medium">Volunteer directory</p>
                             </div>
                         </div>
                         <div class="space-y-3 mb-5">
-                            <div class="flex justify-between items-center bg-white/60 rounded-lg px-4 py-2.5">
-                                <span class="text-sm font-medium text-gray-700">Active Volunteers</span>
+                            <div class="flex justify-between items-center bg-white/70 rounded-lg px-4 py-2.5">
+                                <span class="text-sm font-medium text-gray-700">Active Accounts</span>
                                 <span class="text-lg font-bold text-gray-900">{{ $activeVolunteers ?? 0 }}</span>
                             </div>
-                            <div class="flex justify-between items-center bg-white/60 rounded-lg px-4 py-2.5">
+                            <div class="flex justify-between items-center bg-white/70 rounded-lg px-4 py-2.5">
                                 <span class="text-sm font-medium text-gray-700">Engagement Rate</span>
                                 <span class="text-lg font-bold text-blue-600">{{ $engagementRate ?? 0 }}%</span>
                             </div>
-                            <div class="flex justify-between items-center bg-white/60 rounded-lg px-4 py-2.5">
+                            <div class="flex justify-between items-center bg-white/70 rounded-lg px-4 py-2.5">
                                 <span class="text-sm font-medium text-gray-700">Users with Tasks</span>
                                 <span class="text-lg font-bold text-gray-900">{{ $usersWithTasks ?? 0 }}</span>
                             </div>
                         </div>
-                        <a href="{{ route('admin.reports.volunteer', ['period' => $selectedPeriod, 'start_date' => $filterStartDate, 'end_date' => $filterEndDate]) }}" 
+                        <a href="{{ route('admin.reports.users', ['period' => $selectedPeriod, 'start_date' => $filterStartDate, 'end_date' => $filterEndDate]) }}" 
                            class="mt-4 inline-flex items-center gap-2 text-sm text-blue-700 hover:text-blue-800 font-semibold bg-white/80 px-4 py-2 rounded-lg hover:bg-white transition-all">
-                            View Full Report <i class="fas fa-arrow-right text-xs"></i>
+                            Download Accounts Report <i class="fas fa-arrow-right text-xs"></i>
                         </a>
                     </div>
 
-                    <!-- Task Report -->
+                    <!-- Task List -->
                     <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-xl border-2 border-green-200 p-6 hover:shadow-lg hover:border-green-300 transition-all duration-200 group">
                         <div class="flex items-center gap-3 mb-5">
                             <div class="bg-green-600 rounded-xl p-3 group-hover:scale-110 transition-transform">
                                 <i class="fas fa-tasks text-white text-lg"></i>
                             </div>
                             <div>
-                                <h4 class="font-bold text-gray-900 text-lg">Task Report</h4>
-                                <p class="text-xs text-gray-600 font-medium">Analytics</p>
+                                <h4 class="font-bold text-gray-900 text-lg">Task List</h4>
+                                <p class="text-xs text-gray-600 font-medium">Performance snapshot</p>
                             </div>
                         </div>
                         <div class="space-y-3 mb-5">
-                            <div class="flex justify-between items-center bg-white/60 rounded-lg px-4 py-2.5">
+                            <div class="flex justify-between items-center bg-white/70 rounded-lg px-4 py-2.5">
                                 <span class="text-sm font-medium text-gray-700">Completion Rate</span>
                                 <span class="text-lg font-bold text-green-600">{{ $taskCompletionRate ?? 0 }}%</span>
                             </div>
-                            <div class="flex justify-between items-center bg-white/60 rounded-lg px-4 py-2.5">
-                                <span class="text-sm font-medium text-gray-700">Completed Tasks</span>
+                            <div class="flex justify-between items-center bg-white/70 rounded-lg px-4 py-2.5">
+                                <span class="text-sm font-medium text-gray-700">Completed Assignments</span>
                                 <span class="text-lg font-bold text-gray-900">{{ $completedAssignments ?? 0 }}</span>
                             </div>
-                            <div class="flex justify-between items-center bg-white/60 rounded-lg px-4 py-2.5">
+                            <div class="flex justify-between items-center bg-white/70 rounded-lg px-4 py-2.5">
                                 <span class="text-sm font-medium text-gray-700">Points Awarded</span>
                                 <span class="text-lg font-bold text-gray-900">{{ number_format($totalPointsAwarded ?? 0) }}</span>
                             </div>
                         </div>
-                        <a href="{{ route('admin.reports.task', ['period' => $selectedPeriod, 'start_date' => $filterStartDate, 'end_date' => $filterEndDate]) }}" 
+                        <a href="{{ route('admin.reports.tasks', ['period' => $selectedPeriod, 'start_date' => $filterStartDate, 'end_date' => $filterEndDate]) }}" 
                            class="mt-4 inline-flex items-center gap-2 text-sm text-green-700 hover:text-green-800 font-semibold bg-white/80 px-4 py-2 rounded-lg hover:bg-white transition-all">
-                            View Full Report <i class="fas fa-arrow-right text-xs"></i>
+                            Download Task Report <i class="fas fa-arrow-right text-xs"></i>
                         </a>
                     </div>
 
-                    <!-- Task Chain Report -->
+                    <!-- Rewards List -->
+                    <div class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl border-2 border-purple-200 p-6 hover:shadow-lg hover:border-purple-300 transition-all duration-200 group">
+                        <div class="flex items-center gap-3 mb-5">
+                            <div class="bg-purple-600 rounded-xl p-3 group-hover:scale-110 transition-transform">
+                                <i class="fas fa-gift text-white text-lg"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-gray-900 text-lg">Rewards List</h4>
+                                <p class="text-xs text-gray-600 font-medium">Catalog health</p>
+                            </div>
+                        </div>
+                        <div class="space-y-3 mb-5">
+                            <div class="flex justify-between items-center bg-white/70 rounded-lg px-4 py-2.5">
+                                <span class="text-sm font-medium text-gray-700">Active Rewards</span>
+                                <span class="text-lg font-bold text-gray-900">{{ $activeRewardsCount ?? 0 }}</span>
+                            </div>
+                            <div class="flex justify-between items-center bg-white/70 rounded-lg px-4 py-2.5">
+                                <span class="text-sm font-medium text-gray-700">Redemptions (Period)</span>
+                                <span class="text-lg font-bold text-purple-700">{{ $rewardRedemptionsThisPeriod ?? 0 }}</span>
+                            </div>
+                            <div class="flex justify-between items-center bg-white/70 rounded-lg px-4 py-2.5">
+                                <span class="text-sm font-medium text-gray-700">Pending Approvals</span>
+                                <span class="text-lg font-bold text-gray-900">{{ $pendingRewardRedemptions ?? 0 }}</span>
+                            </div>
+                        </div>
+                        <a href="{{ route('admin.reports.rewards', ['period' => $selectedPeriod, 'start_date' => $filterStartDate, 'end_date' => $filterEndDate]) }}" 
+                           class="mt-4 inline-flex items-center gap-2 text-sm text-purple-700 hover:text-purple-800 font-semibold bg-white/80 px-4 py-2 rounded-lg hover:bg-white transition-all">
+                            Download Rewards Report <i class="fas fa-arrow-right text-xs"></i>
+                        </a>
+                    </div>
+
+                    <!-- Tap & Pass -->
                     <div class="bg-gradient-to-br from-red-50 to-red-100 rounded-xl border-2 border-red-200 p-6 hover:shadow-lg hover:border-red-300 transition-all duration-200 group">
                         <div class="flex items-center gap-3 mb-5">
                             <div class="bg-red-600 rounded-xl p-3 group-hover:scale-110 transition-transform">
                                 <i class="fas fa-link text-white text-lg"></i>
                             </div>
                             <div>
-                                <h4 class="font-bold text-gray-900 text-lg">Task Chain Report</h4>
-                                <p class="text-xs text-gray-600 font-medium">Analytics</p>
+                                <h4 class="font-bold text-gray-900 text-lg">Tap &amp; Pass Nominations</h4>
+                                <p class="text-xs text-gray-600 font-medium">Chain momentum</p>
                             </div>
                         </div>
                         <div class="space-y-3 mb-5">
-                            <div class="flex justify-between items-center bg-white/60 rounded-lg px-4 py-2.5">
-                                <span class="text-sm font-medium text-gray-700">Task Chain Links</span>
+                            <div class="flex justify-between items-center bg-white/70 rounded-lg px-4 py-2.5">
+                                <span class="text-sm font-medium text-gray-700">Accepted Links</span>
                                 <span class="text-lg font-bold text-gray-900">{{ $taskChainNominations ?? 0 }}</span>
                             </div>
-                            <div class="flex justify-between items-center bg-white/60 rounded-lg px-4 py-2.5">
-                                <span class="text-sm font-medium text-gray-700">Chain Engagement</span>
+                            <div class="flex justify-between items-center bg-white/70 rounded-lg px-4 py-2.5">
+                                <span class="text-sm font-medium text-gray-700">Engagement</span>
                                 <span class="text-lg font-bold text-red-600">{{ $chainEngagementRate ?? 0 }}%</span>
                             </div>
-                            <div class="flex justify-between items-center bg-white/60 rounded-lg px-4 py-2.5">
+                            <div class="flex justify-between items-center bg-white/70 rounded-lg px-4 py-2.5">
                                 <span class="text-sm font-medium text-gray-700">Total Nominations</span>
                                 <span class="text-lg font-bold text-gray-900">{{ $totalNominations ?? 0 }}</span>
                             </div>
                         </div>
-                        <a href="{{ route('admin.reports.task-chain', ['period' => $selectedPeriod, 'start_date' => $filterStartDate, 'end_date' => $filterEndDate]) }}" 
+                        <a href="{{ route('admin.reports.tap-pass', ['period' => $selectedPeriod, 'start_date' => $filterStartDate, 'end_date' => $filterEndDate]) }}" 
                            class="mt-4 inline-flex items-center gap-2 text-sm text-red-700 hover:text-red-800 font-semibold bg-white/80 px-4 py-2 rounded-lg hover:bg-white transition-all">
-                            View Full Report <i class="fas fa-arrow-right text-xs"></i>
+                            Download Tap &amp; Pass Report <i class="fas fa-arrow-right text-xs"></i>
                         </a>
                     </div>
-                </div>
-            </div>
 
-            <!-- Retention & Incident Insights -->
-            <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 lg:p-8">
-                <div class="mb-6 lg:mb-8">
-                    <div class="flex items-center gap-3 mb-2">
-                        <div class="bg-emerald-100 rounded-xl p-2.5">
-                            <i class="fas fa-chart-line text-emerald-600 text-lg"></i>
-                        </div>
-                        <h3 class="text-xl font-bold text-gray-900">Retention & Incident Insights</h3>
-                    </div>
-                    <p class="text-sm text-gray-600 ml-12">Track volunteer retention cohorts and incident resolution metrics</p>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    @forelse($retentionMetrics as $metric)
-                        <div class="bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-xl border border-emerald-200 p-6 shadow-sm hover:shadow-md transition-shadow">
-                            <div class="flex items-center justify-between mb-4">
-                                <div class="bg-emerald-600 rounded-lg p-2.5">
-                                    <i class="fas fa-users text-white"></i>
-                                </div>
-                                <span class="text-xs font-semibold uppercase tracking-wide text-emerald-700 bg-emerald-200/50 px-2 py-1 rounded">{{ $metric['label'] }}</span>
-                            </div>
-                            <p class="text-4xl font-bold text-gray-900 mb-1">{{ $metric['retention_rate'] }}%</p>
-                            <div class="mt-4 space-y-2 text-sm">
-                                <div class="flex items-center justify-between bg-white/60 rounded-lg px-3 py-2">
-                                    <span class="text-gray-600">New Users</span>
-                                    <span class="font-semibold text-gray-900">{{ number_format($metric['cohort_size']) }}</span>
-                                </div>
-                                <div class="flex items-center justify-between bg-emerald-200/40 rounded-lg px-3 py-2">
-                                    <span class="text-emerald-700">Active</span>
-                                    <span class="font-semibold text-emerald-700">{{ number_format($metric['retained']) }}</span>
-                                </div>
-                                <p class="text-xs text-gray-500 text-center mt-2">Within {{ $metric['lookback_days'] }} days</p>
-                            </div>
-                        </div>
-                    @empty
-                        <div class="md:col-span-3 bg-gray-50 rounded-xl border border-gray-200 p-8 text-center">
-                            <i class="fas fa-info-circle text-gray-400 text-2xl mb-2"></i>
-                            <p class="text-sm text-gray-500">No retention data available. Encourage new sign-ups to populate cohort metrics.</p>
-                        </div>
-                    @endforelse
-                </div>
-
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <div class="bg-gradient-to-br from-red-50 to-red-100 rounded-xl border border-red-200 p-6 shadow-sm">
+                    <!-- Incident Reports -->
+                    <div class="bg-gradient-to-br from-slate-50 to-slate-100 rounded-xl border-2 border-slate-200 p-6 hover:shadow-lg hover:border-slate-300 transition-all duration-200 group xl:col-span-1">
                         <div class="flex items-center gap-3 mb-5">
-                            <div class="bg-red-600 rounded-lg p-2.5">
-                                <i class="fas fa-clock text-white text-lg"></i>
+                            <div class="bg-slate-700 rounded-xl p-3 group-hover:scale-110 transition-transform">
+                                <i class="fas fa-exclamation-triangle text-white text-lg"></i>
                             </div>
                             <div>
-                                <p class="text-xs font-semibold uppercase tracking-wide text-red-700">Incident Resolution</p>
-                                <p class="text-xs text-gray-600 mt-0.5">Response time metrics</p>
+                                <h4 class="font-bold text-gray-900 text-lg">Incident Reports</h4>
+                                <p class="text-xs text-gray-600 font-medium">Safety oversight</p>
                             </div>
                         </div>
-                        <div class="space-y-4">
-                            <div class="bg-white/60 rounded-lg p-3">
-                                <p class="text-xs text-gray-600 mb-1">Average Resolution Time</p>
-                                <p class="text-2xl font-bold text-gray-900">
-                                    @if($incidentInsights['average_resolution_hours'] !== null)
-                                        @php
-                                            $avgHours = $incidentInsights['average_resolution_hours'];
-                                            if ($avgHours >= 24) {
-                                                $days = floor($avgHours / 24);
-                                                $hours = floor($avgHours % 24);
-                                                echo $days . 'd ' . $hours . 'h';
-                                            } elseif ($avgHours >= 1) {
-                                                $wholeHours = floor($avgHours);
-                                                $minutes = round(($avgHours - $wholeHours) * 60);
-                                                echo $wholeHours . 'h' . ($minutes > 0 ? ' ' . $minutes . 'm' : '');
-                                            } else {
-                                                echo round($avgHours * 60) . 'm';
-                                            }
-                                        @endphp
-                                    @else
-                                        —
-                                    @endif
-                                </p>
+                        <div class="space-y-3 mb-5">
+                            <div class="flex justify-between items-center bg-white/70 rounded-lg px-4 py-2.5">
+                                <span class="text-sm font-medium text-gray-700">Open Cases</span>
+                                <span class="text-lg font-bold text-gray-900">{{ $incidentInsights['open_incidents'] ?? 0 }}</span>
                             </div>
-                            <div class="bg-white/60 rounded-lg p-3">
-                                <p class="text-xs text-gray-600 mb-1">Median Resolution Time</p>
-                                <p class="text-xl font-semibold text-gray-900">
-                                    @if($incidentInsights['median_resolution_hours'] !== null)
-                                        @php
-                                            $medHours = $incidentInsights['median_resolution_hours'];
-                                            if ($medHours >= 24) {
-                                                $days = floor($medHours / 24);
-                                                $hours = floor($medHours % 24);
-                                                echo $days . 'd ' . $hours . 'h';
-                                            } elseif ($medHours >= 1) {
-                                                $wholeHours = floor($medHours);
-                                                $minutes = round(($medHours - $wholeHours) * 60);
-                                                echo $wholeHours . 'h' . ($minutes > 0 ? ' ' . $minutes . 'm' : '');
-                                            } else {
-                                                echo round($medHours * 60) . 'm';
-                                            }
-                                        @endphp
-                                    @else
-                                        —
-                                    @endif
-                                </p>
+                            <div class="flex justify-between items-center bg-white/70 rounded-lg px-4 py-2.5">
+                                <span class="text-sm font-medium text-gray-700">Resolved</span>
+                                <span class="text-lg font-bold text-slate-900">{{ $incidentInsights['resolved_count'] ?? 0 }}</span>
                             </div>
-                            <div class="pt-3 border-t border-red-200 space-y-2">
-                                <div class="flex items-center justify-between text-sm">
-                                    <span class="text-gray-700">Open Incidents</span>
-                                    <span class="font-semibold text-gray-900 bg-white/60 px-2 py-1 rounded">{{ $incidentInsights['open_incidents'] }}</span>
-                                </div>
-                                <div class="flex items-center justify-between text-sm">
-                                    <span class="text-red-700 font-medium">Overdue (&gt;7 days)</span>
-                                    <span class="font-semibold text-red-700 bg-red-200/60 px-2 py-1 rounded">{{ $incidentInsights['overdue_incidents'] }}</span>
-                                </div>
+                            @php
+                                $avgResolutionHours = $incidentInsights['average_resolution_hours'] ?? null;
+                            @endphp
+                            <div class="flex justify-between items-center bg-white/70 rounded-lg px-4 py-2.5">
+                                <span class="text-sm font-medium text-gray-700">Avg Resolution</span>
+                                <span class="text-lg font-bold text-gray-900">
+                                    {{ $avgResolutionHours !== null ? $avgResolutionHours . 'h' : 'N/A' }}
+                                </span>
                             </div>
                         </div>
-                    </div>
-                    <div class="lg:col-span-2 bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
-                        <div class="flex items-center justify-between mb-5">
-                            <div>
-                                <h4 class="text-sm font-semibold text-gray-700 uppercase tracking-wide flex items-center gap-2">
-                                    <i class="fas fa-list-check text-gray-500"></i>
-                                    Recent Resolutions
-                                </h4>
-                                <p class="text-xs text-gray-500 mt-1">Latest incident resolutions</p>
-                            </div>
-                            <span class="text-xs font-medium text-gray-600 bg-gray-100 px-3 py-1.5 rounded-full">
-                                {{ $incidentInsights['resolved_count'] }} resolved
-                            </span>
-                        </div>
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full text-sm">
-                                <thead>
-                                    <tr class="border-b-2 border-gray-200 bg-gray-50">
-                                        <th class="text-left py-3 px-4 font-semibold text-gray-700">Incident Type</th>
-                                        <th class="text-left py-3 px-4 font-semibold text-gray-700">Action Taken</th>
-                                        <th class="text-right py-3 px-4 font-semibold text-gray-700">Resolution</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y divide-gray-100">
-                                    @forelse($incidentInsights['recent_resolutions'] ?? [] as $recent)
-                                        <tr class="hover:bg-gray-50 transition">
-                                            <td class="py-3 px-4">
-                                                <span class="font-medium text-gray-900">
-                                                    {{ \Illuminate\Support\Str::headline($recent['incident_type'] ?? 'Unknown') }}
-                                                </span>
-                                            </td>
-                                            <td class="py-3 px-4">
-                                                @if($recent['action_taken'])
-                                                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
-                                                        {{ \Illuminate\Support\Str::headline($recent['action_taken']) }}
-                                                    </span>
-                                                @else
-                                                    <span class="text-gray-400">—</span>
-                                                @endif
-                                            </td>
-                                            <td class="py-3 px-4 text-right">
-                                                <div class="flex flex-col items-end">
-                                                    <span class="font-medium text-gray-900">{{ $recent['resolved_at'] ?? '—' }}</span>
-                                                    @if(!empty($recent['resolution_time_formatted']))
-                                                        <span class="text-xs text-gray-500 mt-1 inline-flex items-center gap-1 bg-gray-100 px-2 py-0.5 rounded">
-                                                            <i class="fas fa-clock text-gray-400 text-xs"></i>
-                                                            {{ $recent['resolution_time_formatted'] }}
-                                                        </span>
-                                                    @elseif(!empty($recent['resolution_hours']))
-                                                        <span class="text-xs text-gray-500 mt-1">
-                                                            {{ number_format($recent['resolution_hours'], 1) }}h
-                                                        </span>
-                                                    @endif
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    @empty
-                                        <tr>
-                                            <td colspan="3" class="py-8 text-center">
-                                                <div class="flex flex-col items-center">
-                                                    <i class="fas fa-inbox text-gray-300 text-3xl mb-2"></i>
-                                                    <p class="text-sm text-gray-500">No incidents were resolved during this period.</p>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    @endforelse
-                                </tbody>
-                            </table>
-                        </div>
+                        <a href="{{ route('admin.reports.incidents', ['period' => $selectedPeriod, 'start_date' => $filterStartDate, 'end_date' => $filterEndDate]) }}" 
+                           class="mt-4 inline-flex items-center gap-2 text-sm text-slate-800 hover:text-slate-900 font-semibold bg-white/80 px-4 py-2 rounded-lg hover:bg-white transition-all">
+                            Download Incident Report <i class="fas fa-arrow-right text-xs"></i>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -850,42 +639,11 @@
             const Chart = ApexChartsLib;
 
             const periodSelect = document.getElementById('period-select');
-            const customRangeFields = document.getElementById('custom-range-fields');
-            const filterForm = document.getElementById('filter-form');
-            const startDateInput = document.getElementById('start_date');
-            const endDateInput = document.getElementById('end_date');
 
-            if (periodSelect && customRangeFields) {
-                const toggleCustomFields = () => {
-                    if (periodSelect.value === 'custom') {
-                        customRangeFields.classList.remove('hidden');
-                    } else {
-                        customRangeFields.classList.add('hidden');
-                    }
-                };
-
+            if (periodSelect) {
                 periodSelect.addEventListener('change', function() {
-                    toggleCustomFields();
                     // Update dashboard via AJAX when period changes
                     updateDashboard();
-                });
-                toggleCustomFields();
-            }
-            
-            // Update dashboard when custom date inputs change
-            if (startDateInput) {
-                startDateInput.addEventListener('change', function() {
-                    if (periodSelect && periodSelect.value === 'custom') {
-                        updateDashboard();
-                    }
-                });
-            }
-            
-            if (endDateInput) {
-                endDateInput.addEventListener('change', function() {
-                    if (periodSelect && periodSelect.value === 'custom') {
-                        updateDashboard();
-                    }
                 });
             }
             
@@ -900,14 +658,12 @@
                 
                 // Get current filter values
                 const periodSelect = document.getElementById('period-select');
-                const startDateInput = document.getElementById('start_date');
-                const endDateInput = document.getElementById('end_date');
                 const segmentSelect = document.getElementById('segment-select');
                 
                 const params = new URLSearchParams({
                     period: periodSelect ? periodSelect.value : 'last_30_days',
-                    start_date: startDateInput ? startDateInput.value : '',
-                    end_date: endDateInput ? endDateInput.value : '',
+                    start_date: '',
+                    end_date: '',
                     segment: segmentSelect ? segmentSelect.value : 'task_location'
                 });
                 
@@ -919,18 +675,18 @@
                         'Accept': 'application/json',
                     }
                 })
-                .then(response => response.json())
-                .then(data => {
-                    // Update range summary
-                    const rangeSummary = document.getElementById('range-summary');
-                    if (rangeSummary && data.rangeSummary) {
-                        rangeSummary.innerHTML = `
-                            <span class="font-medium">Showing:</span> ${data.rangeSummary.label} 
-                            (${data.rangeSummary.current_start} – ${data.rangeSummary.current_end})
-                            <span class="text-gray-500">| Compared with: ${data.rangeSummary.previous_start} – ${data.rangeSummary.previous_end}</span>
-                        `;
+                .then(response => {
+                    // Check if response is ok and is JSON
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
                     }
-                    
+                    const contentType = response.headers.get('content-type');
+                    if (!contentType || !contentType.includes('application/json')) {
+                        throw new Error('Response is not JSON');
+                    }
+                    return response.json();
+                })
+                .then(data => {
                     // Update metrics cards
                     updateMetricsCards(data);
                     
@@ -940,9 +696,6 @@
                     // Update segmented insights
                     updateSegmentedInsights(data.selectedSegment, data.segmentationData);
                     
-                    // Update alerts
-                    updateAlerts(data.alerts);
-                    
                     // Update top performers
                     updateTopPerformers(data.topPerformers);
                     
@@ -951,12 +704,17 @@
                     if (loading) loading.remove();
                 })
                 .catch(error => {
-                    console.error('Error updating dashboard:', error);
+                    console.error('AJAX update failed, falling back to form submission:', error);
+                    // Remove loading indicator silently - don't show error message
                     const loading = document.getElementById('dashboard-loading');
                     if (loading) {
-                        loading.className = 'fixed top-4 right-4 bg-red-600 text-white px-4 py-2 rounded-lg shadow-lg z-50';
-                        loading.innerHTML = '<i class="fas fa-exclamation-circle"></i> Error updating dashboard';
-                        setTimeout(() => loading.remove(), 3000);
+                        loading.remove();
+                    }
+                    // Fall back to normal form submission if AJAX fails
+                    // This will reload the page with the selected period
+                    const filterForm = document.getElementById('filter-form');
+                    if (filterForm) {
+                        filterForm.submit();
                     }
                 });
             }
@@ -1096,36 +854,6 @@
                 }
             }
             
-            function updateAlerts(alerts) {
-                const alertsSection = document.querySelector('.grid.grid-cols-1.md\\:grid-cols-3');
-                if (!alertsSection || !alerts || !Array.isArray(alerts)) return;
-                
-                const alertStyles = {
-                    'critical': 'bg-red-50 border-red-200 text-red-800',
-                    'warning': 'bg-amber-50 border-amber-200 text-amber-800',
-                    'info': 'bg-blue-50 border-blue-200 text-blue-800',
-                    'success': 'bg-emerald-50 border-emerald-200 text-emerald-800',
-                };
-                
-                const iconStyles = {
-                    'critical': 'fa-triangle-exclamation text-red-600',
-                    'warning': 'fa-circle-exclamation text-amber-600',
-                    'info': 'fa-info-circle text-blue-600',
-                    'success': 'fa-circle-check text-emerald-600',
-                };
-                
-                alertsSection.innerHTML = alerts.map(alert => {
-                    const style = alertStyles[alert.level] || alertStyles['info'];
-                    const icon = iconStyles[alert.level] || iconStyles['info'];
-                    return `
-                        <div class="bg-white rounded-xl border-2 ${style} p-4 flex items-start gap-3">
-                            <i class="fas ${icon} text-lg mt-0.5"></i>
-                            <p class="text-sm font-medium flex-1">${alert.message}</p>
-                        </div>
-                    `;
-                }).join('');
-            }
-            
             function updateTopPerformers(performers) {
                 const performersTable = document.querySelector('table:has(th:contains("Rank"))');
                 if (!performersTable || !performers || !Array.isArray(performers)) return;
@@ -1155,14 +883,12 @@
                 segmentSelect.addEventListener('change', function() {
                     // Update only segmented insights when segment changes
                     const periodSelect = document.getElementById('period-select');
-                    const startDateInput = document.getElementById('start_date');
-                    const endDateInput = document.getElementById('end_date');
                     
                     const params = new URLSearchParams({
                         segment: this.value,
                         period: periodSelect ? periodSelect.value : 'last_30_days',
-                        start_date: startDateInput ? startDateInput.value : '',
-                        end_date: endDateInput ? endDateInput.value : ''
+                        start_date: '',
+                        end_date: ''
                     });
                     
                     fetch(`{{ route('admin.dashboard.segmented-insights') }}?${params.toString()}`, {
@@ -1203,14 +929,12 @@
                 
                 // Get current filter values
                 const periodSelect = document.getElementById('period-select');
-                const startDateInput = document.getElementById('start_date');
-                const endDateInput = document.getElementById('end_date');
                 
                 const params = new URLSearchParams({
                     segment: segment,
                     period: periodSelect ? periodSelect.value : 'last_30_days',
-                    start_date: startDateInput ? startDateInput.value : '',
-                    end_date: endDateInput ? endDateInput.value : ''
+                    start_date: '',
+                    end_date: ''
                 });
                 
                 // Make AJAX request

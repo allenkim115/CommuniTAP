@@ -320,12 +320,16 @@ Route::middleware(['auth', 'admin', 'active'])->prefix('admin')->name('admin.')-
     Route::get('/feedback/{task}/show', [AdminFeedbackController::class, 'show'])->name('feedback.show');
     
     // Report Generation Routes
-    Route::get('/reports/volunteer', [ReportController::class, 'generateVolunteerReport'])
-        ->name('reports.volunteer');
-    Route::get('/reports/task', [ReportController::class, 'generateTaskReport'])
-        ->name('reports.task');
-    Route::get('/reports/task-chain', [ReportController::class, 'generateTaskChainReport'])
-        ->name('reports.task-chain');
+    Route::get('/reports/users', [ReportController::class, 'generateUserAccountsReport'])
+        ->name('reports.users');
+    Route::get('/reports/tasks', [ReportController::class, 'generateTaskListReport'])
+        ->name('reports.tasks');
+    Route::get('/reports/rewards', [ReportController::class, 'generateRewardsReport'])
+        ->name('reports.rewards');
+    Route::get('/reports/tap-pass', [ReportController::class, 'generateTapPassReport'])
+        ->name('reports.tap-pass');
+    Route::get('/reports/incidents', [ReportController::class, 'generateIncidentReportsReport'])
+        ->name('reports.incidents');
 
     // Newly added simple pages to support admin navigation
     // Admin rewards management
@@ -352,10 +356,6 @@ Route::middleware(['auth', 'admin', 'active'])->prefix('admin')->name('admin.')-
     // Admin Incident Report routes
     Route::get('/incident-reports', [AdminIncidentReportController::class, 'index'])->name('incident-reports.index');
     
-
-    // Admin Generate PDF Report
-    Route::get('/dashboard/pdf', [DashboardController::class, 'generateAdminPdf'])
-    ->name('dashboard.pdf');
 
     // Debug route for testing
     Route::get('/debug-incident-reports', function() {

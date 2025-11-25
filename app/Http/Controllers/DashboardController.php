@@ -8,10 +8,10 @@ use Illuminate\Support\Facades\DB;
 use App\Models\User;
 use App\Models\Task;
 use App\Models\Reward;
+use App\Models\RewardRedemption;
 use App\Models\TaskAssignment;
 use App\Models\TapNomination;
 use App\Models\UserIncidentReport;
-use Barryvdh\DomPDF\Facade\Pdf; 
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 
@@ -100,6 +100,12 @@ class DashboardController extends Controller
             ->whereBetween($taskAssignmentTable . '.completed_at', [$currentStart, $currentEnd])
             ->join($taskTable, $taskAssignmentTable . '.taskId', '=', $taskTable . '.taskId')
             ->sum($taskTable . '.points_awarded') ?? 0;
+
+        // Reward catalog metrics
+        $activeRewardsCount = Reward::where('status', 'active')->count();
+        $rewardInventoryTotal = Reward::sum('QTY');
+        $rewardRedemptionsThisPeriod = RewardRedemption::whereBetween('redemption_date', [$currentStart, $currentEnd])->count();
+        $pendingRewardRedemptions = RewardRedemption::where('status', 'pending')->count();
         
         // Tasks with assignments in the period
         $tasksWithAssignments = Task::whereHas('assignments', function ($query) use ($currentStart, $currentEnd) {
@@ -215,7 +221,11 @@ class DashboardController extends Controller
             'taskTypeEngagement',
             'retentionMetrics',
             'incidentInsights',
-            'alerts'
+        'alerts',
+        'activeRewardsCount',
+        'rewardInventoryTotal',
+        'rewardRedemptionsThisPeriod',
+        'pendingRewardRedemptions'
         ));
     }
 
@@ -369,6 +379,10 @@ class DashboardController extends Controller
             'engagementRate' => $engagementRate,
             'usersWithTasks' => $usersWithTasks,
             'totalPointsAwarded' => $totalPointsAwarded,
+            'activeRewardsCount' => $activeRewardsCount,
+            'rewardInventoryTotal' => $rewardInventoryTotal,
+            'rewardRedemptionsThisPeriod' => $rewardRedemptionsThisPeriod,
+            'pendingRewardRedemptions' => $pendingRewardRedemptions,
             'avgTaskCompletionRate' => $avgTaskCompletionRate,
             'completedAssignments' => $completedAssignments,
             'taskChainNominations' => $taskChainNominations,
@@ -1374,132 +1388,6 @@ class DashboardController extends Controller
             'endDate',
             'taskType'
         ));
-    }
-
-
-    public function generateAdminPdf(Request $request)
-    {
-        // Use the same date range resolution as the dashboard
-        [$currentStart, $currentEnd, $selectedPeriod, $periodLabel] = $this->resolveDateRange($request);
-        
-        // Core metrics
-        $totalUsers = User::whereBetween('created_at', [$currentStart, $currentEnd])->count();
-        $activeUsers = User::where('status', 'active')
-            ->whereBetween('created_at', [$currentStart, $currentEnd])
-            ->count();
-        $inactiveUsers = User::where('status', 'inactive')
-            ->whereBetween('created_at', [$currentStart, $currentEnd])
-            ->count();
-        $userActivationRate = $totalUsers > 0 ? round(($activeUsers / $totalUsers) * 100, 1) : 0;
-        
-        // Task analytics
-        $totalTasks = Task::whereBetween('created_at', [$currentStart, $currentEnd])->count();
-        $taskStatusCounts = Task::select('status', DB::raw('COUNT(*) as total'))
-            ->whereBetween('created_at', [$currentStart, $currentEnd])
-            ->groupBy('status')
-            ->pluck('total', 'status');
-        $tasksCompleted = $taskStatusCounts['completed'] ?? 0;
-        $tasksPending = $taskStatusCounts['pending'] ?? 0;
-        $tasksPublished = $taskStatusCounts['published'] ?? 0;
-        $tasksInactive = $taskStatusCounts['inactive'] ?? 0;
-        
-        // Task type breakdown
-        $taskTypeBreakdown = Task::select('task_type', DB::raw('COUNT(*) as total'))
-            ->whereBetween('created_at', [$currentStart, $currentEnd])
-            ->groupBy('task_type')
-            ->pluck('total', 'task_type');
-        
-        // Task assignment and completion analytics
-        $taskAssignmentTable = (new TaskAssignment())->getTable();
-        $taskTable = (new Task())->getTable();
-        $totalAssignments = TaskAssignment::whereBetween('assigned_at', [$currentStart, $currentEnd])->count();
-        $completedAssignments = TaskAssignment::where('status', 'completed')
-            ->whereBetween('completed_at', [$currentStart, $currentEnd])
-            ->count();
-        $taskCompletionRate = $totalAssignments > 0 ? round(($completedAssignments / $totalAssignments) * 100, 1) : 0;
-        
-        // Points analytics
-        $totalPoints = TaskAssignment::where($taskAssignmentTable . '.status', 'completed')
-            ->whereBetween($taskAssignmentTable . '.completed_at', [$currentStart, $currentEnd])
-            ->join($taskTable, $taskAssignmentTable . '.taskId', '=', $taskTable . '.taskId')
-            ->sum($taskTable . '.points_awarded') ?? 0;
-        $avgPointsPerUser = $activeUsers > 0 ? round($totalPoints / $activeUsers, 1) : 0;
-        $avgPointsPerTask = $completedAssignments > 0 ? round($totalPoints / $completedAssignments, 1) : 0;
-        
-        // Engagement metrics
-        $allTimeUsers = User::count();
-        $usersWithTasks = User::whereHas('taskAssignments', function ($query) use ($currentStart, $currentEnd) {
-            $query->whereBetween('assigned_at', [$currentStart, $currentEnd]);
-        })->count();
-        $engagementRate = $allTimeUsers > 0 ? round(($usersWithTasks / $allTimeUsers) * 100, 1) : 0;
-        
-        $activeVolunteers = User::whereHas('taskAssignments', function ($query) use ($currentStart, $currentEnd) {
-            $query->where('status', 'completed')
-                ->whereBetween('completed_at', [$currentStart, $currentEnd]);
-        })->count();
-        
-        // Top performers (top 10 by points earned in period)
-        $topPerformers = User::where('status', 'active')
-            ->whereHas('taskAssignments', function ($query) use ($currentStart, $currentEnd) {
-                $query->where('status', 'completed')
-                    ->whereBetween('completed_at', [$currentStart, $currentEnd]);
-            })
-            ->get(['userId', 'firstName', 'middleName', 'lastName', 'email'])
-            ->map(function ($user) use ($currentStart, $currentEnd, $taskAssignmentTable, $taskTable) {
-                $pointsEarned = TaskAssignment::where($taskAssignmentTable . '.userId', $user->userId)
-                    ->where($taskAssignmentTable . '.status', 'completed')
-                    ->whereBetween($taskAssignmentTable . '.completed_at', [$currentStart, $currentEnd])
-                    ->join($taskTable, $taskAssignmentTable . '.taskId', '=', $taskTable . '.taskId')
-                    ->sum($taskTable . '.points_awarded') ?? 0;
-                
-                $tasksCompleted = TaskAssignment::where($taskAssignmentTable . '.userId', $user->userId)
-                    ->where($taskAssignmentTable . '.status', 'completed')
-                    ->whereBetween($taskAssignmentTable . '.completed_at', [$currentStart, $currentEnd])
-                    ->count();
-                
-                $nameParts = array_filter([$user->firstName, $user->middleName, $user->lastName]);
-                $user->name = implode(' ', $nameParts);
-                $user->points_earned = $pointsEarned;
-                $user->tasks_completed = $tasksCompleted;
-                return $user;
-            })
-            ->sortByDesc('points_earned')
-            ->take(10)
-            ->values();
-        
-        // Reward analytics
-        $totalRewards = Reward::where(function ($query) use ($currentStart, $currentEnd) {
-            $query->whereBetween('created_date', [$currentStart, $currentEnd])
-                ->orWhereBetween('created_at', [$currentStart, $currentEnd])
-                ->orWhereBetween('last_update_date', [$currentStart, $currentEnd]);
-        })->count();
-        
-        $rewardStatusBreakdown = Reward::select('status', DB::raw('COUNT(*) as total'))
-            ->where(function ($query) use ($currentStart, $currentEnd) {
-                $query->whereBetween('created_date', [$currentStart, $currentEnd])
-                    ->orWhereBetween('created_at', [$currentStart, $currentEnd])
-                    ->orWhereBetween('last_update_date', [$currentStart, $currentEnd]);
-            })
-            ->groupBy('status')
-            ->pluck('total', 'status');
-        
-        $rewardsAvailable = $rewardStatusBreakdown['available'] ?? 0;
-        $rewardsRedeemed = $rewardStatusBreakdown['redeemed'] ?? 0;
-        $rewardsInactive = $rewardStatusBreakdown['inactive'] ?? 0;
-
-        $pdf = Pdf::loadView('admin/pdf/pdf-generate', compact(
-            'totalUsers', 'activeUsers', 'inactiveUsers', 'userActivationRate', 'allTimeUsers',
-            'totalTasks', 'tasksCompleted', 'tasksPending', 'tasksPublished', 'tasksInactive',
-            'taskTypeBreakdown', 'totalAssignments', 'completedAssignments', 'taskCompletionRate',
-            'totalPoints', 'avgPointsPerUser', 'avgPointsPerTask',
-            'engagementRate', 'activeVolunteers', 'usersWithTasks',
-            'topPerformers',
-            'totalRewards', 'rewardsAvailable', 'rewardsRedeemed', 'rewardsInactive',
-            'currentStart', 'currentEnd', 'periodLabel'
-        ))->setPaper('a4', 'landscape');
-
-        $filename = 'admin_dashboard_report_' . $currentStart->format('Y-m-d') . '_to_' . $currentEnd->format('Y-m-d') . '.pdf';
-        return $pdf->download($filename);
     }
 
 }
