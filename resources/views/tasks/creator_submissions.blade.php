@@ -54,9 +54,13 @@
                                         <tr class="hover:bg-gradient-to-r hover:from-gray-50 hover:to-gray-100 dark:hover:from-gray-700 dark:hover:to-gray-800 transition-all duration-200">
                                             <td class="px-6 py-4 whitespace-nowrap">
                                                 <div class="flex items-center">
-                                                    <div class="h-10 w-10 rounded-full flex items-center justify-center shadow-md" style="background-color: #F3A261;">
-                                                        <span class="text-sm font-bold text-white">{{ substr($submission->user->name, 0, 2) }}</span>
-                                                    </div>
+                                                    <x-user-avatar
+                                                        :user="$submission->user"
+                                                        size="h-10 w-10"
+                                                        text-size="text-sm"
+                                                        class="shadow-md text-white font-bold"
+                                                        style="background-color: #F3A261;"
+                                                    />
                                                     <div class="ml-4">
                                                         <div class="text-sm font-bold text-gray-900 dark:text-white">{{ $submission->user->name }}</div>
                                                         <div class="text-sm text-gray-500 dark:text-gray-400">{{ $submission->user->email }}</div>

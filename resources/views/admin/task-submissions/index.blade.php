@@ -177,11 +177,13 @@
                                         onmouseout="this.style.backgroundColor='';">
                                         <td class="px-6 py-4">
                                                 <div class="flex items-center">
-                                                <div class="h-10 w-10 rounded-full flex items-center justify-center flex-shrink-0" style="background-color: #2B9D8D;">
-                                                    <span class="text-sm font-semibold text-white">
-                                                        {{ strtoupper(substr($submission->user->name, 0, 1)) }}
-                                                        </span>
-                                                    </div>
+                                                <x-user-avatar
+                                                    :user="$submission->user"
+                                                    size="h-10 w-10"
+                                                    text-size="text-sm"
+                                                    class="flex-shrink-0 text-white font-semibold"
+                                                    style="background-color: #2B9D8D;"
+                                                />
                                                 <div class="ml-3">
                                                     <div class="text-sm font-medium text-gray-900">{{ $submission->user->name }}</div>
                                                     <div class="text-sm text-gray-500">{{ Str::limit($submission->user->email, 25) }}</div>

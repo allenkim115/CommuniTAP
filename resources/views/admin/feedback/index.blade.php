@@ -179,9 +179,12 @@
                                     >
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <div class="flex items-center gap-3">
-                                                <div class="h-11 w-11 rounded-full bg-brand-teal/10 text-brand-teal flex items-center justify-center font-semibold uppercase">
-                                                    {{ substr($feedback->user->name, 0, 2) }}
-                                                </div>
+                                                <x-user-avatar
+                                                    :user="$feedback->user"
+                                                    size="h-11 w-11"
+                                                    text-size="text-sm"
+                                                    class="bg-brand-teal/10 text-brand-teal font-semibold uppercase"
+                                                />
                                                 <div>
                                                     <p class="text-sm font-semibold text-gray-900">{{ $feedback->user->name }}</p>
                                                     <p class="text-xs text-gray-500">{{ $feedback->user->email }}</p>

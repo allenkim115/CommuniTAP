@@ -18,7 +18,6 @@
             <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 p-8">
                 @php
                     $isUncompleted = !in_array($task->status, ['completed']) && !in_array($task->status, ['approved', 'published']);
-                    $showTwoButtons = $isUncompleted || $task->status === 'inactive';
                 @endphp
                 @if($isUncompleted)
                 <div class="mb-6">
@@ -31,7 +30,7 @@
                             </div>
                             <div class="flex-1">
                                 <p class="text-sm font-bold text-blue-800 dark:text-blue-200">
-                                    <strong>Note:</strong> Choose "Update Task" to set status to "Pending" (requires admin approval) or "Update & Publish" to publish directly.
+                                    <strong>Note:</strong> Choosing "Update Task" will set status to "Pending" and require admin approval before it can be published.
                                 </p>
                             </div>
                         </div>
@@ -186,30 +185,13 @@
                            class="px-6 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-xl shadow-sm text-sm font-bold text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-all duration-200">
                             Cancel
                         </a>
-                        @if($showTwoButtons)
-                            <button type="submit" name="action" value="update" 
-                                    class="px-6 py-3 border border-transparent rounded-xl shadow-lg text-sm font-bold text-white focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all duration-200 transform hover:-translate-y-0.5 hover:shadow-xl"
-                                    style="background-color: #2B9D8D;"
-                                    onmouseover="this.style.backgroundColor='#248A7C'"
-                                    onmouseout="this.style.backgroundColor='#2B9D8D'">
-                                Update Task
-                            </button>
-                            <button type="submit" name="action" value="publish" 
-                                    class="px-6 py-3 border border-transparent rounded-xl shadow-lg text-sm font-bold text-white focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all duration-200 transform hover:-translate-y-0.5 hover:shadow-xl"
-                                    style="background-color: #F3A261;"
-                                    onmouseover="this.style.backgroundColor='#E8944F'"
-                                    onmouseout="this.style.backgroundColor='#F3A261'">
-                                Update & Publish
-                            </button>
-                        @else
-                            <button type="submit" name="action" value="update" 
-                                    class="px-6 py-3 border border-transparent rounded-xl shadow-lg text-sm font-bold text-white focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all duration-200 transform hover:-translate-y-0.5 hover:shadow-xl"
-                                    style="background-color: #F3A261;"
-                                    onmouseover="this.style.backgroundColor='#E8944F'"
-                                    onmouseout="this.style.backgroundColor='#F3A261'">
-                                Update Task Proposal
-                            </button>
-                        @endif
+                        <button type="submit" name="action" value="update" 
+                                class="px-6 py-3 border border-transparent rounded-xl shadow-lg text-sm font-bold text-white focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all duration-200 transform hover:-translate-y-0.5 hover:shadow-xl"
+                                style="background-color: {{ $isUncompleted ? '#2B9D8D' : '#F3A261' }};"
+                                onmouseover="this.style.backgroundColor='{{ $isUncompleted ? '#248A7C' : '#E8944F' }}'"
+                                onmouseout="this.style.backgroundColor='{{ $isUncompleted ? '#2B9D8D' : '#F3A261' }}'">
+                            {{ $isUncompleted ? 'Update Task' : 'Update Task Proposal' }}
+                        </button>
                     </div>
                 </form>
             </div>

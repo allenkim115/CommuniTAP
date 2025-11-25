@@ -152,11 +152,13 @@
                         </div>
                         <div class="p-6">
                             <div class="flex items-center space-x-3 mb-6">
-                                <div class="h-14 w-14 rounded-full flex items-center justify-center flex-shrink-0 shadow-md" style="background-color: #2B9D8D;">
-                                    <span class="text-lg font-bold text-white">
-                                        {{ strtoupper(substr($submission->user->name, 0, 1)) }}
-                                    </span>
-                                </div>
+                                <x-user-avatar
+                                    :user="$submission->user"
+                                    size="h-14 w-14"
+                                    text-size="text-lg"
+                                    class="flex-shrink-0 shadow-md"
+                                    style="background-color: #2B9D8D;"
+                                />
                                 <div class="min-w-0 flex-1">
                                     <div class="text-sm font-semibold text-gray-900 truncate">{{ $submission->user->name }}</div>
                                     <div class="text-xs text-gray-500 truncate">{{ $submission->user->email }}</div>

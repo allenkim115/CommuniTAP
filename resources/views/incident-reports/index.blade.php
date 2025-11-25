@@ -147,9 +147,12 @@
                                     <div class="flex-1 space-y-4">
                                         <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                                             <div class="flex items-center gap-3">
-                                                <div class="flex h-12 w-12 items-center justify-center rounded-full bg-brand-peach/60 text-base font-semibold text-brand-orange-dark">
-                                                    {{ strtoupper(substr($report->reportedUser->firstName, 0, 1)) }}{{ strtoupper(substr($report->reportedUser->lastName, 0, 1)) }}
-                                                </div>
+                                                <x-user-avatar
+                                                    :user="$report->reportedUser"
+                                                    size="h-12 w-12"
+                                                    text-size="text-base"
+                                                    class="bg-brand-peach/60 text-brand-orange-dark font-semibold"
+                                                />
                                                 <div>
                                                     <p class="text-base font-semibold text-gray-900 dark:text-white">{{ $report->reportedUser->fullName }}</p>
                                                     <p class="text-sm text-gray-500 dark:text-gray-400">{{ $report->reportedUser->email }}</p>

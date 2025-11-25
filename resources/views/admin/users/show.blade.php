@@ -28,9 +28,12 @@
             <div class="card-surface">
                 <div class="p-6 lg:p-8 flex flex-col gap-6 md:flex-row md:items-center">
                     <div class="relative">
-                        <div class="w-24 h-24 rounded-full bg-gradient-to-br from-brand-orange to-brand-teal flex items-center justify-center text-white text-3xl font-bold shadow-lg">
-                            {{ strtoupper(substr($fullName, 0, 2)) }}
-                        </div>
+                        <x-user-avatar
+                            :user="$user"
+                            size="h-24 w-24"
+                            text-size="text-3xl"
+                            class="bg-gradient-to-br from-brand-orange to-brand-teal text-white font-bold shadow-lg"
+                        />
                         <span class="absolute -bottom-1 -right-1 h-6 w-6 rounded-full border-4 border-white {{ $statusIndicator }}"></span>
                     </div>
                     <div class="flex-1">

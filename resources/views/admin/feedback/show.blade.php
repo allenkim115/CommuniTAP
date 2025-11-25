@@ -57,9 +57,12 @@
                                 <div class="card-surface border border-gray-100 p-4">
                                     <div class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
                                         <div class="flex items-center gap-3">
-                                            <div class="h-11 w-11 rounded-full bg-brand-teal/15 text-brand-teal flex items-center justify-center font-semibold uppercase">
-                                                {{ substr($feedback->user->name, 0, 2) }}
-                                            </div>
+                                            <x-user-avatar
+                                                :user="$feedback->user"
+                                                size="h-11 w-11"
+                                                text-size="text-sm"
+                                                class="bg-brand-teal/15 text-brand-teal font-semibold uppercase"
+                                            />
                                             <div>
                                                 <p class="text-sm font-semibold text-gray-900">{{ $feedback->user->name }}</p>
                                                 <p class="text-xs text-gray-500">{{ $feedback->user->email }}</p>

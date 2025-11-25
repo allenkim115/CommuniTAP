@@ -43,9 +43,20 @@
                                         </div>
                                     </label>
                                     <!-- Hidden file input -->
-                                    <input type="file" id="profile_picture" name="profile_picture" accept="image/*" class="hidden" onchange="previewImage(this)">
+                                    <input type="file"
+                                           id="profile_picture"
+                                           name="profile_picture"
+                                           accept="image/*"
+                                           class="hidden"
+                                           form="profile-update-form"
+                                           onchange="previewImage(this)">
                                 </div>
                             </div>
+                            @if ($errors->has('profile_picture'))
+                                <p class="mt-4 text-sm text-red-600 dark:text-red-400 text-center">
+                                    {{ $errors->first('profile_picture') }}
+                                </p>
+                            @endif
                         </div>
 
                         <!-- Name and Email -->

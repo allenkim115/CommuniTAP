@@ -96,9 +96,12 @@
                                 <div class="flex-1 space-y-3">
                                     <div class="flex flex-wrap items-center justify-between gap-3">
                                         <div class="flex items-center gap-3">
-                                            <div class="h-10 w-10 rounded-full bg-brand-peach/70 text-brand-orange-dark flex items-center justify-center text-sm font-semibold">
-                                                {{ \Illuminate\Support\Str::of($feedback->user->name)->substr(0, 2)->upper() }}
-                                            </div>
+                                            <x-user-avatar
+                                                :user="$feedback->user"
+                                                size="h-10 w-10"
+                                                text-size="text-sm"
+                                                class="bg-brand-peach/70 text-brand-orange-dark"
+                                            />
                                             <div>
                                                 <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ $feedback->user->name }}</p>
                                                 <p class="text-xs text-gray-500 dark:text-gray-400">{{ $feedback->user->email }}</p>

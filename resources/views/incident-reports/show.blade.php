@@ -77,9 +77,12 @@
                     <div class="rounded-2xl border border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/40 p-4 md:col-span-2">
                         <p class="section-heading">Reported user</p>
                         <div class="mt-3 flex items-center gap-4">
-                            <div class="flex h-12 w-12 items-center justify-center rounded-full bg-brand-peach/60 text-base font-semibold text-brand-orange-dark">
-                                {{ strtoupper(substr($incidentReport->reportedUser->firstName, 0, 1)) }}{{ strtoupper(substr($incidentReport->reportedUser->lastName, 0, 1)) }}
-                            </div>
+                            <x-user-avatar
+                                :user="$incidentReport->reportedUser"
+                                size="h-12 w-12"
+                                text-size="text-base"
+                                class="bg-brand-peach/60 text-brand-orange-dark font-semibold"
+                            />
                             <div>
                                 <p class="text-base font-semibold text-gray-900 dark:text-white">{{ $incidentReport->reportedUser->fullName }}</p>
                                 <p class="text-sm text-gray-500 dark:text-gray-400">{{ $incidentReport->reportedUser->email }}</p>

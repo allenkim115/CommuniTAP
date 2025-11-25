@@ -192,26 +192,17 @@
                                     <!-- Limited Participants List -->
                                     <div class="space-y-3 mb-4">
                                         @foreach($displayedParticipants as $assignment)
-                                            @php
-                                                $firstName = $assignment->user->firstName ?? '';
-                                                $lastName = $assignment->user->lastName ?? '';
-                                                $initials = strtoupper(
-                                                    (!empty($firstName) ? substr($firstName, 0, 1) : '') . 
-                                                    (!empty($lastName) ? substr($lastName, 0, 1) : '')
-                                                );
-                                                if (empty($initials)) {
-                                                    $initials = strtoupper(substr($assignment->user->name ?? 'U', 0, 1));
-                                                }
-                                            @endphp
                                             <div class="flex items-center justify-between p-4 bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
                                                 <div class="flex items-center space-x-3 flex-1 min-w-0">
-                                                    <div class="h-10 w-10 rounded-full flex items-center justify-center flex-shrink-0 shadow-md" style="background: linear-gradient(135deg, #F3A261 0%, #F3A261 100%);">
-                                                        <span class="text-sm font-bold text-white">
-                                                            {{ $initials }}
-                                                        </span>
-                                                    </div>
+                                                    <x-user-avatar
+                                                        :user="$assignment->user"
+                                                        size="h-10 w-10"
+                                                        text-size="text-sm"
+                                                        class="shadow-md flex-shrink-0"
+                                                        style="background: linear-gradient(135deg, #F3A261 0%, #F3A261 100%);"
+                                                    />
                                                     <div class="min-w-0 flex-1">
-                                                        <p class="text-sm font-semibold text-gray-900 truncate">{{ $initials }}</p>
+                                                        <p class="text-sm font-semibold text-gray-900 truncate">{{ $assignment->user->name }}</p>
                                                         <p class="text-xs text-gray-500 truncate">{{ $assignment->user->email }}</p>
                                                     </div>
                                                 </div>
@@ -478,11 +469,13 @@
                             @foreach($task->assignments as $assignment)
                                 <div class="flex items-center justify-between p-4 bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
                                     <div class="flex items-center space-x-3 flex-1 min-w-0">
-                                        <div class="h-12 w-12 rounded-full flex items-center justify-center flex-shrink-0 shadow-md" style="background: linear-gradient(135deg, #F3A261 0%, #2B9D8D 100%);">
-                                            <span class="text-base font-bold text-white">
-                                                {{ strtoupper(substr($assignment->user->name, 0, 1)) }}
-                                            </span>
-                                        </div>
+                                        <x-user-avatar
+                                            :user="$assignment->user"
+                                            size="h-12 w-12"
+                                            text-size="text-base"
+                                            class="flex-shrink-0 shadow-md"
+                                            style="background: linear-gradient(135deg, #F3A261 0%, #2B9D8D 100%);"
+                                        />
                                         <div class="min-w-0 flex-1">
                                             <p class="text-sm font-semibold text-gray-900">{{ $assignment->user->name }}</p>
                                             <p class="text-xs text-gray-500">{{ $assignment->user->email }}</p>
