@@ -65,6 +65,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'role' => 'string', // ENUM is handled as string in Laravel
         ];
     }
 

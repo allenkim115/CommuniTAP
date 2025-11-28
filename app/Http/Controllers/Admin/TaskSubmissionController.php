@@ -98,10 +98,24 @@ class TaskSubmissionController extends Controller
             'admin_notes' => 'nullable|string|max:1000'
         ]);
 
+        // Preserve user's original completion notes
+        $userNotes = $submission->completion_notes ?? '';
+        $adminNotes = $request->admin_notes;
+        
+        // If admin provided notes, append them to user's notes; otherwise keep user's notes
+        if ($adminNotes) {
+            $finalNotes = $userNotes 
+                ? $userNotes . "\n\n--- Admin Notes ---\n" . $adminNotes
+                : $adminNotes;
+        } else {
+            // Keep user's notes, or set default if empty
+            $finalNotes = $userNotes ?: 'Approved by admin';
+        }
+
         $submission->update([
             'status' => 'completed',
             'completed_at' => now(),
-            'completion_notes' => $request->admin_notes ?? 'Approved by admin'
+            'completion_notes' => $finalNotes
         ]);
 
         // Award points to user (respecting points cap)

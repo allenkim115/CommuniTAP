@@ -364,10 +364,24 @@ class TaskController extends Controller
             'notes' => 'nullable|string|max:1000'
         ]);
 
+        // Preserve user's original completion notes
+        $userNotes = $submission->completion_notes ?? '';
+        $creatorNotes = $request->notes;
+        
+        // If creator provided notes, append them to user's notes; otherwise keep user's notes
+        if ($creatorNotes) {
+            $finalNotes = $userNotes 
+                ? $userNotes . "\n\n--- Creator Notes ---\n" . $creatorNotes
+                : $creatorNotes;
+        } else {
+            // Keep user's notes, or set default if empty
+            $finalNotes = $userNotes ?: 'Approved by creator';
+        }
+
         $submission->update([
             'status' => 'completed',
             'completed_at' => now(),
-            'completion_notes' => $request->notes ?? 'Approved by creator'
+            'completion_notes' => $finalNotes
         ]);
 
         // Award points to the assignee (respecting points cap)
