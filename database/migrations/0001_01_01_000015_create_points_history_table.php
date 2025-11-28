@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('points_history', function (Blueprint $table) {
             $table->id('historyId');
             $table->foreignId('FK1_userId')->constrained('users', 'userId')->onDelete('cascade');
-            $table->foreignId('FK2_submissionId')->nullable()->constrained('task_submission', 'submissionId')->onDelete('set null');
+            $table->unsignedBigInteger('FK2_submissionId')->nullable();
             $table->integer('points_amount');
             $table->string('transaction_type', 50);
             $table->dateTime('transaction_date');
