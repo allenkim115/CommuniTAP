@@ -2,15 +2,17 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Models\Notification;
+use App\Notifications\ResetPassword as ResetPasswordNotification;
+use App\Notifications\VerifyEmail as VerifyEmailNotification;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
@@ -325,5 +327,46 @@ class User extends Authenticatable
     public function getInitialsAttribute(): string
     {
         return strtoupper(substr($this->firstName, 0, 1) . substr($this->lastName, 0, 1));
+    }
+
+    /**
+     * Send the email verification notification.
+     *
+     * @return void
+     */
+    public function sendEmailVerificationNotification()
+    {
+        // Admins don't need email verification
+        if ($this->isAdmin()) {
+            return;
+        }
+        
+        $this->notify(new VerifyEmailNotification);
+    }
+
+    /**
+     * Determine if the user has verified their email address.
+     *
+     * @return bool
+     */
+    public function hasVerifiedEmail(): bool
+    {
+        // Admins don't need email verification - always return true
+        if ($this->isAdmin()) {
+            return true;
+        }
+        
+        return ! is_null($this->email_verified_at);
+    }
+
+    /**
+     * Send the password reset notification.
+     *
+     * @param  string  $token
+     * @return void
+     */
+    public function sendPasswordResetNotification($token)
+    {
+        $this->notify(new ResetPasswordNotification($token));
     }
 }

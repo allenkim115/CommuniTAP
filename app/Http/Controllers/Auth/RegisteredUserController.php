@@ -75,15 +75,18 @@ class RegisteredUserController extends Controller
 
         event(new Registered($user));
 
-        Auth::login($user);
-
-        // Set a session message about the user's role
-        if ($isFirstUser) {
+        // For admins (first user or any admin), auto-verify their email and log them in
+        // Admins don't need email verification
+        if ($user->isAdmin()) {
+            $user->markEmailAsVerified();
+            Auth::login($user);
             session()->flash('status', 'Welcome! You have been registered as the system administrator.');
-        } else {
-            session()->flash('status', 'Welcome! Your account has been created successfully.');
+            return redirect(route('dashboard', absolute: false));
         }
 
-        return redirect(route('dashboard', absolute: false));
+        // For regular users, send verification email and redirect to verification notice
+        Auth::login($user);
+        session()->flash('status', 'Thanks for signing up! Before getting started, could you verify your email address by clicking on the link we just emailed to you?');
+        return redirect(route('verification.notice'));
     }
 }
