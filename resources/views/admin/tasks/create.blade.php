@@ -181,40 +181,25 @@
                         </div>
                     </div>
 
-                    <!-- Publishing Options -->
-                    <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
-                        <h4 class="text-lg font-bold text-gray-900 dark:text-white mb-4">
-                            Publishing Options
-                        </h4>
-                        
-                        <!-- Publish Immediately -->
-                        <div class="flex items-start gap-3 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600">
-                            <input type="checkbox" name="publish_immediately" id="publish_immediately" value="1" 
-                                   class="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded mt-0.5" 
-                                   {{ old('publish_immediately') ? 'checked' : '' }}>
-                            <div>
-                                <label for="publish_immediately" class="block text-sm font-semibold text-gray-900 dark:text-gray-300 mb-1">
-                                    Publish immediately (make available for users to join)
-                                </label>
-                                <p class="text-xs text-gray-600 dark:text-gray-400">
-                                    If unchecked, the task will be created as "approved" and can be published later. Users will be able to join published tasks.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-
                     <!-- Action Buttons -->
                     <div class="flex justify-end gap-4 pt-6 border-t border-gray-200 dark:border-gray-700">
                         <a href="{{ route('admin.tasks.index') }}"
                             class="px-5 py-2.5 rounded-md text-sm font-medium border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition">
                             Cancel
                         </a>
-                        <button type="submit"
+                        <button type="submit" name="action" value="create"
                             class="px-6 py-2.5 text-sm font-semibold rounded-md text-white shadow-md transition focus:ring-2 focus:ring-orange-400 focus:ring-offset-2"
                             style="background-color: #F3A261;"
                             onmouseover="this.style.backgroundColor='#E8944F'"
                             onmouseout="this.style.backgroundColor='#F3A261'">
                             Create Task
+                        </button>
+                        <button type="submit" name="action" value="create_and_publish"
+                            class="px-6 py-2.5 text-sm font-semibold rounded-md text-white shadow-md transition focus:ring-2 focus:ring-teal-400 focus:ring-offset-2"
+                            style="background-color: #2B9D8D;"
+                            onmouseover="this.style.backgroundColor='#248A7C'"
+                            onmouseout="this.style.backgroundColor='#2B9D8D'">
+                            Create and Publish Task
                         </button>
                     </div>
                 </form>

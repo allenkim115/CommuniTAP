@@ -112,9 +112,26 @@
                         </div>
 
                         @if($r->admin_notes)
+                            @php
+                                $displayNotes = $r->admin_notes;
+                                // If notes only contain coupon code, show a helpful message instead
+                                if (str_contains($r->admin_notes, 'Coupon:')) {
+                                    // Remove the entire "Coupon: [code]" line using regex
+                                    $notesWithoutCoupon = trim(preg_replace('/Coupon:\s*[^\n\r]*/i', '', $r->admin_notes));
+                                    // Clean up any extra whitespace or newlines
+                                    $notesWithoutCoupon = trim($notesWithoutCoupon);
+                                    // If notes only contain the coupon code (or just whitespace after removing it), show default message
+                                    if (empty($notesWithoutCoupon)) {
+                                        $displayNotes = 'Present this coupon to a TAPmin at the barangay hall to claim your reward.';
+                                    } else {
+                                        // If there are other notes, show them without the coupon part
+                                        $displayNotes = $notesWithoutCoupon;
+                                    }
+                                }
+                            @endphp
                             <div class="text-[11px] text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-800/80 border border-gray-200 dark:border-gray-700 rounded-xl p-2.5">
                                 <p class="uppercase text-[10px] tracking-[0.25em] text-gray-400 dark:text-gray-500 mb-1">Notes</p>
-                                <p>{{ $r->admin_notes }}</p>
+                                <p>{{ $displayNotes }}</p>
                             </div>
                         @endif
 

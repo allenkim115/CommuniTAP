@@ -29,6 +29,9 @@ class ProfileUpdateRequest extends FormRequest
                 Rule::unique(User::class, 'email')->ignore($this->user()->userId, 'userId'),
             ],
             'profile_picture' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:2048'],
+            'current_password' => ['nullable', 'string'],
+            'password' => ['nullable', 'string'],
+            'password_confirmation' => ['nullable', 'string'],
         ];
     }
 }

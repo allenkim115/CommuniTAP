@@ -15,16 +15,6 @@
                     </svg>
                     Uploaded Tasks
                 </a>
-                <a href="{{ route('tasks.create') }}" 
-                   class="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
-                   style="background-color: #F3A261;"
-                   onmouseover="this.style.backgroundColor='#E8944F'"
-                   onmouseout="this.style.backgroundColor='#F3A261'">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                    </svg>
-                    New Task
-                </a>
             </div>
         </div>
     </x-slot>

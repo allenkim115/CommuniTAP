@@ -6,8 +6,10 @@ use App\Http\Requests\ProfileUpdateRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rules\Password;
 use Illuminate\View\View;
 
 class ProfileController extends Controller
@@ -23,7 +25,7 @@ class ProfileController extends Controller
     }
 
     /**
-     * Update the user's profile information.
+     * Update the user's profile information and password.
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
@@ -42,6 +44,20 @@ class ProfileController extends Controller
             $validated['profile_picture'] = $path;
         }
 
+        // Handle password update if any password field is provided
+        if ($request->filled('current_password') || $request->filled('password') || $request->filled('password_confirmation')) {
+            // Validate password update - all fields required if any is provided
+            $request->validateWithBag('updatePassword', [
+                'current_password' => ['required', 'current_password'],
+                'password' => ['required', Password::defaults(), 'confirmed'],
+            ]);
+
+            $user->password = Hash::make($request->password);
+        }
+
+        // Remove password fields from validated data before filling user model
+        unset($validated['current_password'], $validated['password'], $validated['password_confirmation']);
+
         $user->fill($validated);
 
         if ($user->isDirty('email')) {
@@ -50,7 +66,12 @@ class ProfileController extends Controller
 
         $user->save();
 
-        return Redirect::route('profile.edit')->with('status', 'Your profile has been updated successfully! All changes have been saved.');
+        $statusMessage = 'Your profile has been updated successfully! All changes have been saved.';
+        if ($request->filled('current_password') && $request->filled('password')) {
+            $statusMessage = 'Your profile and password have been updated successfully! All changes have been saved.';
+        }
+
+        return Redirect::route('profile.edit')->with('status', $statusMessage);
     }
 
     /**

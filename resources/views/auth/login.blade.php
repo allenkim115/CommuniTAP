@@ -8,7 +8,7 @@
         @csrf
         <!-- Logo (Centered, Floating) -->
         <div class="flex justify-center mb-8">
-            <div class="logo-container">
+            <a href="{{ url('/') }}" class="logo-container cursor-pointer">
                 <img 
                     src="{{ asset('images/communitaplogo1.svg') }}" 
                     alt="CommuniTap Logo" 
@@ -19,7 +19,7 @@
                 <div style="display:none;" class="rounded-full w-40 h-40 flex items-center justify-center" style="background: linear-gradient(to bottom right, rgba(243, 162, 97, 0.8), rgba(43, 157, 141, 0.8));">
                     <span class="text-3xl font-bold text-white">CT</span>
                 </div>
-            </div>
+            </a>
         </div>
         <!-- Responsive Form Container -->
         <div class="w-full max-w-md sm:max-w-lg lg:max-w-xl mx-auto space-y-6">

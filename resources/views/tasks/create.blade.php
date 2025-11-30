@@ -4,7 +4,7 @@
             <h2 class="font-bold text-3xl bg-clip-text text-transparent" style="background: linear-gradient(to right, #F3A261, #2B9D8D); -webkit-background-clip: text;">
                 {{ __('Create Task Proposal') }}
             </h2>
-            <a href="{{ route('tasks.index') }}"
+            <a href="{{ route('tasks.my-uploads') }}"
                 class="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-gray-600 hover:text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-xl transition-all duration-200 shadow-sm hover:shadow-md">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
                     stroke="currentColor">
@@ -171,7 +171,7 @@
 
                     <!-- Action Buttons -->
                     <div class="flex justify-end gap-4 pt-6 border-t border-gray-200 dark:border-gray-700">
-                        <a href="{{ route('tasks.index') }}"
+                        <a href="{{ route('tasks.my-uploads') }}"
                             class="px-6 py-3 rounded-xl text-sm font-bold border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200 shadow-sm hover:shadow-md">
                             Cancel
                         </a>
