@@ -112,17 +112,48 @@
             font-size: 1rem;
             color: #64748b;
             pointer-events: none;
-            transition: all 0.2s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             transform-origin: left;
+            z-index: 1;
         }
 
-        .input-group input:focus ~ label,
-        .input-group input:valid ~ label,
-        .input-group input:not(:placeholder-shown) ~ label {
-            top: 0.5rem;
-            font-size: 0.8rem;
-            color: var(--primary);
-            font-weight: 600;
+        /* Floating label states - multiple selectors for maximum compatibility (exclude middleName) */
+        .input-group input:focus ~ label:not([for="middleName"]),
+        .input-group input:valid ~ label:not([for="middleName"]),
+        .input-group input:not(:placeholder-shown) ~ label:not([for="middleName"]),
+        .input-group input.has-value ~ label:not([for="middleName"]),
+        .input-group.has-value label:not([for="middleName"]),
+        .input-group input:focus + label:not([for="middleName"]),
+        .input-group.has-value input ~ label:not([for="middleName"]),
+        .input-group:has(input:focus) label:not([for="middleName"]) {
+            top: 0.5rem !important;
+            font-size: 0.75rem !important;
+            color: var(--primary) !important;
+            font-weight: 600 !important;
+            transform: translateY(0) !important;
+        }
+        
+        /* Middle Name - DEFAULT state: grey, inside input (acts as placeholder) */
+        .input-group label[for="middleName"] {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            will-change: top, font-size, color;
+            color: #64748b !important;
+            top: 1.25rem !important;
+            font-size: 1rem !important;
+            font-weight: normal !important;
+        }
+        
+        /* Middle Name ANIMATED state - only when focused or has value */
+        .input-group:has(#middleName:focus) label[for="middleName"],
+        .input-group:has(#middleName.has-value) label[for="middleName"],
+        #middleName:focus ~ label[for="middleName"],
+        #middleName.has-value ~ label[for="middleName"],
+        .input-group input[id="middleName"]:focus ~ label[for="middleName"],
+        .input-group input[id="middleName"].has-value ~ label[for="middleName"] {
+            color: var(--primary) !important;
+            top: 0.5rem !important;
+            font-size: 0.75rem !important;
+            font-weight: 600 !important;
         }
 
         /* Primary Button */
@@ -191,6 +222,75 @@
         © {{ date('Y') }} {{ config('app.name') }}. All rights reserved.
     </footer>
 </div>
+
+    <!-- Floating Label Animation Script -->
+    <script>
+        (function() {
+            function initFloatingLabels() {
+                // Handle all input fields with floating labels
+                const inputGroups = document.querySelectorAll('.input-group');
+                
+                function updateLabelState(input, group) {
+                    if (input.value && input.value.trim() !== '') {
+                        group.classList.add('has-value');
+                        input.classList.add('has-value');
+                    } else {
+                        // Only remove if not focused
+                        if (document.activeElement !== input) {
+                            group.classList.remove('has-value');
+                            input.classList.remove('has-value');
+                        }
+                    }
+                }
+                
+                inputGroups.forEach(function(group) {
+                    const input = group.querySelector('input');
+                    if (!input) return;
+                    
+                    // Skip middleName - it's handled by custom script
+                    if (input.id === 'middleName') return;
+                    
+                    // Check if input has a value on load (from old() helper or default)
+                    if (input.value && input.value.trim() !== '') {
+                        group.classList.add('has-value');
+                        input.classList.add('has-value');
+                    }
+                    
+                    // Handle focus - always move label up (use capture phase for reliability)
+                    input.addEventListener('focus', function(e) {
+                        e.target.closest('.input-group')?.classList.add('has-value');
+                        e.target.classList.add('has-value');
+                    }, { capture: true, passive: true });
+                    
+                    // Handle blur - keep label up if there's a value
+                    input.addEventListener('blur', function(e) {
+                        updateLabelState(e.target, e.target.closest('.input-group'));
+                    }, { capture: true, passive: true });
+                    
+                    // Handle input (typing)
+                    input.addEventListener('input', function(e) {
+                        updateLabelState(e.target, e.target.closest('.input-group'));
+                    }, { capture: true, passive: true });
+                    
+                    // Also handle on change for select elements
+                    if (input.tagName === 'SELECT') {
+                        input.addEventListener('change', function(e) {
+                            updateLabelState(e.target, e.target.closest('.input-group'));
+                        }, { capture: true, passive: true });
+                    }
+                });
+            }
+            
+            // Run immediately and also on DOM ready
+            initFloatingLabels();
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initFloatingLabels);
+            }
+            
+            // Also run after a short delay to catch any dynamically added elements
+            setTimeout(initFloatingLabels, 100);
+        })();
+    </script>
 
     <!-- Optional: Confetti on Success -->
     <script>

@@ -86,7 +86,7 @@ class TaskController extends Controller
             'end_time' => 'required|date_format:H:i',
             'location' => 'required|string|max:255',
             'max_participants' => 'nullable|integer|min:1',
-            'publish_immediately' => 'boolean',
+            'action' => 'required|in:create,create_and_publish',
         ]);
 
         // Custom validation for end_time after start_time
@@ -120,6 +120,8 @@ class TaskController extends Controller
             }
         }
 
+        $publishImmediately = $request->action === 'create_and_publish';
+
         $taskData = [
             'title' => $request->title,
             'description' => $request->description,
@@ -132,18 +134,18 @@ class TaskController extends Controller
             'location' => $request->location,
             'max_participants' => $request->max_participants,
             'FK1_userId' => null, // Tasks are not assigned initially - users join them
-            'status' => $request->publish_immediately ? 'published' : 'approved',
+            'status' => $publishImmediately ? 'published' : 'pending',
         ];
 
         // Set published date if publishing immediately
-        if ($request->publish_immediately) {
+        if ($publishImmediately) {
             $taskData['published_date'] = now();
         }
 
         $task = Task::create($taskData);
 
         // If published immediately, notify all active users about the new task
-        if ($request->publish_immediately) {
+        if ($publishImmediately) {
             $activeUsers = User::where('status', 'active')
                 ->where('role', '!=', 'admin')
                 ->when(!is_null($task->FK1_userId), fn ($query) => $query->where('userId', '!=', $task->FK1_userId))
@@ -159,7 +161,7 @@ class TaskController extends Controller
             );
         }
 
-        return redirect()->route('admin.tasks.index')->with('status', "Task '{$request->title}' has been created successfully" . ($request->publish_immediately ? ' and published immediately. All active users have been notified.' : '. It is now approved and ready to be published when needed.'));
+        return redirect()->route('admin.tasks.index')->with('status', "Task '{$request->title}' has been created successfully" . ($publishImmediately ? ' and published immediately. All active users have been notified.' : '. It is now pending and can be published when ready.'));
     }
 
     /**
@@ -167,6 +169,11 @@ class TaskController extends Controller
      */
     public function show(Task $task)
     {
+        // Prevent viewing cancelled (draft) tasks - they are considered deleted
+        if ($task->status === 'draft') {
+            return redirect()->route('admin.tasks.index')->with('error', "This task proposal has been cancelled and is no longer available.");
+        }
+        
         $task->load(['assignedUser', 'assignments.user']);
         return view('admin.tasks.show', compact('task'));
     }
@@ -665,11 +672,9 @@ class TaskController extends Controller
         
         $query = Task::with(['assignments.user', 'assignedUser']);
         
-        // Exclude cancelled user proposals (draft) unless specifically filtering for them
+        // Exclude cancelled user proposals (draft) - they are considered deleted
         // Inactive tasks should still be visible
-        if (!$status || $status !== 'draft') {
-            $query->whereNotIn('status', ['draft']);
-        }
+        $query->whereNotIn('status', ['draft']);
         
         // Search by task title
         if ($search) {

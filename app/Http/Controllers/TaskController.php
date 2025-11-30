@@ -214,9 +214,11 @@ class TaskController extends Controller
         $search = trim((string) $request->get('q', ''));
 
         // Base query for this user's uploaded tasks
+        // Exclude cancelled tasks (draft status and inactive tasks that haven't been edited)
         // Include inactive tasks that have been edited (they should be shown as pending/waiting for publishing)
         $query = Task::where('task_type', 'user_uploaded')
             ->where('FK1_userId', $user->userId)
+            ->where('status', '!=', 'draft') // Exclude draft (cancelled) tasks
             ->where(function($q) {
                 // Include non-inactive tasks, or inactive tasks that have been edited (updated after deactivation)
                 $q->where('status', '!=', 'inactive')
@@ -253,9 +255,11 @@ class TaskController extends Controller
         $uploads = $query->orderByDesc('created_at')->get();
 
         // Stats based on all tasks (ignoring current filters), used for tiles
+        // Exclude cancelled tasks (draft status and inactive tasks that haven't been edited)
         // Include inactive tasks that have been edited (they count as pending)
         $allForStats = Task::where('task_type', 'user_uploaded')
             ->where('FK1_userId', $user->userId)
+            ->where('status', '!=', 'draft') // Exclude draft (cancelled) tasks
             ->where(function($q) {
                 // Include non-inactive tasks, or inactive tasks that have been edited (updated after deactivation)
                 $q->where('status', '!=', 'inactive')
@@ -284,11 +288,18 @@ class TaskController extends Controller
             return false;
         })->count();
 
+        // Calculate uncompleted count (exclude pending, completed, and live tasks)
+        $uncompletedCount = $allForStats->filter(function($task) {
+            $isLive = in_array($task->status, ['approved','published']);
+            return !in_array($task->status, ['completed', 'pending']) && !$isLive;
+        })->count();
+
         $stats = [
             'pending' => $pendingCount,
             'live' => $allForStats->whereIn('status', ['approved', 'published'])->count(),
             'rejected' => $allForStats->where('status', 'rejected')->count(),
             'completed' => $allForStats->where('status', 'completed')->count(),
+            'uncompleted' => $uncompletedCount,
             'all' => $allForStats->count(),
         ];
 
@@ -881,7 +892,7 @@ class TaskController extends Controller
     }
 
     /**
-     * Cancel the task proposal (removes from approval queue, allows editing and resubmission)
+     * Cancel the task proposal (removes from approval queue, task is considered deleted)
      */
     public function destroy(Task $task)
     {
@@ -895,10 +906,10 @@ class TaskController extends Controller
             return redirect()->back()->with('error', "Cannot cancel '{$task->title}': This task is currently {$task->status} and cannot be cancelled. Only pending or rejected tasks can be cancelled.");
         }
 
-        // Set to 'draft' status to remove from approval queue but keep it editable
+        // Set to 'draft' status to remove from approval queue (cancelled tasks are considered deleted)
         $task->update(['status' => 'draft']);
 
-        return redirect()->route('tasks.my-uploads')->with('status', "Task proposal '{$task->title}' has been cancelled. You can now edit it and resubmit when ready.");
+        return redirect()->route('tasks.my-uploads')->with('status', "Task proposal '{$task->title}' has been cancelled and removed.");
     }
 
     /**

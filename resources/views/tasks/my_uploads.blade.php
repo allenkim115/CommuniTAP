@@ -65,11 +65,6 @@
             <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
                 @php 
                     $labels = ['pending','live','rejected','completed','uncompleted','all'];
-                    $uncompletedCount = $uploads->filter(function($task) {
-                        $isLive = in_array($task->status, ['approved','published']);
-                        return !in_array($task->status, ['completed']) && !$isLive;
-                    })->count();
-                    $stats['uncompleted'] = $uncompletedCount;
                 @endphp
                 @foreach($labels as $label)
                 <button type="button" onclick="setStatusFilter('{{ $label }}')" 
@@ -139,7 +134,8 @@
                     @foreach($uploads as $task)
                     @php
                         $isLive = in_array($task->status, ['approved','published']);
-                        $isUncompleted = !in_array($task->status, ['completed']) && !$isLive;
+                        // Exclude pending, completed, and live tasks from uncompleted
+                        $isUncompleted = !in_array($task->status, ['completed', 'pending']) && !$isLive;
                         
                         // Check if inactive task has been edited (updated after deactivation)
                         // Edited inactive tasks should show as pending (waiting for publishing) instead of cancelled
@@ -174,7 +170,7 @@
                         <div class="relative">
                             <!-- Header: Title + Status Badge -->
                             <div class="flex justify-between items-start mb-3 gap-3">
-                                <h4 class="font-bold text-gray-900 dark:text-white text-lg leading-tight flex-1 dark:group-hover:text-orange-400 transition-colors group-hover:text-orange-600" style="--hover-color: #F3A261;">
+                                <h4 class="font-bold text-gray-900 dark:text-white text-lg leading-tight flex-1 min-w-0 dark:group-hover:text-orange-400 transition-colors group-hover:text-orange-600 truncate" style="--hover-color: #F3A261;" title="{{ $task->title }}">
                                     {{ $task->title }}
                                 </h4>
                                 @php
