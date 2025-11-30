@@ -19,7 +19,11 @@
                     <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
                         <div class="flex-1">
                             <h1 class="text-3xl lg:text-4xl font-bold text-white mb-2">
-                                Welcome back, {{ Auth::user()->firstName ?? 'Volunteer' }}! 👋
+                                @if(isset($completedTasks) && $completedTasks->count() > 0)
+                                    Welcome back, {{ Auth::user()->firstName ?? 'Volunteer' }}! 👋
+                                @else
+                                    Welcome, {{ Auth::user()->firstName ?? 'Volunteer' }}! 👋
+                                @endif
                             </h1>
                             <p class="text-orange-50 text-lg lg:text-xl">
                                 Ready to make a difference in your community today?
