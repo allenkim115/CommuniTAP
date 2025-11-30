@@ -69,12 +69,12 @@
 
         <!-- Submit Button -->
         <div class="flex justify-center mt-10">
-            <button type="submit" class="btn-primary flex items-center gap-2">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                          d="M11 16l-4-4m0 0l4-4m-4 4h14"></path>
-                </svg>
+            <button type="submit" class="btn-primary flex items-center gap-1.5" style="padding: 0.875rem 1.5rem; min-width: auto;">
                 {{ __('Login') }}
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+                </svg>
             </button>
         </div>
 
