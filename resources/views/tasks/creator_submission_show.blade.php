@@ -142,7 +142,7 @@
                                     @endif
                                 </div>
                             @else
-                                <form action="{{ route('tasks.creator.approve', $submission) }}" method="POST" class="mb-4" id="approve-submission-form">
+                                <form action="{{ route('tasks.creator.approve', $submission) }}" method="POST" class="mb-4" id="approve-submission-form" novalidate>
                                     @csrf
                                     <div class="mb-4">
                                         <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Notes (optional)</label>
@@ -153,7 +153,7 @@
                                             onmouseover="this.style.backgroundColor='#248A7C'"
                                             onmouseout="this.style.backgroundColor='#2B9D8D'">Approve Submission</button>
                                 </form>
-                                <form action="{{ route('tasks.creator.reject', $submission) }}" method="POST" id="reject-submission-form">
+                                <form action="{{ route('tasks.creator.reject', $submission) }}" method="POST" id="reject-submission-form" novalidate>
                                     @csrf
                                     <div class="mb-4">
                                         <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Rejection Reason *</label>

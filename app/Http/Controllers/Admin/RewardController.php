@@ -23,10 +23,10 @@ class RewardController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'sponsor_name' => ['required','string','max:50'],
-            'reward_name' => ['required','string','max:100'],
+            'sponsor_name' => ['required','string','min:10','max:50'],
+            'reward_name' => ['required','string','min:10','max:100'],
             'image' => ['nullable','image','mimes:jpg,jpeg,png,webp','max:5120'],
-            'description' => ['required','string'],
+            'description' => ['required','string','min:10'],
             'points_cost' => ['required','integer','min:1'],
             'QTY' => ['required','integer','min:0'],
             'status' => ['nullable','in:active,inactive'],
@@ -55,10 +55,10 @@ class RewardController extends Controller
     public function update(Request $request, Reward $reward)
     {
         $data = $request->validate([
-            'sponsor_name' => ['required','string','max:50'],
-            'reward_name' => ['required','string','max:100'],
+            'sponsor_name' => ['required','string','min:10','max:50'],
+            'reward_name' => ['required','string','min:10','max:100'],
             'image' => ['nullable','image','mimes:jpg,jpeg,png,webp','max:5120'],
-            'description' => ['required','string'],
+            'description' => ['required','string','min:10'],
             'points_cost' => ['required','integer','min:1'],
             'QTY' => ['required','integer','min:0'],
             'status' => ['required','in:active,inactive'],

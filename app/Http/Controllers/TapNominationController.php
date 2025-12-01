@@ -41,23 +41,26 @@ class TapNominationController extends Controller
             return redirect()->back()->with('error', "Cannot create nomination: You must complete a daily task TODAY before you can nominate someone. Tap & Pass is only available for users who have completed a daily task on the same day. Complete a daily task first, then come back to nominate a teammate!");
         }
 
-        // Get available users for nomination (excluding current user, admin users, and users who have nominated them)
+        // Initial list of available users for nomination (task-specific filtering will be done via AJAX)
         $availableUsers = User::where('userId', '!=', $user->userId)
             ->where('status', 'active')
             ->where('role', '!=', 'admin')
-            ->whereDoesntHave('nominationsMade', function($query) use ($user) {
-                $query->where('FK3_nomineeId', $user->userId)
-                      ->where('status', 'pending');
-            })
             ->orderBy('firstName')
             ->get();
             
 
         // Get available daily tasks for nomination
+        // - Daily, published
+        // - No completed assignment (still ongoing)
+        // - Not at max participants (or unlimited if max_participants is null)
         $availableDailyTasks = Task::where('task_type', 'daily')
             ->where('status', 'published')
             ->whereDoesntHave('assignments', function($query) {
                 $query->where('status', 'completed');
+            })
+            ->where(function ($q) {
+                $q->whereNull('max_participants')
+                  ->orWhereRaw('(SELECT COUNT(*) FROM task_assignments ta WHERE ta.taskId = tasks.taskId) < tasks.max_participants');
             })
             ->orderBy('title')
             ->get();
@@ -231,6 +234,55 @@ class TapNominationController extends Controller
             return redirect()->back()->with('error', "Failed to create nomination for '{$task->title}'. Please try again. If the problem persists, contact support.");
         }
     }
+    
+    /**
+     * Get available users for a specific task (AJAX)
+     * Excludes:
+     * - Current user
+     * - Admins
+     * - Users who have already completed this specific task
+     * - Users who already have a pending nomination TO the current user for this task
+     */
+    public function getAvailableUsersForTask(Request $request)
+    {
+        $user = Auth::user();
+        $taskId = $request->input('task_id');
+        
+        if (!$taskId) {
+            return response()->json(['users' => []]);
+        }
+        
+        $task = Task::find($taskId);
+        
+        if (!$task || !$task->isDailyTask() || $task->status !== 'published') {
+            return response()->json(['users' => []]);
+        }
+        
+        $availableUsers = User::where('userId', '!=', $user->userId)
+            ->where('status', 'active')
+            ->where('role', '!=', 'admin')
+            ->whereDoesntHave('taskAssignments', function($query) use ($task) {
+                // Exclude users who are already assigned to this task in ANY status
+                $query->where('taskId', $task->taskId);
+            })
+            ->whereDoesntHave('nominationsMade', function($query) use ($user, $task) {
+                $query->where('FK3_nomineeId', $user->userId)
+                      ->where('FK1_taskId', $task->taskId)
+                      ->where('status', 'pending');
+            })
+            ->orderBy('firstName')
+            ->get();
+            
+        return response()->json([
+            'users' => $availableUsers->map(function ($u) {
+                return [
+                    'id' => $u->userId,
+                    'name' => $u->fullName,
+                    'email' => $u->email,
+                ];
+            }),
+        ]);
+    }
 
     /**
      * Show nominations received by the current user
@@ -318,7 +370,8 @@ class TapNominationController extends Controller
         }
 
         $nominatorName = $nomination->nominator ? $nomination->nominator->firstName . ' ' . $nomination->nominator->lastName : 'the nominator';
-        return redirect()->route('tasks.index')->with('status', "Nomination accepted! You've been assigned to '{$task->title}' and earned 1 point. Thank you for accepting {$nominatorName}'s nomination!");
+        // Redirect the user directly to the task detail page they were nominated for
+        return redirect()->route('tasks.show', $task)->with('status', "Nomination accepted! You've been assigned to '{$task->title}' and earned 1 point. Thank you for accepting {$nominatorName}'s nomination!");
     }
 
     /**

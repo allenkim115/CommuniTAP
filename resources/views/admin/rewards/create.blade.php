@@ -14,24 +14,24 @@
     <div class="py-10">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
             <div class="card-surface p-6">
-                <form method="POST" action="{{ route('admin.rewards.store') }}" enctype="multipart/form-data" class="space-y-8">
+                <form method="POST" action="{{ route('admin.rewards.store') }}" enctype="multipart/form-data" class="space-y-8" novalidate>
                     @csrf
                     <div class="grid gap-6 md:grid-cols-2">
                         <div class="space-y-2">
                             <label class="text-sm font-semibold text-gray-700">Sponsor name</label>
-                            <input name="sponsor_name" value="{{ old('sponsor_name') }}" class="w-full rounded-2xl border border-gray-200 px-4 py-3 text-sm shadow-sm focus:border-brand-teal focus:ring-brand-teal" required>
+                            <input name="sponsor_name" value="{{ old('sponsor_name') }}" minlength="10" class="w-full rounded-2xl border border-gray-200 px-4 py-3 text-sm shadow-sm focus:border-brand-teal focus:ring-brand-teal" required>
                             @error('sponsor_name') <p class="text-xs text-red-500">{{ $message }}</p> @enderror
                         </div>
                         <div class="space-y-2">
                             <label class="text-sm font-semibold text-gray-700">Reward name</label>
-                            <input name="reward_name" value="{{ old('reward_name') }}" class="w-full rounded-2xl border border-gray-200 px-4 py-3 text-sm shadow-sm focus:border-brand-teal focus:ring-brand-teal" required>
+                            <input name="reward_name" value="{{ old('reward_name') }}" minlength="10" class="w-full rounded-2xl border border-gray-200 px-4 py-3 text-sm shadow-sm focus:border-brand-teal focus:ring-brand-teal" required>
                             @error('reward_name') <p class="text-xs text-red-500">{{ $message }}</p> @enderror
                         </div>
                     </div>
 
                     <div class="space-y-2">
                         <label class="text-sm font-semibold text-gray-700">Description</label>
-                        <textarea name="description" rows="4" class="w-full rounded-2xl border border-gray-200 px-4 py-3 text-sm shadow-sm focus:border-brand-teal focus:ring-brand-teal" placeholder="Describe what makes this reward special..." required>{{ old('description') }}</textarea>
+                        <textarea name="description" rows="4" minlength="10" class="w-full rounded-2xl border border-gray-200 px-4 py-3 text-sm shadow-sm focus:border-brand-teal focus:ring-brand-teal" placeholder="Describe what makes this reward special..." required>{{ old('description') }}</textarea>
                         @error('description') <p class="text-xs text-red-500">{{ $message }}</p> @enderror
                     </div>
 

@@ -140,7 +140,7 @@
                                     <a href="{{ route('admin.rewards.edit', $reward) }}" class="btn-muted text-xs font-semibold px-4 py-2">
                                         <i class="fas fa-pen mr-2"></i>Edit
                                     </a>
-                                    <form action="{{ route('admin.rewards.destroy', $reward) }}" method="POST" id="delete-reward-form-{{ $reward->id }}">
+                                    <form action="{{ route('admin.rewards.destroy', $reward) }}" method="POST" id="delete-reward-form-{{ $reward->id }}" novalidate>
                                         @csrf
                                         @method('DELETE')
                                         <button type="button"

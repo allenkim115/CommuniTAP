@@ -22,7 +22,7 @@
 
     <!-- Form -->
     <form method="POST" action="{{ route('password.store') }}" id="resetPasswordForm" class="animate-fade-in"
-          style="animation-delay: 0.1s;">
+          style="animation-delay: 0.1s;" novalidate>
         @csrf
 
         <!-- Password Reset Token -->

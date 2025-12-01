@@ -111,9 +111,11 @@ class TaskController extends Controller
             
         // Get available tasks that user can join (published tasks) that are not expired
         // Published tasks cannot be inactive, but we exclude inactive for safety
+        // Also exclude tasks that are already full (respecting max_participants and user-uploaded rules)
         $availableTasks = Task::where('tasks.status', 'published')
             ->where('tasks.status', '!=', 'inactive') // Exclude inactive/deactivated tasks
             ->notExpired()
+            // Exclude tasks where this user is already assigned
             ->whereDoesntHave('assignments', function($query) use ($user) {
                 $query->where('userId', $user->userId);
             })
@@ -121,6 +123,24 @@ class TaskController extends Controller
             ->where(function($q) use ($user) {
                 $q->whereNull('FK1_userId')
                   ->orWhere('FK1_userId', '!=', $user->userId);
+            })
+            // Only include tasks that still have capacity
+            ->where(function ($q) {
+                // User-uploaded tasks: only show if there are no participants yet
+                $q->where(function ($sub) {
+                    $sub->where('task_type', 'user_uploaded')
+                        ->whereDoesntHave('assignments');
+                })
+                // Other task types:
+                // - If max_participants is null => unlimited, always show
+                // - If max_participants is set => only show while assignments_count < max_participants
+                ->orWhere(function ($sub) {
+                    $sub->where('task_type', '!=', 'user_uploaded')
+                        ->where(function ($inner) {
+                            $inner->whereNull('max_participants')
+                                  ->orWhereRaw('(SELECT COUNT(*) FROM task_assignments ta WHERE ta.taskId = tasks.taskId) < tasks.max_participants');
+                        });
+                });
             })
             ->with(['assignments.user', 'assignedUser'])
             ->orderBy('created_at', 'desc')
@@ -237,7 +257,9 @@ class TaskController extends Controller
         // Apply status filter
         if ($status && $status !== 'all') {
             if ($status === 'live') {
-                $query->whereIn('status', ['approved', 'published']);
+                // Live tasks are approved/published AND not expired
+                $query->whereIn('status', ['approved', 'published'])
+                      ->notExpired();
             } else {
                 $query->where('status', $status);
             }
@@ -290,13 +312,18 @@ class TaskController extends Controller
 
         // Calculate uncompleted count (exclude pending, completed, and live tasks)
         $uncompletedCount = $allForStats->filter(function($task) {
-            $isLive = in_array($task->status, ['approved','published']);
+            $isLive = in_array($task->status, ['approved','published']) && !$task->isExpired();
             return !in_array($task->status, ['completed', 'pending']) && !$isLive;
+        })->count();
+
+        // Count live tasks: approved/published AND not expired
+        $liveCount = $allForStats->filter(function($task) {
+            return in_array($task->status, ['approved', 'published']) && !$task->isExpired();
         })->count();
 
         $stats = [
             'pending' => $pendingCount,
-            'live' => $allForStats->whereIn('status', ['approved', 'published'])->count(),
+            'live' => $liveCount,
             'rejected' => $allForStats->where('status', 'rejected')->count(),
             'completed' => $allForStats->where('status', 'completed')->count(),
             'uncompleted' => $uncompletedCount,
@@ -600,8 +627,8 @@ class TaskController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'title' => 'required|string|max:100',
-            'description' => 'required|string',
+            'title' => 'required|string|min:10|max:100',
+            'description' => 'required|string|min:10|max:1000',
             'points_awarded' => 'required|integer|min:1',
             'due_date' => 'required|date|after_or_equal:today',
             'start_time' => 'required|date_format:H:i',
@@ -821,8 +848,8 @@ class TaskController extends Controller
         }
 
         $request->validate([
-            'title' => 'required|string|max:100',
-            'description' => 'required|string',
+            'title' => 'required|string|min:10|max:100',
+            'description' => 'required|string|min:10|max:1000',
             'points_awarded' => 'required|integer|min:1',
             'due_date' => 'nullable|date|after_or_equal:today',
             'start_time' => 'nullable|date_format:H:i',
@@ -947,6 +974,38 @@ class TaskController extends Controller
             return redirect()->back()->with('error', "Cannot join '{$task->title}': This task is currently {$statusLabel} and not open for new participants.");
         }
 
+        // Prevent joining tasks that conflict in date and time with another task already joined by the user
+        // Conflict rule:
+        // - Same date (DATE(due_date))
+        // - Time ranges overlap: existing.start_time < new.end_time AND existing.end_time > new.start_time
+        if ($task->due_date && $task->start_time && $task->end_time) {
+            $hasConflictingTask = TaskAssignment::where('userId', $user->userId)
+                ->whereIn('status', ['assigned', 'submitted', 'completed'])
+                ->whereHas('task', function ($query) use ($task) {
+                    $date = $task->due_date instanceof \Carbon\Carbon
+                        ? $task->due_date->toDateString()
+                        : \Carbon\Carbon::parse($task->due_date)->toDateString();
+
+                    $query->whereDate('due_date', $date)
+                          ->whereNotNull('start_time')
+                          ->whereNotNull('end_time')
+                          ->where(function ($timeQuery) use ($task) {
+                              // Overlap condition:
+                              // existing.start_time < new.end_time AND existing.end_time > new.start_time
+                              $timeQuery->where('start_time', '<', $task->end_time)
+                                        ->where('end_time', '>', $task->start_time);
+                          });
+                })
+                ->exists();
+
+            if ($hasConflictingTask) {
+                return redirect()->back()->with(
+                    'error',
+                    "Cannot join '{$task->title}': You already have another task at the same date and time. Please choose a different task or time slot."
+                );
+            }
+        }
+
         // Prevent the creator from joining their own task
         if (!is_null($task->FK1_userId) && $task->FK1_userId === $user->userId) {
             return redirect()->back()->with('error', "Cannot join '{$task->title}': You created this task and cannot participate in it. You can view submissions and approve them instead.");
@@ -1017,11 +1076,23 @@ class TaskController extends Controller
             abort(403, 'You can only submit tasks assigned to you.');
         }
 
-        $request->validate([
-            'photos' => 'required|array|min:2|max:3',
-            'photos.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
-            'completion_notes' => 'nullable|string|max:1000'
-        ]);
+        $request->validate(
+            [
+                'photos' => 'required|array|min:2|max:3',
+                'photos.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+                'completion_notes' => 'nullable|string|min:10|max:1000',
+            ],
+            [
+                'photos.required' => 'Please upload at least 2 clear photos showing your completed task.',
+                'photos.array' => 'Your photos must be uploaded as multiple files (not a single combined file).',
+                'photos.min' => 'Please upload at least 2 photos so we can properly review your work.',
+                'photos.max' => 'You can upload up to 3 photos for this task.',
+                'photos.*.image' => 'Each file must be an image (for example: JPG, PNG, or GIF).',
+                'photos.*.mimes' => 'Each photo must be a JPG, JPEG, PNG, or GIF file.',
+                'photos.*.max' => 'Each photo must be smaller than 2 MB. Please resize or choose a smaller image.',
+                'completion_notes.min' => 'Please provide a short description (at least 10 characters) explaining what you did for this task.',
+            ]
+        );
 
         $photos = [];
         

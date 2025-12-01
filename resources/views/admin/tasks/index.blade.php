@@ -80,21 +80,21 @@
             </div>
 
             <!-- Filters -->
-            <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-6 mb-6">
-                <div class="mb-4">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-1 flex items-center gap-2">
+            <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-4 mb-4">
+                <div class="mb-3">
+                    <h3 class="text-base font-semibold text-gray-900 mb-1 flex items-center gap-2">
                         <i class="fas fa-filter" style="color: #2B9D8D;"></i>
                         Filter Tasks
                     </h3>
-                    <p class="text-sm text-gray-600">Refine your task list by type and progress</p>
+                    <p class="text-xs text-gray-500">Refine your task list by type and progress</p>
                 </div>
-                <form action="{{ route('admin.tasks.filter') }}" method="GET" id="filterForm" class="space-y-4">
+                <form action="{{ route('admin.tasks.filter') }}" method="GET" id="filterForm" class="space-y-3" novalidate>
                     @if(request('status'))
                         <input type="hidden" name="status" value="{{ request('status') }}">
                     @endif
                     
                     <!-- Search Input -->
-                    <div class="mb-4">
+                    <div>
                         <label for="search" class="block text-sm font-medium text-gray-700 mb-2">
                             <i class="fas fa-search" style="color: #2B9D8D;"></i> Search Tasks
                         </label>
@@ -104,7 +104,7 @@
                                    id="search" 
                                    value="{{ request('search') }}" 
                                    placeholder="Search by task title..."
-                                   class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                   class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm">
                             <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
                             @if(request('search'))
                                 <button type="button" 
@@ -116,10 +116,10 @@
                         </div>
                     </div>
                     
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
                         <div>
                             <label for="task_type" class="block text-sm font-medium text-gray-700 mb-2">Task Type</label>
-                            <select name="task_type" id="task_type" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <select name="task_type" id="task_type" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm">
                                 <option value="all" {{ request('task_type') === 'all' || !request('task_type') ? 'selected' : '' }}>All Types</option>
                                 <option value="daily" {{ request('task_type') === 'daily' ? 'selected' : '' }}>Daily Task</option>
                                 <option value="one_time" {{ request('task_type') === 'one_time' ? 'selected' : '' }}>One-Time Task</option>
@@ -128,7 +128,7 @@
                         </div>
                         <div>
                             <label for="assignment_progress" class="block text-sm font-medium text-gray-700 mb-2">Assignment Progress</label>
-                            <select name="assignment_progress" id="assignment_progress" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <select name="assignment_progress" id="assignment_progress" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm">
                                 <option value="all" {{ request('assignment_progress') === 'all' || !request('assignment_progress') ? 'selected' : '' }}>All Progress</option>
                                 <option value="accepted" {{ request('assignment_progress') === 'accepted' ? 'selected' : '' }}>Accepted</option>
                                 <option value="on_the_way" {{ request('assignment_progress') === 'on_the_way' ? 'selected' : '' }}>On the way</option>
@@ -139,15 +139,15 @@
                         </div>
                         <div>
                             <label for="date_from" class="block text-sm font-medium text-gray-700 mb-2">Date From</label>
-                            <input type="date" name="date_from" id="date_from" value="{{ request('date_from') }}" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <input type="date" name="date_from" id="date_from" value="{{ request('date_from') }}" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm">
                         </div>
                         <div>
                             <label for="date_to" class="block text-sm font-medium text-gray-700 mb-2">Date To</label>
-                            <input type="date" name="date_to" id="date_to" value="{{ request('date_to') }}" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <input type="date" name="date_to" id="date_to" value="{{ request('date_to') }}" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm">
                         </div>
                     </div>
-                    <div class="flex justify-end mt-4">
-                        <a href="{{ route('admin.tasks.index') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium transition-colors">
+                    <div class="flex justify-end mt-3">
+                        <a href="{{ route('admin.tasks.index') }}" class="inline-flex items-center gap-2 px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium text-sm transition-colors">
                             <i class="fas fa-times"></i>
                             Clear Filters
                         </a>

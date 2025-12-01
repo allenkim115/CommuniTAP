@@ -231,7 +231,7 @@
                                 </div>
                             @else
                                 <!-- Approve Form -->
-                                <form action="{{ route('admin.task-submissions.approve', $submission) }}" method="POST" class="mb-6">
+                                <form action="{{ route('admin.task-submissions.approve', $submission) }}" method="POST" class="mb-6" novalidate>
                                     @csrf
                                     <div class="mb-4">
                                         <label for="admin_notes" class="block text-xs font-semibold text-gray-600 uppercase tracking-wide mb-2">
@@ -255,7 +255,7 @@
                                 </form>
 
                                 <!-- Reject Form -->
-                                <form action="{{ route('admin.task-submissions.reject', $submission) }}" method="POST">
+                                <form action="{{ route('admin.task-submissions.reject', $submission) }}" method="POST" novalidate>
                                     @csrf
                                     <div class="mb-4">
                                         <label for="rejection_reason" class="block text-xs font-semibold text-gray-600 uppercase tracking-wide mb-2">

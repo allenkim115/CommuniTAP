@@ -179,7 +179,11 @@
                                         Participants
                                     </h3>
                                     <span class="px-3 py-1 text-white text-sm font-bold rounded-full" style="background: linear-gradient(135deg, #F3A261 0%, #F3A261 100%);">
-                                        {{ $task->assignments->count() }}
+                                        @if(!is_null($task->max_participants))
+                                            {{ $task->assignments->count() }} / {{ $task->max_participants }}
+                                        @else
+                                            {{ $task->assignments->count() }}
+                                        @endif
                                     </span>
                                 </div>
 
@@ -266,13 +270,6 @@
                                         @endforeach
                                     </div>
                                     
-                                    <button type="button" onclick="openParticipantsModal()" class="w-full inline-flex justify-center items-center gap-2 px-4 py-2.5 text-sm font-semibold rounded-lg text-white shadow-md transition-all hover:shadow-lg transform hover:-translate-y-0.5"
-                                            style="background-color: #F3A261;"
-                                            onmouseover="this.style.backgroundColor='#E8944F'"
-                                            onmouseout="this.style.backgroundColor='#F3A261'">
-                                        <i class="fas fa-eye"></i>
-                                        View All ({{ $task->assignments->count() }})
-                                    </button>
                                 @else
                                     <div class="text-center py-8">
                                         <i class="fas fa-users-slash text-gray-300 text-3xl mb-3"></i>
@@ -299,7 +296,7 @@
                                     @if($task->status === 'pending')
                                         {{-- For admin-created tasks (daily, one_time), show Edit and Publish only --}}
                                         @if($task->task_type !== 'user_uploaded')
-                                            <form action="{{ route('admin.tasks.publish', $task) }}" method="POST" class="w-full">
+                                            <form action="{{ route('admin.tasks.publish', $task) }}" method="POST" class="w-full" novalidate>
                                                 @csrf
                                                 <button type="submit" 
                                                         class="w-full inline-flex justify-center items-center gap-2 px-4 py-3 border border-transparent text-sm font-bold rounded-lg text-white shadow-md transition-colors brand-primary-btn">
@@ -308,14 +305,14 @@
                                             </form>
                                         @else
                                             {{-- For user-uploaded tasks, show Approve and Reject --}}
-                                            <form action="{{ route('admin.tasks.approve', $task) }}" method="POST" class="w-full">
+                                            <form action="{{ route('admin.tasks.approve', $task) }}" method="POST" class="w-full" novalidate>
                                                 @csrf
                                                 <button type="submit" 
                                                         class="w-full inline-flex justify-center items-center gap-2 px-4 py-3 border border-transparent text-sm font-bold rounded-lg text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 shadow-md transition-colors">
                                                     <i class="fas fa-check"></i> Approve Task
                                                 </button>
                                             </form>
-                                            <form action="{{ route('admin.tasks.reject', $task) }}" method="POST" class="w-full" id="reject-task-form">
+                                            <form action="{{ route('admin.tasks.reject', $task) }}" method="POST" class="w-full" id="reject-task-form" novalidate>
                                                 @csrf
                                                 <button type="button" 
                                                         onclick="showConfirmModal('Are you sure you want to reject this task?', 'Reject Task', 'Reject', 'Cancel', 'red').then(confirmed => { if(confirmed) document.getElementById('reject-task-form').submit(); });"
@@ -328,7 +325,7 @@
                                             </form>
                                         @endif
                                     @elseif($task->status === 'approved' && $task->task_type !== 'user_uploaded')
-                                        <form action="{{ route('admin.tasks.publish', $task) }}" method="POST" class="w-full">
+                                        <form action="{{ route('admin.tasks.publish', $task) }}" method="POST" class="w-full" novalidate>
                                             @csrf
                                             <button type="submit" 
                                                     class="w-full inline-flex justify-center items-center gap-2 px-4 py-3 border border-transparent text-sm font-bold rounded-lg text-white shadow-md transition-colors brand-primary-btn">
@@ -336,7 +333,7 @@
                                             </button>
                                         </form>
                                     @elseif($task->status === 'submitted')
-                                        <form action="{{ route('admin.tasks.complete', $task) }}" method="POST" class="w-full">
+                                        <form action="{{ route('admin.tasks.complete', $task) }}" method="POST" class="w-full" novalidate>
                                             @csrf
                                             <button type="submit" 
                                                     class="w-full inline-flex justify-center items-center gap-2 px-4 py-3 border border-transparent text-sm font-bold rounded-lg text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 shadow-md transition-colors">
@@ -349,7 +346,7 @@
                                     {{-- Deactivate should only be available for published/live tasks that are visible to users --}}
                                     @if($task->task_type !== 'user_uploaded')
                                         @if(in_array($task->status, ['published', 'approved']) && $task->status !== 'inactive')
-                                            <form action="{{ route('admin.tasks.destroy', $task) }}" method="POST" class="w-full" id="deactivate-task-form">
+                                            <form action="{{ route('admin.tasks.destroy', $task) }}" method="POST" class="w-full" id="deactivate-task-form" novalidate>
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="button" 
@@ -376,7 +373,7 @@
                                             @endphp
                                             
                                             @if($canReactivate)
-                                                <form action="{{ route('admin.tasks.reactivate', $task) }}" method="POST" class="w-full mt-3">
+                                                <form action="{{ route('admin.tasks.reactivate', $task) }}" method="POST" class="w-full mt-3" novalidate>
                                                     @csrf
                                                     <button type="submit" 
                                                             class="w-full inline-flex justify-center items-center gap-2 px-4 py-3 border border-transparent text-sm font-bold rounded-lg text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 shadow-md transition-colors">
@@ -448,11 +445,15 @@
             <div class="w-full max-w-3xl bg-white rounded-2xl shadow-2xl overflow-hidden border-2 border-orange-300 transform transition-all max-h-[90vh] flex flex-col">
                 <!-- Modal Header -->
                 <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between" style="background: linear-gradient(135deg, #F3A261 0%, #F3A261 100%);">
-                    <div class="flex items-center gap-3">
+                        <div class="flex items-center gap-3">
                         <i class="fas fa-users text-white text-xl"></i>
                         <h3 class="text-xl font-bold text-white">All Participants</h3>
                         <span class="px-3 py-1 bg-white/20 text-white text-sm font-bold rounded-full">
-                            {{ $task->assignments->count() }}
+                            @if(!is_null($task->max_participants))
+                                {{ $task->assignments->count() }} / {{ $task->max_participants }}
+                            @else
+                                {{ $task->assignments->count() }}
+                            @endif
                         </span>
                     </div>
                     <button type="button" class="text-white hover:text-gray-200 transition-colors" onclick="closeParticipantsModal()" aria-label="Close modal">

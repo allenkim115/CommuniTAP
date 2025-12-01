@@ -36,7 +36,7 @@
 
     <!-- Actions -->
     <div class="w-full max-w-md sm:max-w-lg lg:max-w-xl mx-auto space-y-4">
-        <form method="POST" action="{{ route('verification.send') }}">
+        <form method="POST" action="{{ route('verification.send') }}" novalidate>
             @csrf
             <div class="flex justify-center">
                 <button type="submit" class="btn-primary flex items-center gap-1.5" style="padding: 0.875rem 1.5rem; min-width: auto;">
@@ -49,7 +49,7 @@
             </div>
         </form>
 
-        <form method="POST" action="{{ route('logout') }}">
+        <form method="POST" action="{{ route('logout') }}" novalidate>
             @csrf
             <div class="flex justify-center">
                 <button type="submit" class="text-sm font-medium text-gray-600 hover:text-primary underline-offset-4 hover:underline transition">

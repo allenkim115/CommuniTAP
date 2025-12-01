@@ -133,7 +133,8 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="tasks-grid">
                     @foreach($uploads as $task)
                     @php
-                        $isLive = in_array($task->status, ['approved','published']);
+                        // A task is "Live" only if it's approved/published AND not expired
+                        $isLive = in_array($task->status, ['approved','published']) && !$task->isExpired();
                         // Exclude pending, completed, and live tasks from uncompleted
                         $isUncompleted = !in_array($task->status, ['completed', 'pending']) && !$isLive;
                         
@@ -240,7 +241,7 @@
                                                onmouseover="this.style.backgroundColor='#248A7C'"
                                                onmouseout="this.style.backgroundColor='#2B9D8D'">Edit</a>
                                             @if(!in_array($task->status, ['draft', 'inactive']))
-                                                <form action="{{ route('tasks.destroy', $task) }}" method="POST" id="cancel-task-form-{{ $task->id }}" class="inline">
+                                                <form action="{{ route('tasks.destroy', $task) }}" method="POST" id="cancel-task-form-{{ $task->id }}" class="inline" novalidate>
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="button" onclick="showConfirmModal('Cancel this task proposal?', 'Cancel Task Proposal', 'Cancel', 'Keep', 'red').then(confirmed => { if(confirmed) document.getElementById('cancel-task-form-{{ $task->id }}').submit(); });" class="px-3 py-1.5 text-white text-xs font-bold rounded-xl shadow-md hover:shadow-lg transition-all duration-200"
@@ -309,7 +310,24 @@
 
             const isCreator = task.FK1_userId && Number(task.FK1_userId) === Number({{ auth()->user()->userId }});
             const isFull = task.max_participants !== null && task.max_participants !== undefined && task.assignments && task.assignments.length >= task.max_participants;
-            const isLive = ['approved', 'published'].includes(task.status);
+            
+            // Check if task is expired
+            let isExpired = false;
+            if (task.due_date) {
+                const dueDate = typeof task.due_date === 'string' ? new Date(task.due_date) : new Date(task.due_date.date);
+                if (task.end_time) {
+                    // Combine due_date date with end_time
+                    const [hours, minutes] = task.end_time.split(':');
+                    const deadline = new Date(dueDate);
+                    deadline.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+                    isExpired = new Date() > deadline;
+                } else {
+                    isExpired = new Date() > dueDate;
+                }
+            }
+            
+            // A task is "Live" only if it's approved/published AND not expired
+            const isLive = ['approved', 'published'].includes(task.status) && !isExpired;
 
             contentEl.innerHTML = `
                 <div class="border-b border-gray-200 dark:border-gray-700 -mt-2 -mx-6 px-6 pb-4">

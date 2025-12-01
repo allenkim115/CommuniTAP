@@ -124,7 +124,7 @@
                                 </div>
 
                                 <!-- Redeem Button -->
-                                <form method="POST"
+                                <form method="POST" novalidate
                                       action="{{ route('rewards.redeem', $reward) }}"
                                       id="redeem-reward-form-{{ $reward->id }}">
                                     @csrf

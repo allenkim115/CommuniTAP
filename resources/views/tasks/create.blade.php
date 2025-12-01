@@ -38,7 +38,7 @@
                 </div>
 
                 <!-- Form Section -->
-                <form action="{{ route('tasks.store') }}" method="POST" class="space-y-8">
+                <form action="{{ route('tasks.store') }}" method="POST" class="space-y-8" novalidate>
                     @csrf
 
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -57,7 +57,7 @@
                                     onfocus="this.style.borderColor='#F3A261'; this.style.boxShadow='0 0 0 3px rgba(243, 162, 97, 0.1)';"
                                     onblur="this.style.borderColor=''; this.style.boxShadow='';"
                                     placeholder="Enter task title" required maxlength="100">
-                                <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Max 100 characters.</p>
+                                <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Min 10, max 100 characters.</p>
                                 @error('title')
                                     <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                                 @enderror
@@ -68,7 +68,7 @@
                                 <label for="description" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                     Task Description <span class="text-red-500">*</span>
                                 </label>
-                                <textarea name="description" id="description" rows="7" maxlength="1000"
+                                <textarea name="description" id="description" rows="7" minlength="10" maxlength="1000"
                                     class="w-full px-4 py-2 border-2 border-gray-300 dark:border-gray-600 rounded-xl shadow-sm focus:ring-2 dark:bg-gray-800 dark:text-white transition-all"
                                     style="--focus-ring-color: #F3A261;"
                                     onfocus="this.style.borderColor='#F3A261'; this.style.boxShadow='0 0 0 3px rgba(243, 162, 97, 0.1)';"

@@ -34,8 +34,20 @@ class ProcessTaskDeadlines extends Command
         // Step 1: Send notifications for tasks that are 1 hour before deadline
         $this->sendHourBeforeNotifications($notificationService);
 
-        // Step 2: Mark expired tasks as uncompleted
+        // Step 2: Mark expired task assignments as uncompleted (user-side cleanup + notifications)
         $this->markExpiredTasksAsUncompleted($notificationService);
+
+        // Step 3: Update task-level statuses for all expired tasks (including user-uploaded)
+        // This ensures:
+        // - Tasks with no participants are marked as "uncompleted" instead of staying "published/live"
+        // - Tasks with participants are marked correctly as "completed" or "uncompleted"
+        //   based on whether anyone actually finished the task
+        $completedUpdates = Task::completeExpiredTasks();
+        $this->info("Completed processing for {$completedUpdates} expired task(s) (status updated to completed/uncompleted).");
+
+        // Step 4: Fix any tasks incorrectly left as completed (e.g., no participants or none actually completed)
+        $fixedTasks = Task::fixIncorrectlyCompletedTasks();
+        $this->info("Fixed {$fixedTasks} incorrectly marked completed task(s).");
 
         $this->info('Task deadline processing completed.');
     }

@@ -66,9 +66,10 @@ document.addEventListener('DOMContentLoaded', function() {
         showToast('{{ session('error') }}', 'error', 5000);
     @endif
     @if($errors->any())
-        @foreach($errors->all() as $error)
-            showToast('{{ $error }}', 'error', 5000);
-        @endforeach
+        const validationErrors = @json($errors->all());
+        validationErrors.forEach(function(message) {
+            showToast(message, 'error', 5000);
+        });
     @endif
 });
 </script>

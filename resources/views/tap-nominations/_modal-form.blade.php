@@ -58,7 +58,7 @@
     @endif
 
     <!-- Form -->
-    <form method="POST" action="{{ route('tap-nominations.store') }}" id="nomination-form" class="space-y-6" onsubmit="event.preventDefault(); showNominationConfirmModal();">
+    <form method="POST" action="{{ route('tap-nominations.store') }}" id="nomination-form" class="space-y-6" onsubmit="event.preventDefault(); showNominationConfirmModal();" novalidate>
         @csrf
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -93,13 +93,8 @@
                     <span class="text-red-500">*</span>
                 </label>
                 <div class="relative group">
-                    <select id="modal_nominee_id" name="nominee_id" class="block w-full px-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-600 shadow-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500 dark:bg-gray-700 dark:text-white transition-all duration-200 appearance-none bg-white hover:border-orange-400 hover:shadow-md" required>
-                        <option value="">Choose a user...</option>
-                        @foreach($availableUsers as $user)
-                            <option value="{{ $user->userId }}" {{ old('nominee_id') == $user->userId ? 'selected' : '' }}>
-                                {{ $user->fullName }} ({{ $user->email }})
-                            </option>
-                        @endforeach
+                    <select id="modal_nominee_id" name="nominee_id" class="block w-full px-4 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-600 shadow-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500 dark:bg-gray-700 dark:text-white transition-all duration-200 appearance-none bg-white hover:border-orange-400 hover:shadow-md" required disabled>
+                        <option value="">Select a daily task first...</option>
                     </select>
                     <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                         <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">

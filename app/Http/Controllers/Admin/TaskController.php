@@ -27,21 +27,88 @@ class TaskController extends Controller
         \App\Models\Task::fixIncorrectlyCompletedTasks();
         
         // Auto-publish any approved user-uploaded tasks (for tasks approved before the auto-publish feature)
-        Task::where('task_type', 'user_uploaded')
+        // and notify the creator + all eligible users, just like the normal approve flow.
+        $autoPublishUserUploaded = Task::where('task_type', 'user_uploaded')
             ->where('status', 'approved')
             ->whereNull('published_date')
-            ->update([
+            ->get();
+
+        foreach ($autoPublishUserUploaded as $task) {
+            $task->update([
                 'status' => 'published',
                 'published_date' => now(),
             ]);
+
+            // Refresh to ensure we have the latest relations
+            $task->refresh();
+
+            // Notify the task creator (if present)
+            if ($task->FK1_userId && $task->assignedUser) {
+                $this->notificationService->notify(
+                    $task->assignedUser,
+                    'task_proposal_published',
+                    "Your task proposal \"{$task->title}\" was approved and is now live!",
+                    [
+                        'url' => route('tasks.show', $task),
+                        'description' => 'Participants can now join. Monitor submissions regularly.',
+                    ]
+                );
+            }
+
+            // Notify all non-admin users (excluding the creator) that a new task is available
+            $activeUsers = User::where('role', '!=', 'admin')
+                ->when(!is_null($task->FK1_userId), fn ($query) => $query->where('userId', '!=', $task->FK1_userId))
+                ->get(['userId', 'firstName', 'lastName']);
+
+            if ($activeUsers->isNotEmpty()) {
+                $this->notificationService->notifyMany(
+                    $activeUsers,
+                    'new_task_available',
+                    "New task available: \"{$task->title}\"",
+                    [
+                        'url' => route('tasks.show', $task),
+                        'description' => 'Join now to earn points!',
+                    ]
+                );
+            }
+        }
         
-        // Auto-publish any approved tasks that have a published_date (should be published)
-        // This handles tasks that were reactivated but status wasn't updated correctly
-        Task::where('status', 'approved')
+        // Auto-publish any approved tasks that already have a published_date (should be published)
+        // and notify eligible users if they weren't previously notified.
+        $autoPublishRegular = Task::where('status', 'approved')
             ->whereNotNull('published_date')
-            ->update([
+            ->get();
+
+        foreach ($autoPublishRegular as $task) {
+            // If it's already published, skip
+            if ($task->status === 'published') {
+                continue;
+            }
+
+            $task->update([
                 'status' => 'published',
             ]);
+
+            // For user-uploaded tasks we already handled above; avoid double notifying
+            if ($task->task_type === 'user_uploaded') {
+                continue;
+            }
+
+            // Notify all non-admin users about this task being available
+            $activeUsers = User::where('role', '!=', 'admin')->get(['userId', 'firstName', 'lastName']);
+
+            if ($activeUsers->isNotEmpty()) {
+                $this->notificationService->notifyMany(
+                    $activeUsers,
+                    'task_published',
+                    "New task available: \"{$task->title}\"",
+                    [
+                        'url' => route('tasks.show', $task),
+                        'description' => 'Join now while slots are open.',
+                    ]
+                );
+            }
+        }
 
         $tasks = Task::with(['assignments.user', 'assignedUser'])
             ->whereNotIn('status', ['draft']) // Exclude cancelled user proposals, but show inactive tasks
@@ -77,8 +144,8 @@ class TaskController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'title' => 'required|string|max:100',
-            'description' => 'required|string',
+            'title' => 'required|string|min:10|max:100',
+            'description' => 'required|string|min:10|max:1000',
             'task_type' => 'required|in:daily,one_time',
             'points_awarded' => 'required|integer|min:1',
             'due_date' => 'required|date|after_or_equal:today',
@@ -256,8 +323,8 @@ class TaskController extends Controller
         }
         
         $request->validate([
-            'title' => 'required|string|max:100',
-            'description' => 'required|string',
+            'title' => 'required|string|min:10|max:100',
+            'description' => 'required|string|min:10|max:1000',
             'points_awarded' => 'required|integer|min:1',
             'due_date' => 'required|date|after_or_equal:today',
             'start_time' => 'required|date_format:H:i',

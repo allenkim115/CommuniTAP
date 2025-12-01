@@ -16,7 +16,7 @@
 
     <!-- Registration Form -->
     <form method="POST" action="{{ route('register') }}" id="registerForm" class="animate-fade-in"
-          style="animation-delay: 0.1s;">
+          style="animation-delay: 0.1s;" novalidate>
         @csrf
 
         <!-- Logo -->

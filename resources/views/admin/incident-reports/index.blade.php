@@ -91,7 +91,7 @@
                         </a>
             </div>
 
-                    <form id="filters-form" method="GET" action="{{ route('admin.incident-reports.index') }}" class="space-y-6">
+                    <form id="filters-form" method="GET" action="{{ route('admin.incident-reports.index') }}" class="space-y-6" novalidate>
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
                             <label class="flex flex-col text-sm font-medium text-gray-700">
                                 <span>Status</span>

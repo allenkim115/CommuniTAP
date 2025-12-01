@@ -123,7 +123,7 @@
                         </x-slot>
                     </x-dropdown>
 
-                    <form method="POST" action="{{ route('logout') }}">
+                    <form method="POST" action="{{ route('logout') }}" novalidate>
                         @csrf
                         <button class="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">Log out</button>
                     </form>
@@ -214,7 +214,7 @@
                 </svg>
                 Task Chain
             </a>
-            <form method="POST" action="{{ route('logout') }}" class="pt-2 border-t border-gray-100 dark:border-gray-800">
+            <form method="POST" action="{{ route('logout') }}" class="pt-2 border-t border-gray-100 dark:border-gray-800" novalidate>
                 @csrf
                 <button class="mt-2 text-sm font-medium" style="color: #2B9D8D;">Log out</button>
             </form>

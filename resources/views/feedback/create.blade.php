@@ -68,7 +68,7 @@
                     <p class="text-sm text-gray-600 dark:text-gray-400">Your feedback helps us improve and deliver better results.</p>
                 </div>
 
-                <form action="{{ route('feedback.store', $task) }}" method="POST">
+                <form action="{{ route('feedback.store', $task) }}" method="POST" novalidate>
                     @csrf
                     
                     <!-- Rating Section -->

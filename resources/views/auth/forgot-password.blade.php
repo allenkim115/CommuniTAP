@@ -30,7 +30,7 @@
 
     <!-- Form -->
     <form method="POST" action="{{ route('password.email') }}" id="forgotPasswordForm" class="animate-fade-in"
-          style="animation-delay: 0.1s;">
+          style="animation-delay: 0.1s;" novalidate>
         @csrf
 
         <!-- Form Container -->

@@ -17,7 +17,7 @@
                         </div>
                         
                         <!-- Filters Section - Right Side -->
-                        <form method="GET" action="{{ route('admin.dashboard') }}" id="filter-form" class="flex flex-col sm:flex-row items-start sm:items-end gap-3">
+                        <form method="GET" action="{{ route('admin.dashboard') }}" id="filter-form" class="flex flex-col sm:flex-row items-start sm:items-end gap-3" novalidate>
                             <div class="w-full sm:w-auto">
                                 <label for="period-select" class="block text-xs font-semibold text-white mb-1.5 flex items-center gap-2">
                                     <i class="fas fa-calendar-alt text-white/90 text-xs"></i>
@@ -46,7 +46,8 @@
             <!-- Key Metrics Cards -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <!-- Total Users Card -->
-                <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl shadow-lg p-6 text-white transform hover:scale-105 transition-all duration-200">
+                <a href="{{ route('admin.users.index') }}"
+                   class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl shadow-lg p-6 text-white transform hover:scale-105 transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-300 cursor-pointer block">
                     <div class="flex items-center justify-between mb-4">
                         <div class="bg-white/20 rounded-lg p-3">
                             <i class="fas fa-users text-2xl"></i>
@@ -71,14 +72,15 @@
                     </div>
                     <div class="text-4xl font-bold mb-1">{{ number_format($totalUsers) }}</div>
                     <p class="text-blue-100 text-sm font-medium mb-4">Total Users</p>
-                    <a href="{{ route('admin.users.index') }}" 
-                       class="text-white/90 hover:text-white text-sm font-medium inline-flex items-center gap-1">
-                        View Details <i class="fas fa-arrow-right text-xs"></i>
-                    </a>
-                </div>
+                    <div class="text-white/90 text-sm font-medium inline-flex items-center gap-1">
+                        <span>View Details</span>
+                        <i class="fas fa-arrow-right text-xs"></i>
+                    </div>
+                </a>
 
                 <!-- Total Tasks Card -->
-                <div class="bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl shadow-lg p-6 text-white transform hover:scale-105 transition-all duration-200">
+                <a href="{{ route('admin.tasks.index') }}"
+                   class="bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl shadow-lg p-6 text-white transform hover:scale-105 transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-orange-300 cursor-pointer block">
                     <div class="flex items-center justify-between mb-4">
                         <div class="bg-white/20 rounded-lg p-3">
                             <i class="fas fa-tasks text-2xl"></i>
@@ -103,14 +105,15 @@
                     </div>
                     <div class="text-4xl font-bold mb-1">{{ number_format($totalTasks) }}</div>
                     <p class="text-orange-100 text-sm font-medium mb-4">Tasks Created</p>
-                    <a href="{{ route('admin.tasks.index') }}" 
-                       class="text-white/90 hover:text-white text-sm font-medium inline-flex items-center gap-1">
-                        View Details <i class="fas fa-arrow-right text-xs"></i>
-                    </a>
-                </div>
+                    <div class="text-white/90 text-sm font-medium inline-flex items-center gap-1">
+                        <span>View Details</span>
+                        <i class="fas fa-arrow-right text-xs"></i>
+                    </div>
+                </a>
 
                 <!-- Total Incidents Card -->
-                <div class="bg-gradient-to-br from-red-500 to-red-600 rounded-2xl shadow-lg p-6 text-white transform hover:scale-105 transition-all duration-200">
+                <a href="{{ route('admin.incident-reports.index') }}"
+                   class="bg-gradient-to-br from-red-500 to-red-600 rounded-2xl shadow-lg p-6 text-white transform hover:scale-105 transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-red-300 cursor-pointer block">
                     <div class="flex items-center justify-between mb-4">
                         <div class="bg-white/20 rounded-lg p-3">
                             <i class="fas fa-exclamation-triangle text-2xl"></i>
@@ -135,11 +138,11 @@
                     </div>
                     <div class="text-4xl font-bold mb-1">{{ number_format($totalIncidents) }}</div>
                     <p class="text-red-100 text-sm font-medium mb-4">Incident Reports</p>
-                    <a href="{{ route('admin.incident-reports.index') }}" 
-                       class="text-white/90 hover:text-white text-sm font-medium inline-flex items-center gap-1">
-                        View Details <i class="fas fa-arrow-right text-xs"></i>
-                    </a>
-                </div>
+                    <div class="text-white/90 text-sm font-medium inline-flex items-center gap-1">
+                        <span>View Details</span>
+                        <i class="fas fa-arrow-right text-xs"></i>
+                    </div>
+                </a>
             </div>
 
             <!-- KPI Row -->
