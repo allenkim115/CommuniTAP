@@ -1,6 +1,6 @@
 <section>
 
-    <form method="post" action="{{ route('password.update') }}" class="space-y-6">
+    <form method="post" action="{{ route('password.update') }}" class="space-y-6" novalidate>
         @csrf
         @method('put')
 

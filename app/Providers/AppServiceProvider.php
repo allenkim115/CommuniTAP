@@ -41,6 +41,8 @@ class AppServiceProvider extends ServiceProvider
                 'task_submission_rejected',
                 'task_assignment_completed',
                 'task_progress_updated',
+                'task_deadline_reminder',
+                'task_marked_uncompleted',
                 'tap_nomination_received',
                 'tap_nomination_accepted',
                 'tap_nomination_declined',
@@ -51,6 +53,7 @@ class AppServiceProvider extends ServiceProvider
                 'task_proposal_rejected',
                 'task_proposal_published',
                 'task_proposal_reactivated',
+                'new_task_available',
                 'task_published',
             ];
 

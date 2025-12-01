@@ -19,7 +19,7 @@
         @endif
     </div>
     @if($unreadCount > 0)
-        <form method="POST" action="{{ route('notifications.mark-all-read') }}">
+        <form method="POST" action="{{ route('notifications.mark-all-read') }}" novalidate>
             @csrf
             <button type="submit" class="text-xs font-semibold transition-colors"
                     style="color: {{ $accentColor }};"
@@ -33,53 +33,48 @@
 <div class="max-h-96 overflow-y-auto">
     @forelse($notifications as $notification)
         @php
-            $message = strtolower($notification->message ?? '');
-            $iconColor = $accentColor;
-            $iconType = 'default';
+            $type = $notification->type ?? 'default';
 
-            if (str_contains($message, 'reward') || str_contains($message, 'redeem')) {
-                $iconType = 'reward';
-            } elseif (str_contains($message, 'task') || str_contains($message, 'assign')) {
-                $iconType = 'task';
-            } elseif (str_contains($message, 'point') || str_contains($message, 'earn')) {
-                $iconType = 'points';
-            } elseif (str_contains($message, 'feedback')) {
-                $iconType = 'feedback';
-            }
+            // Map notification types to Font Awesome icon classes
+            $iconClass = match (true) {
+                // Task-related notifications (user + admin)
+                str_starts_with($type, 'task_'),
+                $type === 'new_task_available' => 'fa-solid fa-list-check text-blue-500',
 
-            $iconPaths = match ($iconType) {
-                'reward' => [
-                    'M20 12v8a2 2 0 01-2 2H6a2 2 0 01-2-2v-8',
-                    'M4 12h16',
-                    'M12 12v10',
-                    'M12 12V6a2 2 0 00-2-2H7a2 2 0 00-2 2c0 1.657 1.343 3 3 3h3',
-                    'M12 6a2 2 0 012-2h3a2 2 0 012 2c0 1.657-1.343 3-3 3h-3',
-                ],
-                'task' => [
-                    'M9 3h6a2 2 0 012 2v12a2 2 0 01-2 2H9a2 2 0 01-2-2V5a2 2 0 012-2z',
-                    'M9 5h6',
-                    'M9 12l2 2 4-4',
-                ],
-                'points' => [
-                    'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2',
-                    'M12 4v4',
-                    'M12 14v4',
-                ],
-                'feedback' => [
-                    'M21 11.5c0 4.142-3.806 7.5-8.5 7.5-.964 0-1.897-.128-2.769-.362L6 21v-3.612C4.182 15.938 3 13.861 3 11.5 3 7.358 6.806 4 11.5 4S21 7.358 21 11.5z',
-                    'M8.5 11.5h.01',
-                    'M11.5 11.5h.01',
-                    'M14.5 11.5h.01',
-                ],
-                default => [
-                    'M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9',
-                ],
+                // Tap nomination notifications
+                str_starts_with($type, 'tap_nomination_') => 'fa-solid fa-hand-holding-heart text-emerald-500',
+
+                // Reward notifications
+                str_starts_with($type, 'reward_') => 'fa-solid fa-gift text-amber-500',
+
+                // Incident report notifications
+                str_starts_with($type, 'incident_') => 'fa-solid fa-triangle-exclamation text-red-500',
+
+                // Fallback
+                default => 'fa-solid fa-bell text-slate-500',
             };
         @endphp
         @php
-            $targetUrl = $notification->data['url'] ?? route('notifications.index');
+            // Determine target URL with sensible fallbacks
+            $targetUrl = $notification->data['url'] ?? null;
+
+            // Special handling for known notification types
             if ($notification->type === 'reward_claim_submitted') {
                 $targetUrl = route('admin.redemptions.index', ['status' => 'pending']);
+            } elseif (in_array($notification->type, ['task_deadline_reminder', 'task_marked_uncompleted'], true)) {
+                // For task-related reminders/uncompleted, fall back to the specific task page when possible
+                $taskId = $notification->data['taskId'] ?? null;
+                if ($taskId) {
+                    $targetUrl = route('tasks.show', ['task' => $taskId]);
+                } elseif (!$targetUrl) {
+                    // Final fallback to tasks list for safety
+                    $targetUrl = route('tasks.index');
+                }
+            }
+
+            // Global fallback if still missing
+            if (!$targetUrl) {
+                $targetUrl = route('notifications.index');
             }
         @endphp
         <a href="{{ $targetUrl }}" 
@@ -92,11 +87,7 @@
                 <div class="flex-shrink-0 mt-0.5">
                     <div class="p-1.5 rounded-lg bg-gray-100 dark:bg-gray-700"
                          @if($notification->status === 'unread') style="background-color: {{ $highlightBackground }};" @endif>
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: {{ is_string($iconColor) ? $iconColor : '#2B9D8D' }};">
-                            @foreach($iconPaths as $path)
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $path }}"></path>
-                            @endforeach
-                        </svg>
+                        <i class="{{ $iconClass }} text-sm" aria-hidden="true"></i>
                     </div>
                 </div>
                 <div class="flex-1 min-w-0">

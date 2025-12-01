@@ -215,14 +215,19 @@
                                     
                                     <!-- Uploader Info -->
                                     <div class="flex items-center gap-2 mb-4 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl text-sm">
-                                        <div class="flex-shrink-0 w-8 h-8 rounded-full bg-teal-100 dark:bg-teal-900/30 flex items-center justify-center">
-                                            <svg class="w-4 h-4 text-teal-600 dark:text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                                            </svg>
-                                        </div>
+                                        @php $uploader = $task->assignedUser; @endphp
+                                        @if($uploader)
+                                            <x-user-avatar :user="$uploader" size="h-8 w-8" textSize="text-xs"
+                                                class="flex-shrink-0 bg-teal-100 dark:bg-teal-900/30" />
+                                        @else
+                                            <div class="flex-shrink-0 w-8 h-8 rounded-full bg-teal-100 dark:bg-teal-900/30 flex items-center justify-center">
+                                                <svg class="w-4 h-4 text-teal-600 dark:text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                                                </svg>
+                                            </div>
+                                        @endif
                                         <div class="flex-1 min-w-0">
                                             <p class="font-semibold text-gray-900 dark:text-gray-100 truncate">
-                                                @php $uploader = $task->assignedUser; @endphp
                                                 {{ $uploader?->name ?? 'Admin' }}
                                             </p>
                                             <p class="text-xs text-gray-500 dark:text-gray-400">Uploader</p>
@@ -537,51 +542,77 @@
                                 </div>
                             ` : assignmentStatus === 'completed' ? `
                                 <!-- Completed Status -->
-                                <div class="mb-6">
-                                    <div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-6 text-center">
-                                        <div class="flex flex-col items-center">
-                                            <svg class="w-12 h-12 text-green-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                            </svg>
-                                            <h3 class="text-lg font-semibold text-green-800 dark:text-green-200 mb-2">Task Completed</h3>
-                                            <p class="text-sm text-green-700 dark:text-green-300 mb-4">
-                                                Congratulations! Your task has been approved and completed.
-                                            </p>
-                                        </div>
-                                    </div>
-                                    
-                                    <!-- Action Buttons -->
-                                    <div class="text-center space-y-3">
-                                        <!-- Task Feedback Button -->
-                                        <a href="/feedback/${taskId}/create" class="inline-flex items-center px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-lg transition-colors">
-                                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
-                                            </svg>
-                                            Task Feedback
-                                        </a>
-                                        
-                                        <!-- Tap & Pass Button - Only for daily tasks completed TODAY -->
-                                        ${task.task_type === 'daily' && userAssignments[taskId] && userAssignments[taskId].pivot && userAssignments[taskId].pivot.completed_today ? `
-                                        <div>
-                                            <a href="/tap-nominations/create/${taskId}" class="inline-flex items-center px-4 py-2 bg-green-500 hover:bg-green-600 text-white font-medium rounded-lg transition-colors">
-                                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                                                </svg>
-                                                🎯 Tap & Pass
-                                            </a>
-                                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Nominate someone for a daily task (completed today)</p>
-                                        </div>
-                                        ` : task.task_type === 'daily' && userAssignments[taskId] && userAssignments[taskId].pivot && !userAssignments[taskId].pivot.completed_today ? `
-                                        <div class="text-center">
-                                            <div class="inline-flex items-center px-4 py-2 bg-gray-400 text-white font-medium rounded-lg cursor-not-allowed opacity-60">
-                                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                                                </svg>
-                                                🎯 Tap & Pass
+                                <div class="mb-8">
+                                    <div class="max-w-2xl mx-auto rounded-2xl border border-teal-100 bg-gradient-to-r from-emerald-50 via-teal-50 to-emerald-50 shadow-md px-6 py-6 sm:px-8 sm:py-8">
+                                        <div class="flex flex-col gap-4 sm:gap-5">
+                                            <!-- Header -->
+                                            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                                                <div class="flex items-center gap-3">
+                                                    <div class="flex items-center justify-center w-12 h-12 rounded-full bg-emerald-100 text-emerald-600 shadow-sm">
+                                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                        </svg>
+                                                    </div>
+                                                    <div>
+                                                        <h3 class="text-lg sm:text-xl font-semibold text-teal-800">
+                                                            Task Completed
+                                                        </h3>
+                                                        <p class="text-sm text-teal-700">
+                                                            Congratulations! Your task has been approved and completed.
+                                                        </p>
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Only available for tasks completed today</p>
+
+                                            <!-- Divider -->
+                                            <div class="h-px bg-gradient-to-r from-transparent via-emerald-200 to-transparent"></div>
+
+                                            <!-- Action Buttons -->
+                                            <div class="grid gap-3 sm:gap-4 sm:grid-cols-3 items-start">
+                                                <!-- Give Feedback Button -->
+                                                <a href="/feedback/${taskId}/create"
+                                                   class="inline-flex items-center px-2.5 sm:px-3 py-1.5 text-sm font-semibold rounded-lg text-white shadow-sm hover:shadow-md transition-all"
+                                                   style="background-color: #2B9D8D;">
+                                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                                                    </svg>
+                                                    Give Feedback
+                                                </a>
+
+                                                <!-- View Feedback Button -->
+                                                <a href="/feedback/${taskId}/show"
+                                                   class="inline-flex items-center px-2.5 sm:px-3 py-1.5 text-sm font-semibold rounded-lg border border-teal-200 bg-white text-teal-800 hover:bg-teal-50 transition-all">
+                                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                                    </svg>
+                                                    View Feedback
+                                                </a>
+
+                                                <!-- Tap & Pass Button - Only for daily tasks completed TODAY -->
+                                                ${task.task_type === 'daily' && userAssignments[taskId] && userAssignments[taskId].pivot && userAssignments[taskId].pivot.completed_today ? `
+                                                <div class="flex flex-col items-center">
+                                                    <a href="/tap-nominations/create/${taskId}" class="inline-flex items-center px-4 sm:px-5 py-2.5 text-sm font-semibold rounded-lg text-white shadow-sm hover:shadow-md transition-all" style="background-color: #F97316;">
+                                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                                        </svg>
+                                                        Tap & Pass
+                                                    </a>
+                                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 text-center">Nominate someone for a daily task (completed today)</p>
+                                                </div>
+                                                ` : task.task_type === 'daily' && userAssignments[taskId] && userAssignments[taskId].pivot && !userAssignments[taskId].pivot.completed_today ? `
+                                                <div class="flex flex-col items-center">
+                                                    <div class="inline-flex items-center px-4 sm:px-5 py-2.5 text-sm font-semibold rounded-lg bg-gray-300 text-gray-600 cursor-not-allowed opacity-75">
+                                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                                        </svg>
+                                                        Tap & Pass
+                                                    </div>
+                                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 text-center">Only available for tasks completed today</p>
+                                                </div>
+                                                ` : ''}
+                                            </div>
                                         </div>
-                                        ` : ''}
                                     </div>
                                 </div>
                             ` : ''}

@@ -22,9 +22,9 @@ class ProfileUpdateRequest extends FormRequest
             'email' => [
                 'required',
                 'string',
-                'lowercase',
                 'email',
                 'max:100',
+                'lowercase',
                 // Ignore the current user's record using the correct primary key column
                 Rule::unique(User::class, 'email')->ignore($this->user()->userId, 'userId'),
             ],
@@ -34,4 +34,5 @@ class ProfileUpdateRequest extends FormRequest
             'password_confirmation' => ['nullable', 'string'],
         ];
     }
+
 }

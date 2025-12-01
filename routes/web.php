@@ -82,6 +82,7 @@ Route::middleware(['auth', 'user', 'active'])->group(function () {
     
     // Tap & Pass nomination routes
     Route::get('/tap-nominations/create/{task}', [TapNominationController::class, 'create'])->name('tap-nominations.create');
+    Route::get('/tap-nominations/available-users', [TapNominationController::class, 'getAvailableUsersForTask'])->name('tap-nominations.available-users');
     Route::post('/tap-nominations', [TapNominationController::class, 'store'])->name('tap-nominations.store');
     Route::get('/tap-nominations', [TapNominationController::class, 'index'])->name('tap-nominations.index');
     Route::get('/tap-nominations/my-nominations', [TapNominationController::class, 'myNominations'])->name('tap-nominations.my-nominations');

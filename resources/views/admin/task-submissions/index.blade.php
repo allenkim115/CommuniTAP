@@ -86,7 +86,7 @@
                     </h3>
                     <p class="text-sm text-gray-600">Refine your submission list by task type or search</p>
                 </div>
-                <form action="{{ route('admin.task-submissions.index') }}" method="GET" id="filterForm" class="space-y-4">
+                <form action="{{ route('admin.task-submissions.index') }}" method="GET" id="filterForm" class="space-y-4" novalidate>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <!-- Search Input -->
                         <div>

@@ -131,7 +131,7 @@
 
                     <div class="mt-6 flex flex-col gap-4 md:flex-row">
                             @if($user->status === 'active')
-                            <form method="POST" action="{{ route('admin.users.suspend', $user) }}" id="suspend-user-form" class="flex-1">
+                            <form method="POST" action="{{ route('admin.users.suspend', $user) }}" id="suspend-user-form" class="flex-1" novalidate>
                                     @csrf
                                     @method('PATCH')
                                 <button type="button"
@@ -141,7 +141,7 @@
                                     </button>
                                 </form>
                             @else
-                            <form method="POST" action="{{ route('admin.users.reactivate', $user) }}" id="reactivate-user-form" class="flex-1">
+                            <form method="POST" action="{{ route('admin.users.reactivate', $user) }}" id="reactivate-user-form" class="flex-1" novalidate>
                                     @csrf
                                     @method('PATCH')
                                 <button type="button"

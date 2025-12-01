@@ -3,7 +3,7 @@
         @csrf
     </form>
 
-    <form id="profile-update-form" method="post" action="{{ route('profile.update') }}" enctype="multipart/form-data" class="space-y-8">
+    <form id="profile-update-form" method="post" action="{{ route('profile.update') }}" enctype="multipart/form-data" class="space-y-8" novalidate>
         @csrf
         @method('patch')
 

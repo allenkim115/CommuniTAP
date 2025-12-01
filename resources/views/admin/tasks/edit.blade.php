@@ -20,7 +20,7 @@
             <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-6 lg:p-8 space-y-6">
                 
                 <!-- Form Section -->
-                <form action="{{ route('admin.tasks.update', $task) }}" method="POST" class="space-y-8">
+                <form action="{{ route('admin.tasks.update', $task) }}" method="POST" class="space-y-8" novalidate>
                     @csrf
                     @method('PUT')
                     @if($task->status === 'inactive')
@@ -50,7 +50,7 @@
                                 <input type="text" name="title" id="title" value="{{ old('title', $task->title) }}"
                                     class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
                                     placeholder="Enter task title" required maxlength="100">
-                                <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Max 100 characters.</p>
+                                <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Min 10, max 100 characters.</p>
                                 @error('title')
                                     <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                                 @enderror
@@ -61,7 +61,7 @@
                                 <label for="description" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                     Task Description <span class="text-red-500">*</span>
                                 </label>
-                                <textarea name="description" id="description" rows="7" maxlength="1000"
+                                <textarea name="description" id="description" rows="7" minlength="10" maxlength="1000"
                                     class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
                                     placeholder="Provide details: objectives, requirements, and outcomes"
                                     required>{{ old('description', $task->description) }}</textarea>

@@ -98,7 +98,7 @@
                     @endif
 
                     <!-- Moderation Form -->
-                    <form method="POST" action="{{ route('admin.incident-reports.update', $incidentReport) }}">
+                    <form method="POST" action="{{ route('admin.incident-reports.update', $incidentReport) }}" novalidate>
                         @csrf
                         @method('PATCH')
 

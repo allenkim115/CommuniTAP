@@ -159,7 +159,7 @@
                             <!-- Footer actions / status -->
                             @if($nomination->status === 'pending')
                                     <div class="flex items-center gap-3 pt-4 border-t-2 border-gray-100 dark:border-gray-700">
-                                        <form method="POST" action="{{ route('tap-nominations.accept', $nomination) }}" class="flex-1" id="accept-form-{{ $nomination->id }}">
+                                        <form method="POST" action="{{ route('tap-nominations.accept', $nomination) }}" class="flex-1" id="accept-form-{{ $nomination->id }}" novalidate>
                                         @csrf
                                             <button type="button" onclick="event.stopPropagation(); showConfirmModal('Accept this nomination? You will earn +1 point.', 'Accept Nomination', 'Accept', 'Cancel', 'green').then(confirmed => { if(confirmed) document.getElementById('accept-form-{{ $nomination->id }}').submit(); });" class="w-full inline-flex items-center justify-center gap-2 px-4 py-3 text-white text-sm font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 hover:scale-105 active:scale-95"
                                                     style="background-color: #2B9D8D;"
@@ -171,7 +171,7 @@
                                             Accept
                                         </button>
                                     </form>
-                                        <form method="POST" action="{{ route('tap-nominations.decline', $nomination) }}" class="flex-1" id="decline-form-{{ $nomination->id }}">
+                                        <form method="POST" action="{{ route('tap-nominations.decline', $nomination) }}" class="flex-1" id="decline-form-{{ $nomination->id }}" novalidate>
                                         @csrf
                                             <button type="button" onclick="event.stopPropagation(); showConfirmModal('Decline this nomination?', 'Decline Nomination', 'Decline', 'Cancel', 'red').then(confirmed => { if(confirmed) document.getElementById('decline-form-{{ $nomination->id }}').submit(); });" class="w-full inline-flex items-center justify-center gap-2 px-4 py-3 text-white text-sm font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 hover:scale-105 active:scale-95"
                                                     style="background-color: #2B9D8D;"

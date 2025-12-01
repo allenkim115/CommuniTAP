@@ -42,7 +42,7 @@
                         @endforeach
                     </div>
 
-                    <form method="GET" action="{{ route('admin.redemptions.index') }}" class="flex flex-col gap-3 rounded-2xl border border-gray-100 bg-gray-50/60 p-4 sm:flex-row sm:items-center">
+                    <form method="GET" action="{{ route('admin.redemptions.index') }}" class="flex flex-col gap-3 rounded-2xl border border-gray-100 bg-gray-50/60 p-4 sm:flex-row sm:items-center" novalidate>
                         <input type="hidden" name="status" value="{{ $activeTab }}">
                         <label class="flex flex-1 items-center gap-3 rounded-full bg-white px-4 py-2 shadow-sm focus-within:ring-2 focus-within:ring-brand-teal/40">
                             <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -114,7 +114,7 @@
                                     </td>
                                     <td class="px-4 py-4">
                                         @if($red->status !== 'claimed')
-                                            <form method="POST" action="{{ route('admin.redemptions.claim', $red) }}" class="inline-flex" id="claim-redemption-{{ $red->redemptionId }}">
+                                            <form method="POST" action="{{ route('admin.redemptions.claim', $red) }}" class="inline-flex" id="claim-redemption-{{ $red->redemptionId }}" novalidate>
                                                 @csrf
                                                 @method('PATCH')
                                                 <button type="button"

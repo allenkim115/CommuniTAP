@@ -126,7 +126,7 @@
                     </div>
                     
                     <!-- Filters -->
-                    <form method="GET" action="{{ route('progress') }}" id="progress-filter-form" class="bg-gradient-to-r from-gray-50 to-orange-50/30 dark:from-gray-700/50 dark:to-orange-900/10 rounded-xl p-5 mb-6 border-2 border-orange-100 dark:border-orange-900/30 shadow-md">
+                    <form method="GET" action="{{ route('progress') }}" id="progress-filter-form" class="bg-gradient-to-r from-gray-50 to-orange-50/30 dark:from-gray-700/50 dark:to-orange-900/10 rounded-xl p-5 mb-6 border-2 border-orange-100 dark:border-orange-900/30 shadow-md" novalidate>
                         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                             <div>
                                 <label for="start_date" class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">

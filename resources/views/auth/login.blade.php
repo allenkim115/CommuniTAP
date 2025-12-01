@@ -4,7 +4,7 @@
 
     <!-- Login Form -->
     <form method="POST" action="{{ route('login') }}" id="loginForm" class="animate-fade-in"
-          style="animation-delay: 0.1s;">
+          style="animation-delay: 0.1s;" novalidate>
         @csrf
         <!-- Logo (Centered, Floating) -->
         <div class="flex justify-center mb-8">

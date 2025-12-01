@@ -17,7 +17,7 @@
 
             <!-- Feedback Form -->
             <div class="bg-white/95 dark:bg-gray-900/80 rounded-2xl shadow-2xl border border-brand-peach/60 dark:border-gray-800 p-8 space-y-6">
-                <form action="{{ route('feedback.update', $feedback) }}" method="POST">
+                <form action="{{ route('feedback.update', $feedback) }}" method="POST" novalidate>
                     @csrf
                     @method('PATCH')
                     

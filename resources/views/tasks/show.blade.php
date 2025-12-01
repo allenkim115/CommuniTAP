@@ -271,13 +271,6 @@
                                         @endforeach
                                     </div>
                                     
-                                    <button type="button" onclick="openParticipantsModal()" class="w-full inline-flex justify-center items-center gap-2 px-4 py-2.5 text-sm font-semibold rounded-lg text-white shadow-md transition-all hover:shadow-lg transform hover:-translate-y-0.5"
-                                            style="background-color: #F3A261;"
-                                            onmouseover="this.style.backgroundColor='#E8944F'"
-                                            onmouseout="this.style.backgroundColor='#F3A261'">
-                                        <i class="fas fa-eye"></i>
-                                        View All ({{ $task->assignments->count() }})
-                                    </button>
                                 @else
                                     <div class="text-center py-8">
                                         <i class="fas fa-users-slash text-gray-300 text-3xl mb-3"></i>
@@ -587,7 +580,7 @@
                                     <i class="fas fa-users-slash mr-2"></i>Join This Task
                                 </button>
                             @else
-                                <form action="{{ route('tasks.join', $task) }}" method="POST" class="inline">
+                                <form action="{{ route('tasks.join', $task) }}" method="POST" class="inline" novalidate>
                                     @csrf
                                     <button type="submit" class="inline-flex items-center gap-2 px-8 py-3 border border-transparent text-sm font-bold rounded-lg text-white shadow-md transition-colors brand-primary-btn">
                                         <i class="fas fa-user-plus"></i> Join This Task
@@ -646,7 +639,7 @@
                                             $disabled = $btnIdx === false || $currIdx === false || $btnIdx !== $currIdx + 1;
                                             $progressLabel = ucfirst(str_replace('_',' ', $p));
                                         @endphp
-                                        <form id="progress-form-{{ $p }}" action="{{ route('tasks.progress', $task) }}" method="POST" class="inline">
+                                        <form id="progress-form-{{ $p }}" action="{{ route('tasks.progress', $task) }}" method="POST" class="inline" novalidate>
                                             @csrf
                                             @method('PATCH')
                                             <input type="hidden" name="progress" value="{{ $p }}">
@@ -669,28 +662,49 @@
                             
                             @if($userAssignment->status === 'submitted')
                                 <!-- Pending Approval Status -->
-                                <div class="mb-6">
-                                    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-6 text-center">
-                                        <div class="flex flex-col items-center">
-                                            <i class="fas fa-clock text-yellow-500 text-5xl mb-4"></i>
-                                            <h3 class="text-lg font-semibold text-yellow-800 mb-2">Pending Approval</h3>
-                                            <p class="text-sm text-yellow-700 mb-4">
+                                <div class="mb-8">
+                                    <div class="bg-yellow-50 border border-yellow-200 rounded-2xl p-6 md:p-7 shadow-sm">
+                                        <div class="flex flex-col md:flex-row md:items-center gap-4 md:gap-6">
+                                            <div class="flex items-center justify-center">
+                                                <div class="w-14 h-14 md:w-16 md:h-16 rounded-full flex items-center justify-center shadow-sm"
+                                                     style="background: linear-gradient(135deg, #FDF3D1, #FFEFC2);">
+                                                    <i class="fas fa-clock text-3xl md:text-4xl" style="color: #2B9D8D;"></i>
+                                                </div>
+                                            </div>
+                                            <div class="flex-1 text-center md:text-left">
+                                                <h3 class="text-lg md:text-xl font-semibold mb-1" style="color: #2B9D8D;">
+                                                    Pending Approval
+                                                </h3>
+                                                <p class="text-sm text-yellow-800 mb-1">
+                                                    We’ve received your proof. A reviewer will check it shortly.
+                                                </p>
+                                                <p class="text-xs text-yellow-700 mb-3 md:mb-2">
                                                 @if($task->task_type === 'user_uploaded')
                                                     Your task completion has been submitted and is waiting for the task creator's approval.
                                                 @else
                                                     Your task completion has been submitted and is waiting for admin approval.
                                                 @endif
-                                            </p>
-                                            @if($userAssignment->submitted_at)
-                                                <p class="text-xs text-yellow-600">
-                                                    Submitted on {{ is_string($userAssignment->submitted_at) ? \Carbon\Carbon::parse($userAssignment->submitted_at)->format('M j, Y \a\t g:i A') : $userAssignment->submitted_at->format('M j, Y \a\t g:i A') }}
                                                 </p>
-                                            @endif
+                                                @if($userAssignment->submitted_at)
+                                                    <p class="text-xs font-medium text-yellow-700">
+                                                        Submitted on {{ is_string($userAssignment->submitted_at) ? \Carbon\Carbon::parse($userAssignment->submitted_at)->format('M j, Y \a\t g:i A') : $userAssignment->submitted_at->format('M j, Y \a\t g:i A') }}
+                                                    </p>
+                                                @endif
+                                            </div>
                                         </div>
                                     </div>
                                     <!-- User Submission Preview -->
                                     <div class="mt-6 text-left">
-                                        <h4 class="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-3">Your Submission</h4>
+                                        <div class="flex items-center justify-between gap-2 mb-3">
+                                            <div>
+                                                <h4 class="text-sm font-semibold text-gray-800 dark:text-gray-200">
+                                                    Your Submission
+                                                </h4>
+                                                <p class="text-xs text-gray-500 dark:text-gray-400">
+                                                    Review what you sent before the reviewer makes a decision.
+                                                </p>
+                                            </div>
+                                        </div>
                                         @if(($userAssignment->completion_notes ?? null))
                                             <div class="mb-4 text-sm text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-700 p-4 rounded-md">
                                                 {{ $userAssignment->completion_notes }}
@@ -701,7 +715,7 @@
                                         @endphp
                                         @if(is_array($photos) && count($photos) > 0)
                                             <div class="mb-4">
-                                                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                                                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
                                                     @foreach($photos as $index => $photo)
                                                         @php 
                                                             // Build a robust relative URL to avoid APP_URL issues
@@ -720,8 +734,15 @@
                                                         </div>
                                                     @endforeach
                                                 </div>
-                                                <div class="mt-3">
-                                                    <button type="button" onclick="openImageModal(document.querySelector('img[data-photo-url]')?.getAttribute('data-photo-url'))" class="inline-flex items-center px-3 py-2 bg-gray-900 text-white text-sm rounded hover:bg-black" style="color: white !important;">
+                                                <div class="mt-4 flex flex-wrap gap-3">
+                                                    <button
+                                                        type="button"
+                                                        onclick="openImageModal(document.querySelector('img[data-photo-url]')?.getAttribute('data-photo-url'))"
+                                                        class="inline-flex items-center px-4 py-2 text-sm font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-150"
+                                                        style="background-color: #2B9D8D; color: #ffffff;"
+                                                        onmouseover="this.style.backgroundColor='#248A7C'"
+                                                        onmouseout="this.style.backgroundColor='#2B9D8D'">
+                                                        <i class="fas fa-images mr-2"></i>
                                                         Review Proof
                                                     </button>
                                                 </div>
@@ -731,16 +752,21 @@
                                         @endif
                                     </div>
 
-                                    <!-- Task Feedback Button -->
-                                    <div class="mt-4 flex flex-wrap justify-center items-center gap-3">
-                                        <a href="{{ route('feedback.create', $task) }}" class="inline-flex items-center px-4 py-2 text-white font-medium rounded-lg transition-colors"
-                                           style="background-color: #2B9D8D;"
+                                    <!-- Feedback Buttons -->
+                                    <div class="mt-5 flex flex-wrap justify-center items-center gap-3">
+                                        <a href="{{ route('feedback.create', $task) }}"
+                                           class="inline-flex items-center px-4 py-2 text-sm font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-150"
+                                           style="background-color: #2B9D8D; color: #ffffff;"
                                            onmouseover="this.style.backgroundColor='#248A7C'"
                                            onmouseout="this.style.backgroundColor='#2B9D8D'">
                                             <i class="fas fa-comment mr-2"></i>
-                                            Task Feedback
+                                            Give Feedback
                                         </a>
-                                        <a href="{{ route('feedback.show', $task) }}" class="inline-flex items-center px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium rounded-lg transition-colors">
+                                        <a href="{{ route('feedback.show', $task) }}"
+                                           class="inline-flex items-center px-4 py-2 text-sm font-semibold rounded-lg border transition-all duration-150"
+                                           style="border-color: #2B9D8D; color: #2B9D8D; background-color: #ffffff;"
+                                           onmouseover="this.style.backgroundColor='rgba(43,157,141,0.06)'"
+                                           onmouseout="this.style.backgroundColor='#ffffff'">
                                             <i class="fas fa-eye mr-2"></i>
                                             View Feedback
                                         </a>
@@ -788,65 +814,82 @@
                                 <!-- Removed duplicate upload area to consolidate into the form below -->
                             @elseif($userAssignment->status === 'completed')
                                 <!-- Completed Status -->
-                                <div class="mb-6">
-                                    <div class="border rounded-lg p-6 text-center" style="background-color: rgba(43, 157, 141, 0.1); border-color: #2B9D8D;">
-                                        <div class="flex flex-col items-center">
-                                            <i class="fas fa-check-circle text-5xl mb-4" style="color: #2B9D8D;"></i>
-                                            <h3 class="text-lg font-semibold mb-2" style="color: #2B9D8D;">Task Completed</h3>
-                                            <p class="text-sm mb-4" style="color: #2B9D8D;">
-                                                Congratulations! Your task has been approved and completed.
-                                            </p>
-                                            @if($userAssignment->completed_at)
-                                                <p class="text-xs" style="color: #2B9D8D;">
-                                                    Completed on {{ is_string($userAssignment->completed_at) ? \Carbon\Carbon::parse($userAssignment->completed_at)->format('M j, Y \a\t g:i A') : $userAssignment->completed_at->format('M j, Y \a\t g:i A') }}
-                                                </p>
-                                            @endif
+                                <div class="mb-8">
+                                    <div class="max-w-3xl mx-auto rounded-2xl border border-teal-100 bg-gradient-to-r from-emerald-50 via-teal-50 to-emerald-50 shadow-md px-6 py-6 sm:px-8 sm:py-8">
+                                        <div class="flex flex-col gap-4 sm:gap-5">
+                                            <!-- Header -->
+                                            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                                                <div class="flex items-center gap-3">
+                                                    <div class="flex items-center justify-center w-12 h-12 rounded-full bg-emerald-100 text-emerald-600 shadow-sm">
+                                                        <i class="fas fa-check text-xl"></i>
+                                                    </div>
+                                                    <div>
+                                                        <h3 class="text-xl font-semibold text-teal-800">
+                                                            Task Completed
+                                                        </h3>
+                                                        <p class="text-sm text-teal-700">
+                                                            Congratulations! Your task has been approved and completed.
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                @if($userAssignment->completed_at)
+                                                    <div class="text-xs sm:text-sm text-teal-700 sm:text-right">
+                                                        <span class="font-semibold block sm:inline">Completed on:</span>
+                                                        <span class="sm:ml-1">
+                                                            {{ is_string($userAssignment->completed_at) ? \Carbon\Carbon::parse($userAssignment->completed_at)->format('M j, Y \a\t g:i A') : $userAssignment->completed_at->format('M j, Y \a\t g:i A') }}
+                                                        </span>
+                                                    </div>
+                                                @endif
+                                            </div>
+
+                                            <!-- Divider -->
+                                            <div class="h-px bg-gradient-to-r from-transparent via-emerald-200 to-transparent"></div>
+
+                                            <!-- Action Buttons -->
+                                            <div class="grid gap-3 sm:gap-4 sm:grid-cols-3 items-start">
+                                                <!-- Give Feedback Button -->
+                                                <a href="{{ route('feedback.create', $task) }}"
+                                                   class="inline-flex items-center px-2.5 sm:px-3 py-1.5 text-sm font-semibold rounded-lg text-white shadow-sm hover:shadow-md transition-all"
+                                                   style="background-color: #2B9D8D;">
+                                                    <i class="fas fa-comment mr-2"></i>
+                                                    Give Feedback
+                                                </a>
+
+                                                <!-- View Feedback Button -->
+                                                <a href="{{ route('feedback.show', $task) }}"
+                                                   class="inline-flex items-center px-2.5 sm:px-3 py-1.5 text-sm font-semibold rounded-lg border border-teal-200 bg-white text-teal-800 hover:bg-teal-50 transition-all">
+                                                    <i class="fas fa-eye mr-2"></i>
+                                                    View Feedback
+                                                </a>
+
+                                                <!-- Tap & Pass Button + helper (daily tasks only) -->
+                                                @if($task->task_type === 'daily' && $userAssignment->completed_at)
+                                                    <div class="flex flex-col items-center sm:items-start">
+                                                        @if(\Carbon\Carbon::parse($userAssignment->completed_at)->isToday())
+                                                            <button
+                                                                onclick="openNominationModal({{ $task->taskId }})"
+                                                                class="inline-flex items-center px-4 sm:px-5 py-2.5 text-sm font-semibold rounded-lg text-white shadow-sm hover:shadow-md transition-all"
+                                                                style="background-color: #F97316;">
+                                                                <i class="fas fa-bolt mr-2"></i>
+                                                                Tap & Pass
+                                                            </button>
+                                                            <p class="text-xs text-gray-500 mt-1 text-center sm:text-left">
+                                                                Nominate someone for a daily task (completed today)
+                                                            </p>
+                                                        @else
+                                                            <div class="inline-flex items-center px-4 sm:px-5 py-2.5 text-sm font-semibold rounded-lg bg-gray-300 text-gray-600 cursor-not-allowed opacity-75">
+                                                                <i class="fas fa-bolt mr-2"></i>
+                                                                Tap & Pass
+                                                            </div>
+                                                            <p class="text-xs text-gray-500 mt-1 text-center sm:text-left">
+                                                                Only available for tasks completed today
+                                                            </p>
+                                                        @endif
+                                                    </div>
+                                                @endif
+                                            </div>
                                         </div>
                                     </div>
-                                    
-                                    <!-- Action Buttons -->
-                                    <div class="mt-4 flex flex-wrap justify-center items-center gap-3">
-                                        <!-- Task Feedback Button -->
-                                        <a href="{{ route('feedback.create', $task) }}" class="inline-flex items-center px-4 py-2 text-white font-medium rounded-lg transition-colors"
-                                           style="background-color: #2B9D8D;"
-                                           onmouseover="this.style.backgroundColor='#248A7C'"
-                                           onmouseout="this.style.backgroundColor='#2B9D8D'">
-                                            <i class="fas fa-comment mr-2"></i>
-                                            Task Feedback
-                                        </a>
-                                        
-                                        <a href="{{ route('feedback.show', $task) }}" class="inline-flex items-center px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium rounded-lg transition-colors">
-                                            <i class="fas fa-eye mr-2"></i>
-                                            View Feedback
-                                        </a>
-                                        
-                                        <!-- Tap & Pass Button - Only for daily tasks completed TODAY -->
-                                        @if($task->task_type === 'daily' && $userAssignment->completed_at && \Carbon\Carbon::parse($userAssignment->completed_at)->isToday())
-                                            <button onclick="openNominationModal({{ $task->taskId }})" class="inline-flex items-center px-4 py-2 text-white font-medium rounded-lg transition-colors"
-                                                    style="background-color: #2B9D8D;"
-                                                    onmouseover="this.style.backgroundColor='#248A7C'"
-                                                    onmouseout="this.style.backgroundColor='#2B9D8D'">
-                                                <i class="fas fa-bolt mr-2"></i>
-                                                🎯 Tap & Pass
-                                            </button>
-                                        @elseif($task->task_type === 'daily' && $userAssignment->completed_at && !\Carbon\Carbon::parse($userAssignment->completed_at)->isToday())
-                                            <div class="inline-flex items-center px-4 py-2 bg-gray-400 text-white font-medium rounded-lg cursor-not-allowed opacity-60">
-                                                <i class="fas fa-bolt mr-2"></i>
-                                                🎯 Tap & Pass
-                                            </div>
-                                        @endif
-                                    </div>
-                                    
-                                    <!-- Helper text for Tap & Pass -->
-                                    @if($task->task_type === 'daily' && $userAssignment->completed_at)
-                                        <p class="text-xs text-gray-500 mt-2 text-center">
-                                            @if(\Carbon\Carbon::parse($userAssignment->completed_at)->isToday())
-                                                Nominate someone for a daily task (completed today)
-                                            @else
-                                                Only available for tasks completed today
-                                            @endif
-                                        </p>
-                                    @endif
                                 </div>
                             @endif
                         @endif
@@ -858,7 +901,7 @@
                             && $assignmentForForm->status === 'assigned' 
                             && ($assignmentForForm->progress ?? 'accepted') === 'done')
                         <div class="flex justify-center">
-                            <form id="task-submit-form" action="{{ route('tasks.submit', $task) }}" method="POST" enctype="multipart/form-data" class="w-full max-w-md">
+                            <form id="task-submit-form" action="{{ route('tasks.submit', $task) }}" method="POST" enctype="multipart/form-data" class="w-full max-w-md" novalidate>
                                 @csrf
                                 
                                 <!-- Completion Notes (visible only when progress is done) -->
@@ -975,14 +1018,6 @@
                                         </div>
                                     @endforeach
                                 </div>
-                                
-                                <button type="button" onclick="openParticipantsModal()" class="w-full inline-flex justify-center items-center gap-2 px-4 py-2.5 text-sm font-semibold rounded-lg text-white shadow-md transition-all hover:shadow-lg transform hover:-translate-y-0.5"
-                                        style="background-color: #F3A261;"
-                                        onmouseover="this.style.backgroundColor='#E8944F'"
-                                        onmouseout="this.style.backgroundColor='#F3A261'">
-                                    <i class="fas fa-eye"></i>
-                                    View All ({{ $task->assignments->count() }})
-                                </button>
                             @else
                                 <div class="text-center py-8">
                                     <i class="fas fa-users-slash text-gray-300 text-3xl mb-3"></i>
@@ -1645,6 +1680,8 @@
             })
             .then(html => {
                 modalContent.innerHTML = html;
+                // After the modal content is injected, wire up the task/user dropdown behavior
+                initNominationModalControls();
             })
             .catch(error => {
                 console.error('Error loading nomination form:', error);
@@ -1670,6 +1707,93 @@
             modal.classList.add('hidden');
             modal.style.display = 'none';
             document.body.style.overflow = 'auto';
+        }
+        
+        /**
+         * Initialize Tap & Pass modal controls after content is loaded via AJAX.
+         * - Binds change handler to task dropdown
+         * - Dynamically loads eligible users for the selected task
+         */
+        function initNominationModalControls() {
+            const taskSelect = document.getElementById('modal_task_id');
+            const nomineeSelect = document.getElementById('modal_nominee_id');
+
+            if (!taskSelect || !nomineeSelect) {
+                return;
+            }
+
+            // Remove any previous listener by cloning the node
+            const newTaskSelect = taskSelect.cloneNode(true);
+            taskSelect.parentNode.replaceChild(newTaskSelect, taskSelect);
+
+            const actualTaskSelect = document.getElementById('modal_task_id');
+
+            actualTaskSelect.addEventListener('change', function () {
+                const taskId = this.value;
+
+                nomineeSelect.innerHTML = '';
+
+                if (!taskId) {
+                    nomineeSelect.disabled = true;
+                    const opt = document.createElement('option');
+                    opt.value = '';
+                    opt.textContent = 'Select a daily task first...';
+                    nomineeSelect.appendChild(opt);
+                    return;
+                }
+
+                nomineeSelect.disabled = true;
+                const loadingOpt = document.createElement('option');
+                loadingOpt.value = '';
+                loadingOpt.textContent = 'Loading available users...';
+                nomineeSelect.appendChild(loadingOpt);
+
+                fetch(`{{ route('tap-nominations.available-users') }}?task_id=` + encodeURIComponent(taskId), {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json',
+                    },
+                    credentials: 'same-origin',
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        nomineeSelect.innerHTML = '';
+
+                        const placeholder = document.createElement('option');
+                        placeholder.value = '';
+                        placeholder.textContent = data.users && data.users.length
+                            ? 'Choose a user...'
+                            : 'No eligible users for this task';
+                        nomineeSelect.appendChild(placeholder);
+
+                        if (data.users && data.users.length) {
+                            data.users.forEach(user => {
+                                const opt = document.createElement('option');
+                                opt.value = user.id;
+                                opt.textContent = `${user.name} (${user.email})`;
+                                nomineeSelect.appendChild(opt);
+                            });
+
+                            nomineeSelect.disabled = false;
+                        } else {
+                            nomineeSelect.disabled = true;
+                        }
+                    })
+                    .catch(() => {
+                        nomineeSelect.innerHTML = '';
+                        const errorOpt = document.createElement('option');
+                        errorOpt.value = '';
+                        errorOpt.textContent = 'Error loading users. Please try again.';
+                        nomineeSelect.appendChild(errorOpt);
+                        nomineeSelect.disabled = true;
+                    });
+            });
+
+            // Trigger once so that if a task is pre-selected, users are loaded immediately
+            if (actualTaskSelect.value) {
+                const event = new Event('change');
+                actualTaskSelect.dispatchEvent(event);
+            }
         }
         
         // Close modal on backdrop click
