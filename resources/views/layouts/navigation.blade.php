@@ -220,7 +220,7 @@
             </x-responsive-nav-link>
             
             <x-responsive-nav-link :href="route('tap-nominations.index')" :active="request()->routeIs('tap-nominations.*')">
-                🎯 {{ __('Nominations') }}
+                {{ __('Nominations') }}
                 @if($pendingNominationsCount > 0)
                     <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
                         {{ $pendingNominationsCount }}
@@ -239,7 +239,7 @@
             </x-responsive-nav-link>
             
             <x-responsive-nav-link :href="route('rewards.index')" :active="request()->routeIs('rewards.*') || request()->routeIs('rewards.mine')">
-                {{ __('Spend Points') }}
+                {{ __('Rewards') }}
             </x-responsive-nav-link>
             
             <x-responsive-nav-link :href="route('notifications.index')" :active="request()->routeIs('notifications.*')">

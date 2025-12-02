@@ -203,7 +203,10 @@
                     <p class="text-gray-600 dark:text-gray-300 mb-2 text-lg">You haven't sent any Tap & Pass nominations yet.</p>
                     <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">Complete a daily task and nominate someone to get started!</p>
                     <a href="{{ route('tasks.index') }}" 
-                       class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-orange-600 to-teal-500 hover:from-orange-700 hover:to-teal-600 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5">
+                       class="inline-flex items-center gap-2 px-6 py-3 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5"
+                       style="background-color: #F3A261;"
+                       onmouseover="this.style.backgroundColor='#E8944F'"
+                       onmouseout="this.style.backgroundColor='#F3A261'">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                         </svg>
