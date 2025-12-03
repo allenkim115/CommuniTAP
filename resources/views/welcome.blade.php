@@ -77,7 +77,11 @@
   </script>
 
   <style>
-    .btn-primary {
+  html {
+    /* Match the main page background so overscroll / bounce areas don't show pure white */
+    background-color: #FDFDFC;
+  }
+  .btn-primary {
       position: relative;
       overflow: hidden;
     }
@@ -179,8 +183,9 @@
       transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     }
     header {
+      /* Very subtle glassy background: visible enough for readability, but almost invisible */
       backdrop-filter: blur(10px);
-      background: rgba(253, 253, 252, 0.8);
+      background: rgba(253, 253, 252, 0.4);
     }
     @keyframes gradient-shift {
       0%, 100% { background-position: 0% 50%; }
@@ -200,7 +205,7 @@
 <body class="bg-light text-dark min-h-screen flex flex-col antialiased">
 
   <!-- Header -->
-  <header class="absolute inset-x-0 top-0 z-50 px-6 py-5 lg:px-12 animate-fade-in">
+  <header class="fixed inset-x-0 top-0 z-50 px-6 py-5 lg:px-12 animate-fade-in">
     <nav class="flex justify-between items-center">
       <div class="flex items-center gap-6 text-sm font-medium ml-auto">
         @auth
@@ -218,7 +223,7 @@
   </header>
 
   <!-- Hero Section -->
-  <main class="flex-1 pt-32 pb-20 px-6 lg:px-12">
+  <main class="flex-1 pt-44 lg:pt-32 pb-20 px-6 lg:px-12">
     
     <!-- Hero Content -->
     <section class="max-w-4xl mx-auto text-center space-y-8 animate-fade-up" style="animation-delay:0.1s;">

@@ -25,7 +25,7 @@
                 document.documentElement.classList.remove('dark');
             }
         </script>
-        <div class="min-h-screen" style="background-color:#f1f1f1">
+        <div class="min-h-screen pt-16" style="background-color:#f1f1f1">
             @include('layouts.partials.admin-navigation')
 
             @isset($header)

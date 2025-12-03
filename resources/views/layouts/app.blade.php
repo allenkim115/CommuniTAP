@@ -79,7 +79,7 @@
                 document.documentElement.classList.remove('dark');
             }
         </script>
-        <div class="min-h-screen" style="background-color:#f6f7fb">
+        <div class="min-h-screen pt-16" style="background-color:#f6f7fb">
             @include('layouts.navigation')
 
             <!-- Page Heading -->
