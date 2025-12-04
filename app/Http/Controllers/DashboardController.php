@@ -1284,11 +1284,16 @@ class DashboardController extends Controller
         $userTasks = $user->assignedTasks()
             ->where('tasks.status', '!=', 'inactive')
             ->get();
+
         $ongoingTasks = $user->ongoingTasks()
             ->where('tasks.status', '!=', 'inactive')
             ->get();
+
+        // Ensure completed tasks are ordered by the most recently completed first
+        // so the dashboard "Completed Tasks" list shows the latest 5 completions.
         $completedTasks = $user->completedTasks()
             ->where('tasks.status', '!=', 'inactive')
+            ->orderBy('task_assignments.completed_at', 'desc')
             ->get();
 
         $ongoingTasksCount = $ongoingTasks->count();
