@@ -1,101 +1,118 @@
 <x-admin-layout>
     <x-slot name="header">
-        <div class="flex justify-between items-center">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
+            <h2 class="font-semibold text-lg sm:text-xl text-gray-800 leading-tight">
                 {{ __('Task Management') }}
             </h2>
             
-            <a href="{{ route('admin.tasks.create') }}" class="inline-flex items-center gap-2 text-white font-medium py-2 px-4 rounded-lg transition-colors"
+            <a href="{{ route('admin.tasks.create') }}" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 text-white font-semibold py-3 px-6 rounded-lg transition-colors text-base min-h-[44px]"
                style="background-color: #F3A261;"
                onmouseover="this.style.backgroundColor='#E8944F'"
                onmouseout="this.style.backgroundColor='#F3A261'">
-                <i class="fas fa-plus"></i>
-                Create Task
+                <i class="fas fa-plus text-lg"></i>
+                <span>Create Task</span>
             </a>
         </div>
     </x-slot>
 
-    <div class="py-8">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+    <div class="py-4 sm:py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <!-- Toast Notifications -->
             <x-session-toast />
 
             <!-- Task Statistics -->
-            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
-                <a href="{{ route('admin.tasks.index') }}" class="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-all {{ !request('status') || request('status') === 'all' ? '' : '' }}"
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 sm:gap-3 lg:gap-4 mb-4 sm:mb-6">
+                <a href="{{ route('admin.tasks.index') }}" class="bg-white rounded-lg border-2 border-gray-200 p-3 sm:p-4 lg:p-5 hover:shadow-md transition-all min-h-[90px] sm:min-h-[100px] lg:min-h-[120px] flex flex-col justify-between {{ !request('status') || request('status') === 'all' ? '' : '' }}"
                    @if(!request('status') || request('status') === 'all') style="border-color: #2B9D8D; background-color: rgba(43, 157, 141, 0.1);" @endif
                    @if(!request('status') || request('status') === 'all') onmouseover="this.style.borderColor='#248A7C';" onmouseout="this.style.borderColor='#2B9D8D';" @endif>
-                    <div class="flex items-center gap-2 mb-2">
-                        <i class="fas fa-tasks" style="color: #2B9D8D;"></i>
-                        <p class="text-xs font-medium text-gray-600">Total Tasks</p>
+                    <div class="flex items-center gap-1.5 sm:gap-2 mb-1.5 sm:mb-2">
+                        <i class="fas fa-tasks text-sm sm:text-base lg:text-lg" style="color: #2B9D8D;"></i>
+                        <p class="text-[10px] sm:text-xs lg:text-sm font-semibold text-gray-600 leading-tight">Total Tasks</p>
                     </div>
-                    <p class="text-2xl font-bold text-gray-900">{{ $taskStats['total'] }}</p>
+                    <p class="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">{{ $taskStats['total'] }}</p>
                 </a>
 
-                <a href="{{ route('admin.tasks.filter', ['status' => 'pending']) }}" class="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-all {{ request('status') === 'pending' ? '' : '' }}"
+                <a href="{{ route('admin.tasks.filter', ['status' => 'pending']) }}" class="bg-white rounded-lg border-2 border-gray-200 p-3 sm:p-4 lg:p-5 hover:shadow-md transition-all min-h-[90px] sm:min-h-[100px] lg:min-h-[120px] flex flex-col justify-between {{ request('status') === 'pending' ? '' : '' }}"
                    @if(request('status') === 'pending') style="border-color: #FED2B3; background-color: rgba(254, 210, 179, 0.1);" @endif
                    @if(request('status') === 'pending') onmouseover="this.style.borderColor='#E8C19F';" onmouseout="this.style.borderColor='#FED2B3';" @endif>
-                    <div class="flex items-center gap-2 mb-2">
-                        <i class="fas fa-clock" style="color: #FED2B3;"></i>
-                        <p class="text-xs font-medium text-gray-600">Pending</p>
+                    <div class="flex items-center gap-1.5 sm:gap-2 mb-1.5 sm:mb-2">
+                        <i class="fas fa-clock text-sm sm:text-base" style="color: #FED2B3;"></i>
+                        <p class="text-[10px] sm:text-xs font-medium text-gray-600 leading-tight">Pending</p>
                     </div>
-                    <p class="text-2xl font-bold text-gray-900">{{ $taskStats['pending'] }}</p>
+                    <p class="text-xl sm:text-2xl font-bold text-gray-900">{{ $taskStats['pending'] }}</p>
                 </a>
 
-                <a href="{{ route('admin.tasks.filter', ['status' => 'completed']) }}" class="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-all {{ request('status') === 'completed' ? '' : '' }}"
+                <a href="{{ route('admin.tasks.filter', ['status' => 'completed']) }}" class="bg-white rounded-lg border-2 border-gray-200 p-3 sm:p-4 lg:p-5 hover:shadow-md transition-all min-h-[90px] sm:min-h-[100px] lg:min-h-[120px] flex flex-col justify-between {{ request('status') === 'completed' ? '' : '' }}"
                    @if(request('status') === 'completed') style="border-color: #2B9D8D; background-color: rgba(43, 157, 141, 0.1);" @endif
                    @if(request('status') === 'completed') onmouseover="this.style.borderColor='#248A7C';" onmouseout="this.style.borderColor='#2B9D8D';" @endif>
-                    <div class="flex items-center gap-2 mb-2">
-                        <i class="fas fa-check-circle" style="color: #2B9D8D;"></i>
-                        <p class="text-xs font-medium text-gray-600">Completed</p>
+                    <div class="flex items-center gap-1.5 sm:gap-2 mb-1.5 sm:mb-2">
+                        <i class="fas fa-check-circle text-sm sm:text-base" style="color: #2B9D8D;"></i>
+                        <p class="text-[10px] sm:text-xs font-medium text-gray-600 leading-tight">Completed</p>
                     </div>
-                    <p class="text-2xl font-bold text-gray-900">{{ $taskStats['completed'] }}</p>
+                    <p class="text-xl sm:text-2xl font-bold text-gray-900">{{ $taskStats['completed'] }}</p>
                 </a>
 
-                <a href="{{ route('admin.tasks.filter', ['status' => 'published']) }}" class="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-all {{ request('status') === 'published' ? '' : '' }}"
+                <a href="{{ route('admin.tasks.filter', ['status' => 'published']) }}" class="bg-white rounded-lg border-2 border-gray-200 p-3 sm:p-4 lg:p-5 hover:shadow-md transition-all min-h-[90px] sm:min-h-[100px] lg:min-h-[120px] flex flex-col justify-between {{ request('status') === 'published' ? '' : '' }}"
                    @if(request('status') === 'published') style="border-color: #2B9D8D; background-color: rgba(43, 157, 141, 0.1);" @endif
                    @if(request('status') === 'published') onmouseover="this.style.borderColor='#248A7C';" onmouseout="this.style.borderColor='#2B9D8D';" @endif>
-                    <div class="flex items-center gap-2 mb-2">
-                        <i class="fas fa-rocket" style="color: #2B9D8D;"></i>
-                        <p class="text-xs font-medium text-gray-600">Published</p>
+                    <div class="flex items-center gap-1.5 sm:gap-2 mb-1.5 sm:mb-2">
+                        <i class="fas fa-rocket text-sm sm:text-base" style="color: #2B9D8D;"></i>
+                        <p class="text-[10px] sm:text-xs font-medium text-gray-600 leading-tight">Published</p>
                     </div>
-                    <p class="text-2xl font-bold text-gray-900">{{ $taskStats['published'] }}</p>
+                    <p class="text-xl sm:text-2xl font-bold text-gray-900">{{ $taskStats['published'] }}</p>
                 </a>
 
-                <a href="{{ route('admin.tasks.filter', ['status' => 'uncompleted']) }}" class="bg-white rounded-lg border border-gray-200 p-4 hover:border-orange-500 hover:shadow-md transition-all {{ request('status') === 'uncompleted' ? 'border-orange-500 bg-orange-50' : '' }}">
-                    <div class="flex items-center gap-2 mb-2">
-                        <i class="fas fa-exclamation-triangle text-orange-600"></i>
-                        <p class="text-xs font-medium text-gray-600">Uncompleted</p>
+                <a href="{{ route('admin.tasks.filter', ['status' => 'uncompleted']) }}" class="bg-white rounded-lg border-2 border-gray-200 p-3 sm:p-4 lg:p-5 hover:border-orange-500 hover:shadow-md transition-all min-h-[90px] sm:min-h-[100px] lg:min-h-[120px] flex flex-col justify-between {{ request('status') === 'uncompleted' ? 'border-orange-500 bg-orange-50' : '' }}">
+                    <div class="flex items-center gap-1.5 sm:gap-2 mb-1.5 sm:mb-2">
+                        <i class="fas fa-exclamation-triangle text-sm sm:text-base lg:text-lg text-orange-600"></i>
+                        <p class="text-[10px] sm:text-xs lg:text-sm font-semibold text-gray-600 leading-tight">Uncompleted</p>
                     </div>
-                    <p class="text-2xl font-bold text-gray-900">{{ $taskStats['uncompleted'] ?? 0 }}</p>
+                    <p class="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">{{ $taskStats['uncompleted'] ?? 0 }}</p>
                 </a>
 
-                <a href="{{ route('admin.tasks.filter', ['status' => 'inactive']) }}" class="bg-white rounded-lg border border-gray-200 p-4 hover:border-gray-400 hover:shadow-md transition-all {{ request('status') === 'inactive' ? 'border-gray-400 bg-gray-50' : '' }}">
-                    <div class="flex items-center gap-2 mb-2">
-                        <i class="fas fa-pause-circle text-gray-600"></i>
-                        <p class="text-xs font-medium text-gray-600">Inactive</p>
+                <a href="{{ route('admin.tasks.filter', ['status' => 'inactive']) }}" class="bg-white rounded-lg border-2 border-gray-200 p-3 sm:p-4 lg:p-5 hover:border-gray-400 hover:shadow-md transition-all min-h-[90px] sm:min-h-[100px] lg:min-h-[120px] flex flex-col justify-between {{ request('status') === 'inactive' ? 'border-gray-400 bg-gray-50' : '' }}">
+                    <div class="flex items-center gap-1.5 sm:gap-2 mb-1.5 sm:mb-2">
+                        <i class="fas fa-pause-circle text-sm sm:text-base lg:text-lg text-gray-600"></i>
+                        <p class="text-[10px] sm:text-xs lg:text-sm font-semibold text-gray-600 leading-tight">Inactive</p>
                     </div>
-                    <p class="text-2xl font-bold text-gray-900">{{ $taskStats['inactive'] ?? 0 }}</p>
+                    <p class="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">{{ $taskStats['inactive'] ?? 0 }}</p>
                 </a>
             </div>
 
             <!-- Filters -->
-            <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-4 mb-4">
-                <div class="mb-3">
-                    <h3 class="text-base font-semibold text-gray-900 mb-1 flex items-center gap-2">
-                        <i class="fas fa-filter" style="color: #2B9D8D;"></i>
-                        Filter Tasks
-                    </h3>
-                    <p class="text-xs text-gray-500">Refine your task list by type and progress</p>
-                </div>
-                <form action="{{ route('admin.tasks.filter') }}" method="GET" id="filterForm" class="space-y-3" novalidate>
+            <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-3 sm:p-6 mb-4">
+                <div x-data="{ filtersOpen: false }" class="w-full">
+                    <button type="button" @click="filtersOpen = !filtersOpen" class="w-full sm:hidden flex items-center justify-between py-2.5 px-3 bg-gray-50 rounded-lg mb-0">
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-filter text-base" style="color: #2B9D8D;"></i>
+                            <span class="text-sm font-semibold text-gray-900">Filters</span>
+                            @if(request('search') || request('task_type') && request('task_type') !== 'all' || request('assignment_progress') && request('assignment_progress') !== 'all' || request('date_from') || request('date_to'))
+                                <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-brand-teal text-white text-xs font-bold">{{ 
+                                    (request('search') ? 1 : 0) + 
+                                    (request('task_type') && request('task_type') !== 'all' ? 1 : 0) + 
+                                    (request('assignment_progress') && request('assignment_progress') !== 'all' ? 1 : 0) + 
+                                    (request('date_from') ? 1 : 0) + 
+                                    (request('date_to') ? 1 : 0) 
+                                }}</span>
+                            @endif
+                        </div>
+                        <i class="fas fa-chevron-down transition-transform text-sm" :class="{'rotate-180': filtersOpen}"></i>
+                    </button>
+                    <div class="hidden sm:block mb-3">
+                        <h3 class="text-base font-semibold text-gray-900 mb-1 flex items-center gap-2">
+                            <i class="fas fa-filter" style="color: #2B9D8D;"></i>
+                            Filter Tasks
+                        </h3>
+                        <p class="text-xs text-gray-500">Refine your task list by type and progress</p>
+                    </div>
+                <form action="{{ route('admin.tasks.filter') }}" method="GET" id="filterForm" class="space-y-3 sm:space-y-3 mt-3 sm:mt-0" x-show="filtersOpen || window.innerWidth >= 640" x-cloak novalidate>
                     @if(request('status'))
                         <input type="hidden" name="status" value="{{ request('status') }}">
                     @endif
                     
                     <!-- Search Input -->
                     <div>
-                        <label for="search" class="block text-sm font-medium text-gray-700 mb-2">
+                        <label for="search" class="hidden sm:block text-sm font-semibold text-gray-700 mb-2">
                             <i class="fas fa-search" style="color: #2B9D8D;"></i> Search Tasks
                         </label>
                         <div class="relative">
@@ -103,23 +120,23 @@
                                    name="search" 
                                    id="search" 
                                    value="{{ request('search') }}" 
-                                   placeholder="Search by task title..."
-                                   class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm">
-                            <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                                   placeholder="Search tasks..."
+                                   class="w-full pl-10 pr-10 sm:pl-12 sm:pr-12 py-2.5 sm:py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm min-h-[40px] sm:min-h-[44px]">
+                            <i class="fas fa-search absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm"></i>
                             @if(request('search'))
                                 <button type="button" 
                                         id="clearSearch" 
-                                        class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                                    <i class="fas fa-times"></i>
+                                        class="absolute right-3 sm:right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1 min-w-[28px] min-h-[28px] flex items-center justify-center">
+                                    <i class="fas fa-times text-sm"></i>
                                 </button>
                             @endif
                         </div>
                     </div>
                     
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+                    <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3">
                         <div>
-                            <label for="task_type" class="block text-sm font-medium text-gray-700 mb-2">Task Type</label>
-                            <select name="task_type" id="task_type" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm">
+                            <label for="task_type" class="hidden sm:block text-sm font-semibold text-gray-700 mb-1.5">Task Type</label>
+                            <select name="task_type" id="task_type" class="w-full px-3 py-2 sm:px-4 sm:py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm min-h-[40px] sm:min-h-[44px] bg-white">
                                 <option value="all" {{ request('task_type') === 'all' || !request('task_type') ? 'selected' : '' }}>All Types</option>
                                 <option value="daily" {{ request('task_type') === 'daily' ? 'selected' : '' }}>Daily Task</option>
                                 <option value="one_time" {{ request('task_type') === 'one_time' ? 'selected' : '' }}>One-Time Task</option>
@@ -127,8 +144,8 @@
                             </select>
                         </div>
                         <div>
-                            <label for="assignment_progress" class="block text-sm font-medium text-gray-700 mb-2">Assignment Progress</label>
-                            <select name="assignment_progress" id="assignment_progress" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm">
+                            <label for="assignment_progress" class="hidden sm:block text-sm font-semibold text-gray-700 mb-1.5">Progress</label>
+                            <select name="assignment_progress" id="assignment_progress" class="w-full px-3 py-2 sm:px-4 sm:py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm min-h-[40px] sm:min-h-[44px] bg-white">
                                 <option value="all" {{ request('assignment_progress') === 'all' || !request('assignment_progress') ? 'selected' : '' }}>All Progress</option>
                                 <option value="accepted" {{ request('assignment_progress') === 'accepted' ? 'selected' : '' }}>Accepted</option>
                                 <option value="on_the_way" {{ request('assignment_progress') === 'on_the_way' ? 'selected' : '' }}>On the way</option>
@@ -138,21 +155,24 @@
                             </select>
                         </div>
                         <div>
-                            <label for="date_from" class="block text-sm font-medium text-gray-700 mb-2">Date From</label>
-                            <input type="date" name="date_from" id="date_from" value="{{ request('date_from') }}" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm">
+                            <label for="date_from" class="hidden sm:block text-sm font-semibold text-gray-700 mb-1.5">Date From</label>
+                            <input type="date" name="date_from" id="date_from" value="{{ request('date_from') }}" class="w-full px-3 py-2 sm:px-4 sm:py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm min-h-[40px] sm:min-h-[44px]">
                         </div>
                         <div>
-                            <label for="date_to" class="block text-sm font-medium text-gray-700 mb-2">Date To</label>
-                            <input type="date" name="date_to" id="date_to" value="{{ request('date_to') }}" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm">
+                            <label for="date_to" class="hidden sm:block text-sm font-semibold text-gray-700 mb-1.5">Date To</label>
+                            <input type="date" name="date_to" id="date_to" value="{{ request('date_to') }}" class="w-full px-3 py-2 sm:px-4 sm:py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm min-h-[40px] sm:min-h-[44px]">
                         </div>
                     </div>
-                    <div class="flex justify-end mt-3">
-                        <a href="{{ route('admin.tasks.index') }}" class="inline-flex items-center gap-2 px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium text-sm transition-colors">
-                            <i class="fas fa-times"></i>
-                            Clear Filters
+                    @if(request('search') || request('task_type') && request('task_type') !== 'all' || request('assignment_progress') && request('assignment_progress') !== 'all' || request('date_from') || request('date_to'))
+                    <div class="flex justify-end pt-2">
+                        <a href="{{ route('admin.tasks.index') }}" class="inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium text-sm transition-colors min-h-[36px] sm:min-h-[40px]">
+                            <i class="fas fa-times text-xs"></i>
+                            <span class="hidden sm:inline">Clear</span>
                         </a>
                     </div>
+                    @endif
                 </form>
+                </div>
                 
                 <!-- Active Filters Display -->
                 <div class="mt-6 pt-6 border-t border-gray-200" id="active-filters">
@@ -199,9 +219,9 @@
             <!-- Tasks Cards -->
             <div id="tasks-table-container">
                 @if($tasks->count() > 0)
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 mb-4 sm:mb-6">
                         @foreach($tasks as $task)
-                        <a href="{{ route('admin.tasks.show', $task) }}" class="group bg-white rounded-lg border border-gray-200 p-5 hover:border-blue-500 hover:shadow-md transition-all block
+                        <a href="{{ route('admin.tasks.show', $task) }}" class="group bg-white rounded-lg border-2 border-gray-200 p-5 sm:p-6 hover:border-blue-500 hover:shadow-md transition-all block min-h-[200px] sm:min-h-[180px]
                             @if($task->status === 'pending') border-l-4 border-l-yellow-500
                             @elseif($task->status === 'approved') border-l-4 border-l-green-500
                             @elseif($task->status === 'published') border-l-4 border-l-blue-500
@@ -213,18 +233,18 @@
                             @elseif($task->status === 'inactive') border-l-4 border-l-gray-400
                             @endif">
                             <!-- Card Header -->
-                            <div class="mb-3">
-                                <h3 class="text-base font-semibold text-gray-900 line-clamp-2 transition-colors mb-2 group-hover:text-blue-600" style="--hover-color: #2B9D8D;">
+                            <div class="mb-4">
+                                <h3 class="text-base sm:text-lg font-bold text-gray-900 line-clamp-2 transition-colors mb-2 group-hover:text-blue-600 leading-tight" style="--hover-color: #2B9D8D;">
                                     {{ $task->title }}
                                 </h3>
-                                <p class="text-sm text-gray-600 line-clamp-2">
+                                <p class="text-sm sm:text-base text-gray-600 line-clamp-2 leading-relaxed">
                                     {{ Str::limit($task->description, 80) }}
                                 </p>
                             </div>
 
                             <!-- Badges Row -->
-                            <div class="flex flex-wrap gap-2 mb-3">
-                                <span class="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded" style="background-color: rgba(43, 157, 141, 0.2); color: #2B9D8D;">
+                            <div class="flex flex-wrap gap-2 mb-4">
+                                <span class="inline-flex items-center gap-1.5 px-3 py-1.5 sm:py-1 text-xs sm:text-sm font-semibold rounded-lg" style="background-color: rgba(43, 157, 141, 0.2); color: #2B9D8D;">
                                     @if($task->task_type === 'daily')
                                         <i class="fas fa-calendar-day"></i>
                                     @elseif($task->task_type === 'one_time')
@@ -234,7 +254,7 @@
                                     @endif
                                     {{ ucfirst(str_replace('_', ' ', $task->task_type)) }}
                                 </span>
-                                <span class="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded
+                                <span class="inline-flex items-center gap-1.5 px-3 py-1.5 sm:py-1 text-xs sm:text-sm font-semibold rounded-lg
                                     @if($task->status === 'pending') 
                                     @php $statusBg = 'rgba(254, 210, 179, 0.2)'; $statusColor = '#FED2B3'; @endphp
                                     @elseif($task->status === 'approved') 
@@ -278,15 +298,15 @@
                             </div>
 
                             <!-- Task Info -->
-                            <div class="space-y-1.5 mb-3">
-                                <div class="flex items-center gap-2 text-sm text-gray-600">
-                                    <i class="fas fa-star text-yellow-500"></i>
-                                    <span class="font-medium text-gray-900">{{ $task->points_awarded }}</span>
-                                    <span> points</span>
+                            <div class="space-y-2 mb-0">
+                                <div class="flex items-center gap-2.5 text-base sm:text-sm text-gray-600">
+                                    <i class="fas fa-star text-yellow-500 text-lg"></i>
+                                    <span class="font-bold text-gray-900 text-lg sm:text-base">{{ $task->points_awarded }}</span>
+                                    <span class="font-semibold">points</span>
                                 </div>
-                                <div class="flex items-center gap-2 text-sm text-gray-600">
-                                    <i class="fas fa-calendar text-gray-400"></i>
-                                    <span>{{ is_string($task->creation_date) ? \Carbon\Carbon::parse($task->creation_date)->format('M j, Y') : $task->creation_date->format('M j, Y') }}</span>
+                                <div class="flex items-center gap-2.5 text-base sm:text-sm text-gray-600">
+                                    <i class="fas fa-calendar text-gray-400 text-base"></i>
+                                    <span class="font-medium">{{ is_string($task->creation_date) ? \Carbon\Carbon::parse($task->creation_date)->format('M j, Y') : $task->creation_date->format('M j, Y') }}</span>
                                 </div>
                             </div>
                         </a>
@@ -307,13 +327,16 @@
                 @endif
                 
                 <!-- Pagination -->
-                <div class="mt-6 flex justify-center" id="tasks-pagination">
+                <div class="mt-4 sm:mt-6 flex justify-center" id="tasks-pagination">
                     {{ $tasks->links() }}
                 </div>
             </div>
         </div>
     </div>
 
+    <style>
+        [x-cloak] { display: none !important; }
+    </style>
     <script>
         // Update tasks via AJAX when filters change (no page refresh)
         document.addEventListener('DOMContentLoaded', function() {

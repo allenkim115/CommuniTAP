@@ -5,19 +5,19 @@
     <x-slot name="header">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
-                <h2 class="font-bold text-3xl bg-clip-text text-transparent" style="background: linear-gradient(to right, #F3A261, #2B9D8D); -webkit-background-clip: text;">
+                <h2 class="font-bold text-3xl text-gray-800 dark:text-white">
                     {{ __('Review Task Submission') }}
                 </h2>
                 <p class="text-sm font-semibold text-gray-600 dark:text-gray-400 mt-2">
                     Submitted by {{ $submission->user->name }} on {{ is_string($submission->submitted_at) ? \Carbon\Carbon::parse($submission->submitted_at)->format('M j, Y \a\t g:i A') : $submission->submitted_at->format('M j, Y \a\t g:i A') }}
                 </p>
             </div>
-            <a href="{{ route('tasks.creator.submissions') }}" 
+            <a href="{{ route('tasks.my-uploads') }}" 
                class="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-gray-600 hover:text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-xl transition-all duration-200 shadow-sm hover:shadow-md">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
                 </svg>
-                Back to Submissions
+                Back to My Uploads
             </a>
         </div>
     </x-slot>

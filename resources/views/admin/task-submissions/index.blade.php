@@ -21,76 +21,90 @@
         </div>
     </x-slot>
 
-    <div class="py-8">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+    <div class="py-4 sm:py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <!-- Toast Notifications -->
             <x-session-toast />
             
             <!-- Statistics Cards -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-5 hover:shadow-md transition-shadow">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
+                <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-4 sm:p-5 hover:shadow-md transition-shadow">
                     <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-sm font-medium text-gray-600 mb-1">Pending Review</p>
-                            <p class="text-2xl font-bold text-gray-900">{{ $submissions->total() }}</p>
-                            </div>
-                        <div class="h-12 w-12 rounded-lg flex items-center justify-center" style="background-color: rgba(254, 210, 179, 0.2);">
-                            <i class="fas fa-clock text-xl" style="color: #FED2B3;"></i>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-xs sm:text-sm font-medium text-gray-600 mb-1">Pending Review</p>
+                            <p class="text-xl sm:text-2xl font-bold text-gray-900">{{ $submissions->total() }}</p>
+                        </div>
+                        <div class="h-10 w-10 sm:h-12 sm:w-12 rounded-lg flex items-center justify-center flex-shrink-0 ml-2" style="background-color: rgba(254, 210, 179, 0.2);">
+                            <i class="fas fa-clock text-base sm:text-xl" style="color: #FED2B3;"></i>
                         </div>
                     </div>
                 </div>
 
-                <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-5 hover:shadow-md transition-shadow">
+                <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-4 sm:p-5 hover:shadow-md transition-shadow">
                     <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-sm font-medium text-gray-600 mb-1">Completed Today</p>
-                            <p class="text-2xl font-bold text-gray-900">0</p>
-                            </div>
-                        <div class="h-12 w-12 rounded-lg flex items-center justify-center" style="background-color: rgba(43, 157, 141, 0.2);">
-                            <i class="fas fa-check-circle text-xl" style="color: #2B9D8D;"></i>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-xs sm:text-sm font-medium text-gray-600 mb-1">Completed Today</p>
+                            <p class="text-xl sm:text-2xl font-bold text-gray-900">0</p>
+                        </div>
+                        <div class="h-10 w-10 sm:h-12 sm:w-12 rounded-lg flex items-center justify-center flex-shrink-0 ml-2" style="background-color: rgba(43, 157, 141, 0.2);">
+                            <i class="fas fa-check-circle text-base sm:text-xl" style="color: #2B9D8D;"></i>
                         </div>
                     </div>
                 </div>
 
-                <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-5 hover:shadow-md transition-shadow">
+                <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-4 sm:p-5 hover:shadow-md transition-shadow">
                     <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-sm font-medium text-gray-600 mb-1">Total Completed</p>
-                            <p class="text-2xl font-bold text-gray-900">0</p>
-                            </div>
-                        <div class="h-12 w-12 rounded-lg flex items-center justify-center" style="background-color: rgba(43, 157, 141, 0.2);">
-                            <i class="fas fa-chart-line text-xl" style="color: #2B9D8D;"></i>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-xs sm:text-sm font-medium text-gray-600 mb-1">Total Completed</p>
+                            <p class="text-xl sm:text-2xl font-bold text-gray-900">0</p>
+                        </div>
+                        <div class="h-10 w-10 sm:h-12 sm:w-12 rounded-lg flex items-center justify-center flex-shrink-0 ml-2" style="background-color: rgba(43, 157, 141, 0.2);">
+                            <i class="fas fa-chart-line text-base sm:text-xl" style="color: #2B9D8D;"></i>
                         </div>
                     </div>
                 </div>
 
-                <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-5 hover:shadow-md transition-shadow">
+                <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-4 sm:p-5 hover:shadow-md transition-shadow">
                     <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-sm font-medium text-gray-600 mb-1">Rejected Today</p>
-                            <p class="text-2xl font-bold text-gray-900">0</p>
-                            </div>
-                        <div class="h-12 w-12 rounded-lg flex items-center justify-center" style="background-color: rgba(43, 157, 141, 0.2);">
-                            <i class="fas fa-times-circle text-xl" style="color: #2B9D8D;"></i>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-xs sm:text-sm font-medium text-gray-600 mb-1">Rejected Today</p>
+                            <p class="text-xl sm:text-2xl font-bold text-gray-900">0</p>
+                        </div>
+                        <div class="h-10 w-10 sm:h-12 sm:w-12 rounded-lg flex items-center justify-center flex-shrink-0 ml-2" style="background-color: rgba(43, 157, 141, 0.2);">
+                            <i class="fas fa-times-circle text-base sm:text-xl" style="color: #2B9D8D;"></i>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Filters -->
-            <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-6 mb-6">
-                <div class="mb-4">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-1 flex items-center gap-2">
-                        <i class="fas fa-filter" style="color: #2B9D8D;"></i>
-                        Filter Submissions
-                    </h3>
-                    <p class="text-sm text-gray-600">Refine your submission list by task type or search</p>
-                </div>
-                <form action="{{ route('admin.task-submissions.index') }}" method="GET" id="filterForm" class="space-y-4" novalidate>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-3 sm:p-6 mb-4 sm:mb-6">
+                <div x-data="{ filtersOpen: false }" class="w-full">
+                    <button type="button" @click="filtersOpen = !filtersOpen" class="w-full sm:hidden flex items-center justify-between py-2.5 px-3 bg-gray-50 rounded-lg mb-0">
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-filter text-base" style="color: #2B9D8D;"></i>
+                            <span class="text-sm font-semibold text-gray-900">Filters</span>
+                            @if(request('search') || (request('task_type') && request('task_type') !== 'all'))
+                                <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-brand-teal text-white text-xs font-bold">{{ 
+                                    (request('search') ? 1 : 0) + 
+                                    (request('task_type') && request('task_type') !== 'all' ? 1 : 0) 
+                                }}</span>
+                            @endif
+                        </div>
+                        <i class="fas fa-chevron-down transition-transform text-sm" :class="{'rotate-180': filtersOpen}"></i>
+                    </button>
+                    <div class="hidden sm:block mb-3 sm:mb-4">
+                        <h3 class="text-base sm:text-lg font-semibold text-gray-900 mb-1 flex items-center gap-2">
+                            <i class="fas fa-filter" style="color: #2B9D8D;"></i>
+                            Filter Submissions
+                        </h3>
+                        <p class="text-xs sm:text-sm text-gray-600">Refine your submission list by task type or search</p>
+                    </div>
+                <form action="{{ route('admin.task-submissions.index') }}" method="GET" id="filterForm" class="space-y-3 sm:space-y-4 mt-3 sm:mt-0" x-show="filtersOpen || window.innerWidth >= 640" x-cloak novalidate>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                         <!-- Search Input -->
                         <div>
-                            <label for="search" class="block text-sm font-medium text-gray-700 mb-2">
+                            <label for="search" class="hidden sm:block text-sm font-medium text-gray-700 mb-1.5">
                                 <i class="fas fa-search" style="color: #2B9D8D;"></i> Search
                             </label>
                             <div class="relative">
@@ -98,14 +112,14 @@
                                        name="search" 
                                        id="search" 
                                        value="{{ request('search') }}" 
-                                       placeholder="Search by task title, user name, or email..."
-                                       class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                                <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                                       placeholder="Search..."
+                                       class="w-full pl-10 pr-10 sm:pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm min-h-[40px] sm:min-h-[44px]">
+                                <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm"></i>
                                 @if(request('search'))
                                     <button type="button" 
                                             onclick="document.getElementById('search').value=''; document.getElementById('filterForm').submit();"
-                                            class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                                        <i class="fas fa-times"></i>
+                                            class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1 min-w-[28px] min-h-[28px] flex items-center justify-center">
+                                        <i class="fas fa-times text-sm"></i>
                                     </button>
                                 @endif
                             </div>
@@ -113,8 +127,8 @@
                         
                         <!-- Task Type Filter -->
                         <div>
-                            <label for="task_type" class="block text-sm font-medium text-gray-700 mb-2">Task Type</label>
-                            <select name="task_type" id="task_type" onchange="document.getElementById('filterForm').submit();" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <label for="task_type" class="hidden sm:block text-sm font-medium text-gray-700 mb-1.5">Task Type</label>
+                            <select name="task_type" id="task_type" onchange="document.getElementById('filterForm').submit();" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm min-h-[40px] sm:min-h-[44px] bg-white">
                                 <option value="all" {{ request('task_type') === 'all' || !request('task_type') ? 'selected' : '' }}>All Types</option>
                                 <option value="daily" {{ request('task_type') === 'daily' ? 'selected' : '' }}>Daily Task</option>
                                 <option value="one_time" {{ request('task_type') === 'one_time' ? 'selected' : '' }}>One-Time Task</option>
@@ -122,13 +136,16 @@
                         </div>
                     </div>
                     
-                    <div class="flex justify-end mt-4">
-                        <a href="{{ route('admin.task-submissions.index') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium transition-colors">
-                            <i class="fas fa-times"></i>
-                            Clear Filters
+                    @if(request('search') || (request('task_type') && request('task_type') !== 'all'))
+                    <div class="flex justify-end pt-2">
+                        <a href="{{ route('admin.task-submissions.index') }}" class="inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium text-sm transition-colors min-h-[36px] sm:min-h-[40px]">
+                            <i class="fas fa-times text-xs"></i>
+                            <span class="hidden sm:inline">Clear</span>
                         </a>
                     </div>
+                    @endif
                 </form>
+                </div>
                 
                 <!-- Active Filters Display -->
                 @if(request('search') || (request('task_type') && request('task_type') !== 'all'))

@@ -7,99 +7,99 @@
                 </svg>
                 Back to Tasks
             </a>
-            <div class="flex items-center gap-3 flex-wrap">
-                <a href="{{ route('tasks.creator.submissions') }}" class="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-xl transition-all duration-200 shadow-sm hover:shadow-md"
+            <div class="flex items-center gap-2 sm:gap-3 flex-wrap w-full sm:w-auto">
+                <a href="{{ route('tasks.creator.submissions') }}" class="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-semibold rounded-lg sm:rounded-xl transition-all duration-200 shadow-sm hover:shadow-md flex-1 sm:flex-initial min-w-0"
                    style="color: #2B9D8D; background-color: rgba(43, 157, 141, 0.1);"
                    onmouseover="this.style.color='#248A7C'; this.style.backgroundColor='rgba(43, 157, 141, 0.2)';"
                    onmouseout="this.style.color='#2B9D8D'; this.style.backgroundColor='rgba(43, 157, 141, 0.1)';">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
-                    Review Submissions
+                    <span class="truncate">Review Submissions</span>
                 </a>
-                <a href="{{ route('tasks.creator.history') }}" class="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-xl transition-all duration-200 shadow-sm hover:shadow-md"
+                <a href="{{ route('tasks.creator.history') }}" class="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-semibold rounded-lg sm:rounded-xl transition-all duration-200 shadow-sm hover:shadow-md flex-1 sm:flex-initial min-w-0"
                    style="color: #2B9D8D; background-color: rgba(43, 157, 141, 0.1);"
                    onmouseover="this.style.color='#248A7C'; this.style.backgroundColor='rgba(43, 157, 141, 0.2)';"
                    onmouseout="this.style.color='#2B9D8D'; this.style.backgroundColor='rgba(43, 157, 141, 0.1)';">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
-                    View History
+                    <span class="truncate">View History</span>
                 </a>
-                <a href="{{ route('tasks.create') }}" class="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                <a href="{{ route('tasks.create') }}" class="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-semibold text-white rounded-lg sm:rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex-1 sm:flex-initial min-w-0"
                    style="background-color: #F3A261;"
                    onmouseover="this.style.backgroundColor='#E8944F'"
                    onmouseout="this.style.backgroundColor='#F3A261'">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                     </svg>
-                    Add Task
+                    <span class="truncate">Add Task</span>
                 </a>
             </div>
         </div>
     </x-slot>
 
     <div class="min-h-screen bg-gradient-to-b from-gray-50 via-orange-50/30 to-teal-50/20 dark:from-gray-900 dark:via-gray-900 dark:to-gray-950 transition-colors duration-200">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 md:py-8">
             <x-session-toast />
 
             <!-- Header Section -->
-            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4">
-                <div class="flex items-center gap-3">
-                    <div class="w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg" style="background-color: #F3A261;">
-                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 sm:mb-8 gap-4">
+                <div class="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
+                    <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg flex-shrink-0" style="background-color: #F3A261;">
+                        <svg class="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7a2 2 0 012-2h4l2 2h6a2 2 0 012 2v7a2 2 0 01-2 2H5a2 2 0 01-2-2V7z" />
                         </svg>
                     </div>
-                    <div>
-                        <h3 class="text-2xl font-bold text-gray-900 dark:text-gray-100">My Uploaded Tasks</h3>
-                        <p class="text-sm text-gray-500 dark:text-gray-400">Manage and track your task submissions</p>
+                    <div class="min-w-0 flex-1">
+                        <h3 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100">My Uploaded Tasks</h3>
+                        <p class="text-xs sm:text-sm text-gray-500 dark:text-gray-400">Manage and track your task submissions</p>
                     </div>
                 </div>
-                <div class="px-4 py-2 bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200 dark:border-gray-700">
-                    <span class="text-sm font-semibold text-gray-700 dark:text-gray-300">Total: <span class="dark:text-orange-400" style="color: #F3A261;">{{ $stats['all'] ?? 0 }}</span></span>
+                <div class="px-3 py-1.5 sm:px-4 sm:py-2 bg-white dark:bg-gray-800 rounded-lg sm:rounded-xl shadow-md border border-gray-200 dark:border-gray-700 w-full sm:w-auto text-center sm:text-left">
+                    <span class="text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300">Total: <span class="dark:text-orange-400" style="color: #F3A261;">{{ $stats['all'] ?? 0 }}</span></span>
                 </div>
             </div>
 
             <!-- Stats -->
-            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
+            <div class="grid grid-cols-3 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 mb-6 sm:mb-8">
                 @php 
                     $labels = ['pending','live','rejected','completed','uncompleted','all'];
                 @endphp
                 @foreach($labels as $label)
                 <button type="button" onclick="setStatusFilter('{{ $label }}')" 
-                   class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-5 text-center border-2 transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 status-filter-btn @class(['dark:from-orange-900/20 dark:to-orange-800/20' => ($activeStatus ?? 'all') === $label, 'border-gray-200 dark:border-gray-700 dark:hover:border-orange-700' => ($activeStatus ?? 'all') !== $label])"
+                   class="bg-white dark:bg-gray-800 rounded-lg sm:rounded-xl shadow-md p-3 sm:p-4 md:p-5 text-center border-2 transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 active:scale-95 status-filter-btn @class(['dark:from-orange-900/20 dark:to-orange-800/20' => ($activeStatus ?? 'all') === $label, 'border-gray-200 dark:border-gray-700 dark:hover:border-orange-700' => ($activeStatus ?? 'all') !== $label])"
                    data-status="{{ $label }}"
                    @if(($activeStatus ?? 'all') === $label) style="border-color: #F3A261; background-color: rgba(243, 162, 97, 0.1);" @endif
                    @if(($activeStatus ?? 'all') !== $label) onmouseover="this.style.borderColor='#F3A261';" onmouseout="this.style.borderColor='';" @endif>
-                    <p class="text-xs uppercase tracking-wide font-bold text-gray-500 dark:text-gray-400 mb-2">{{ ucfirst($label) }}</p>
-                    <p class="text-2xl font-bold bg-clip-text text-transparent" style="background: linear-gradient(to right, #F3A261, #2B9D8D); -webkit-background-clip: text;">{{ $stats[$label] ?? 0 }}</p>
+                    <p class="text-[10px] xs:text-xs uppercase tracking-wide font-bold text-gray-500 dark:text-gray-400 mb-1 sm:mb-2 leading-tight">{{ ucfirst($label) }}</p>
+                    <p class="text-lg sm:text-xl md:text-2xl font-bold bg-clip-text text-transparent" style="background: linear-gradient(to right, #F3A261, #2B9D8D); -webkit-background-clip: text;">{{ $stats[$label] ?? 0 }}</p>
                 </button>
                 @endforeach
             </div>
 
             <!-- Filters -->
-            <div class="mb-6">
-                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-4 flex flex-col sm:flex-row sm:items-end gap-4">
-                    <div class="flex-shrink-0 min-w-[160px]">
+            <div class="mb-4 sm:mb-6">
+                <div class="bg-white dark:bg-gray-800 rounded-lg sm:rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-3 sm:p-4 flex flex-col sm:flex-row sm:items-end gap-3 sm:gap-4">
+                    <div class="flex-shrink-0 w-full sm:min-w-[160px] sm:w-auto">
                         <label for="status" class="block text-xs font-bold text-gray-600 dark:text-gray-300 mb-1.5">Status</label>
                         <div class="relative">
-                            <select id="status" name="status" class="w-full border-2 border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 rounded-xl shadow-sm pl-3 pr-10 py-2.5 text-sm font-semibold text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all appearance-none bg-white dark:bg-gray-900">
+                            <select id="status" name="status" class="w-full border-2 border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 rounded-lg sm:rounded-xl shadow-sm pl-3 pr-10 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all appearance-none bg-white dark:bg-gray-900">
                                 @php $options = ['all' => 'All', 'pending' => 'Pending', 'live' => 'Live', 'rejected' => 'Rejected', 'completed' => 'Completed', 'uncompleted' => 'Uncompleted']; @endphp
                                 @foreach($options as $value => $text)
                                     <option value="{{ $value }}" {{ ($activeStatus ?? 'all') === $value ? 'selected' : '' }}>{{ $text }}</option>
                                 @endforeach
                             </select>
                             <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                                 </svg>
                             </div>
                         </div>
                     </div>
-                    <div class="flex-1 min-w-0">
+                    <div class="flex-1 min-w-0 w-full sm:w-auto">
                         <label for="q" class="block text-xs font-bold text-gray-600 dark:text-gray-300 mb-1.5">Search</label>
-                        <input type="text" id="q" name="q" value="{{ $search ?? '' }}" placeholder="Search title, description, or location" class="w-full border-2 border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 rounded-xl shadow-sm px-3 py-2.5 text-sm focus:ring-2 transition-all"
+                        <input type="text" id="q" name="q" value="{{ $search ?? '' }}" placeholder="Search title, description, or location" class="w-full border-2 border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 rounded-lg sm:rounded-xl shadow-sm px-3 py-2 sm:py-2.5 text-xs sm:text-sm focus:ring-2 transition-all"
                                style="--focus-ring-color: #F3A261;"
                                onfocus="this.style.borderColor='#F3A261'; this.style.boxShadow='0 0 0 3px rgba(243, 162, 97, 0.1)';"
                                onblur="this.style.borderColor=''; this.style.boxShadow='';" />
