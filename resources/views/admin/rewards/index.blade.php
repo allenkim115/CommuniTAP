@@ -1,17 +1,17 @@
 <x-admin-layout>
     <x-slot name="header">
-        <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-                <h2 class="text-3xl font-semibold text-gray-900 leading-tight">{{ __('Rewards Catalog') }}</h2>
-                <p class="text-sm text-gray-500">Curate incentives that keep TAP volunteers energized.</p>
+                <h2 class="text-2xl sm:text-3xl font-semibold text-gray-900 leading-tight">{{ __('Rewards Catalog') }}</h2>
+                <p class="text-xs sm:text-sm text-gray-500">Curate incentives that keep TAP volunteers energized.</p>
             </div>
-            <div class="flex flex-wrap gap-3">
-                <a href="{{ route('admin.redemptions.index') }}" class="btn-muted flex items-center gap-2 text-sm px-5 py-2.5">
-                    <i class="fas fa-receipt"></i>
+            <div class="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
+                <a href="{{ route('admin.redemptions.index') }}" class="w-full sm:w-auto btn-muted flex items-center justify-center gap-2 text-base sm:text-sm px-6 py-3 sm:px-5 sm:py-2.5 min-h-[44px] font-semibold">
+                    <i class="fas fa-receipt text-lg"></i>
                     Reward Redemptions
                 </a>
-                <a href="{{ route('admin.rewards.create') }}" class="btn-brand flex items-center gap-2 text-sm px-5 py-2.5">
-                    <i class="fas fa-plus"></i>
+                <a href="{{ route('admin.rewards.create') }}" class="w-full sm:w-auto btn-brand flex items-center justify-center gap-2 text-base sm:text-sm px-6 py-3 sm:px-5 sm:py-2.5 min-h-[44px] font-semibold">
+                    <i class="fas fa-plus text-lg"></i>
                     Create Reward
                 </a>
             </div>
@@ -24,37 +24,37 @@
         $outOfStock = $rewards->filter(fn($reward) => $reward->QTY === 0)->count();
     @endphp
 
-    <div class="py-10">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+    <div class="py-4 sm:py-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-4 sm:space-y-8">
             @if(session('status'))
                 <div class="rounded-2xl border border-brand-teal/30 bg-brand-teal/10 px-4 py-3 text-sm font-medium text-brand-teal">
                     {{ session('status') }}
                 </div>
             @endif
 
-            <div class="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-                <div class="stat-card flex flex-col gap-2">
-                    <p class="text-sm font-medium text-gray-500">Rewards in catalog</p>
-                    <p class="mt-2 text-3xl font-semibold text-gray-900">{{ $totalRewards }}</p>
+            <div class="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+                <div class="stat-card flex flex-col gap-2 p-4 sm:p-5">
+                    <p class="text-xs sm:text-sm font-medium text-gray-500">Rewards in catalog</p>
+                    <p class="mt-1.5 sm:mt-2 text-2xl sm:text-3xl font-semibold text-gray-900">{{ $totalRewards }}</p>
                 </div>
-                <div class="stat-card flex flex-col gap-2">
-                    <p class="text-sm font-medium text-gray-500">Active rewards</p>
-                    <div class="flex items-baseline gap-2">
-                        <span class="text-3xl font-semibold text-gray-900">{{ $activeRewards }}</span>
-                        <span class="text-xs uppercase tracking-wide text-green-500 font-semibold">live</span>
+                <div class="stat-card flex flex-col gap-2 p-4 sm:p-5">
+                    <p class="text-xs sm:text-sm font-medium text-gray-500">Active rewards</p>
+                    <div class="flex items-baseline gap-2 mt-1.5 sm:mt-2">
+                        <span class="text-2xl sm:text-3xl font-semibold text-gray-900">{{ $activeRewards }}</span>
+                        <span class="text-[10px] sm:text-xs uppercase tracking-wide text-green-500 font-semibold">live</span>
                     </div>
                 </div>
-                <div class="stat-card flex flex-col gap-2">
-                    <p class="text-sm font-medium text-gray-500">Out of stock</p>
-                    <div class="flex items-center gap-2">
-                        <span class="text-3xl font-semibold {{ $outOfStock ? 'text-red-600' : 'text-gray-900' }}">{{ $outOfStock }}</span>
-                        <span class="text-xs uppercase tracking-wide {{ $outOfStock ? 'text-red-500' : 'text-gray-400' }}">needs restock</span>
+                <div class="stat-card flex flex-col gap-2 p-4 sm:p-5">
+                    <p class="text-xs sm:text-sm font-medium text-gray-500">Out of stock</p>
+                    <div class="flex items-center gap-2 mt-1.5 sm:mt-2">
+                        <span class="text-2xl sm:text-3xl font-semibold {{ $outOfStock ? 'text-red-600' : 'text-gray-900' }}">{{ $outOfStock }}</span>
+                        <span class="text-[10px] sm:text-xs uppercase tracking-wide {{ $outOfStock ? 'text-red-500' : 'text-gray-400' }}">needs restock</span>
                     </div>
                 </div>
             </div>
 
-            <div class="card-surface p-6">
-                <div class="flex flex-col gap-3 border-b border-gray-100 pb-6 md:flex-row md:items-center md:justify-between">
+            <div class="card-surface p-4 sm:p-6">
+                <div class="flex flex-col gap-3 border-b border-gray-100 pb-4 sm:pb-6 sm:flex-row sm:items-center sm:justify-between">
                     <div>
                         <h3 class="text-2xl font-semibold text-gray-900">Manage Rewards</h3>
                     </div>
@@ -74,7 +74,7 @@
                     </div>
                 </div>
 
-                <div class="mt-6 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+                <div class="mt-4 sm:mt-6 grid gap-4 sm:gap-6 sm:grid-cols-2 xl:grid-cols-3">
                     @forelse($rewards as $reward)
                         @php
                             $isOutOfStock = $reward->QTY === 0;
@@ -136,16 +136,16 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="flex flex-wrap gap-3">
-                                    <a href="{{ route('admin.rewards.edit', $reward) }}" class="btn-muted text-xs font-semibold px-4 py-2">
+                                <div class="flex flex-col sm:flex-row gap-2 sm:gap-3">
+                                    <a href="{{ route('admin.rewards.edit', $reward) }}" class="w-full sm:w-auto btn-muted text-xs font-semibold px-4 py-2 text-center">
                                         <i class="fas fa-pen mr-2"></i>Edit
                                     </a>
-                                    <form action="{{ route('admin.rewards.destroy', $reward) }}" method="POST" id="delete-reward-form-{{ $reward->id }}" novalidate>
+                                    <form action="{{ route('admin.rewards.destroy', $reward) }}" method="POST" id="delete-reward-form-{{ $reward->id }}" class="w-full sm:w-auto" novalidate>
                                         @csrf
                                         @method('DELETE')
                                         <button type="button"
                                             onclick="showConfirmModal('Delete this reward?', 'Delete Reward', 'Delete', 'Cancel', 'red').then(confirmed => { if(confirmed) document.getElementById('delete-reward-form-{{ $reward->id }}').submit(); });"
-                                            class="btn-brand text-xs font-semibold px-4 py-2 bg-brand-teal hover:bg-brand-teal-dark">
+                                            class="w-full btn-brand text-xs font-semibold px-4 py-2 bg-brand-teal hover:bg-brand-teal-dark">
                                             <i class="fas fa-trash mr-2"></i>Delete
                                         </button>
                                     </form>

@@ -32,8 +32,8 @@
         }
     @endphp
 
-    <div class="py-10">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+    <div class="py-4 sm:py-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-4 sm:space-y-8">
             <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 <div class="stat-card flex flex-col gap-3">
                     <p class="text-sm font-medium text-gray-500">Total Feedback</p>
@@ -79,27 +79,34 @@
             @endif
 
             <div class="card-surface overflow-hidden">
-                <div class="flex flex-col gap-6 px-6 py-5 border-b border-gray-100">
-                    <div class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-                        <div>
-                            <h3 class="text-2xl font-semibold text-gray-900">All Feedback</h3>
+                <div x-data="{ filtersOpen: false }" class="flex flex-col gap-3 sm:gap-6 px-3 sm:px-6 py-3 sm:py-5 border-b border-gray-100">
+                    <button type="button" @click="filtersOpen = !filtersOpen" class="w-full sm:hidden flex items-center justify-between py-2.5 px-3 bg-gray-50 rounded-lg">
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-filter text-base" style="color: #2B9D8D;"></i>
+                            <span class="text-sm font-semibold text-gray-900">Filters</span>
                         </div>
-                        <div class="flex items-center gap-2 text-sm text-gray-500">
-                            <span class="inline-flex items-center gap-2 rounded-full bg-gray-100 px-3 py-1 font-medium">
-                                <i class="fas fa-database text-brand-teal"></i>
+                        <i class="fas fa-chevron-down transition-transform text-sm" :class="{'rotate-180': filtersOpen}"></i>
+                    </button>
+                    <div class="hidden sm:flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+                        <div>
+                            <h3 class="text-xl sm:text-2xl font-semibold text-gray-900">All Feedback</h3>
+                        </div>
+                        <div class="flex items-center gap-2 text-xs sm:text-sm text-gray-500">
+                            <span class="inline-flex items-center gap-2 rounded-full bg-gray-100 px-2 sm:px-3 py-1 font-medium">
+                                <i class="fas fa-database text-brand-teal text-xs"></i>
                                 {{ $feedbackCount }} records
                             </span>
                         </div>
                     </div>
-                    <div id="admin-feedback-controls" class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+                    <div id="admin-feedback-controls" class="flex flex-col gap-3 sm:gap-4 lg:flex-row lg:items-end lg:justify-between" x-show="filtersOpen || window.innerWidth >= 640" x-cloak>
                         <div class="w-full lg:max-w-md">
                             <label for="admin-feedback-search" class="sr-only">Search feedback</label>
                             <div class="relative">
                                 <input
                                     id="admin-feedback-search"
                                     type="text"
-                                    placeholder="Search users, tasks or comments..."
-                                    class="w-full rounded-xl border border-gray-200 bg-white px-10 py-2.5 text-sm text-gray-900 placeholder-gray-500 focus:border-brand-teal focus:ring-2 focus:ring-brand-teal/40"
+                                    placeholder="Search..."
+                                    class="w-full rounded-lg sm:rounded-xl border border-gray-200 bg-white pl-9 sm:pl-10 pr-4 py-2 sm:py-2.5 text-sm text-gray-900 placeholder-gray-500 focus:border-brand-teal focus:ring-2 focus:ring-brand-teal/40 min-h-[40px] sm:min-h-[44px]"
                                 >
                                 <svg class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-teal" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M11 18a7 7 0 100-14 7 7 0 000 14z"/>
@@ -109,9 +116,9 @@
                         <div class="w-full lg:w-auto">
                             <input type="hidden" id="admin-feedback-rating-filter" value="">
                             <div class="flex flex-col gap-2">
-                                <div class="flex flex-wrap items-center gap-3">
-                                    <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">Filter by rating</p>
-                                    <button type="button" id="admin-rating-filter-reset" class="text-[11px] font-semibold text-brand-teal hover:text-brand-teal-dark uppercase tracking-[0.2em]">
+                                <div class="flex flex-wrap items-center gap-2 sm:gap-3">
+                                    <p class="hidden sm:block text-xs font-semibold uppercase tracking-wide text-gray-500">Filter by rating</p>
+                                    <button type="button" id="admin-rating-filter-reset" class="text-[10px] sm:text-[11px] font-semibold text-brand-teal hover:text-brand-teal-dark uppercase tracking-[0.2em]">
                                         Reset
                                     </button>
                                 </div>

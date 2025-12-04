@@ -60,19 +60,19 @@
         ];
     @endphp
 
-    <div class="py-10">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-8">
-            <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+    <div class="py-4 sm:py-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-4 sm:space-y-8">
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 sm:gap-3 lg:gap-4">
                 @foreach($summaryCards as $card)
-                    <div class="stat-card">
-                        <div class="flex items-start justify-between gap-4">
-                            <div>
-                                <p class="text-sm font-medium text-gray-500">{{ $card['label'] }}</p>
-                                <p class="mt-2 text-2xl font-semibold text-gray-900">{{ $card['value'] }}</p>
-                                <p class="text-xs text-gray-500 mt-1">{{ $card['context'] }}</p>
+                    <div class="stat-card p-3 sm:p-4">
+                        <div class="flex items-start justify-between gap-2 sm:gap-3 lg:gap-4">
+                            <div class="flex-1 min-w-0">
+                                <p class="text-[10px] sm:text-xs lg:text-sm font-medium text-gray-500 leading-tight">{{ $card['label'] }}</p>
+                                <p class="mt-1.5 sm:mt-2 text-xl sm:text-2xl font-semibold text-gray-900">{{ $card['value'] }}</p>
+                                <p class="text-[9px] sm:text-[10px] lg:text-xs text-gray-500 mt-1 leading-tight">{{ $card['context'] }}</p>
                             </div>
-                            <span class="inline-flex h-10 w-10 items-center justify-center rounded-xl {{ $card['accent'] }}">
-                                <i class="{{ $card['icon'] }} text-base"></i>
+                            <span class="inline-flex h-8 w-8 sm:h-9 sm:w-9 lg:h-10 lg:w-10 items-center justify-center rounded-xl flex-shrink-0 {{ $card['accent'] }}">
+                                <i class="{{ $card['icon'] }} text-xs sm:text-sm lg:text-base"></i>
                             </span>
                         </div>
                     </div>
@@ -80,22 +80,40 @@
                 </div>
 
             <div class="card-surface">
-                <div class="p-6 space-y-6">
-                    <div class="flex flex-wrap items-center justify-between gap-4">
+                <div x-data="{ filtersOpen: false }" class="p-3 sm:p-6">
+                    <button type="button" @click="filtersOpen = !filtersOpen" class="w-full sm:hidden flex items-center justify-between py-2.5 px-3 bg-gray-50 rounded-lg mb-0">
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-filter text-base" style="color: #2B9D8D;"></i>
+                            <span class="text-sm font-semibold text-gray-900">Filters</span>
+                            @if(request('status') || request('incident_type') || request('date_from') || request('date_to') || request('search'))
+                                <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-brand-teal text-white text-xs font-bold">{{ 
+                                    (request('status') ? 1 : 0) + 
+                                    (request('incident_type') ? 1 : 0) + 
+                                    (request('date_from') ? 1 : 0) + 
+                                    (request('date_to') ? 1 : 0) + 
+                                    (request('search') ? 1 : 0) 
+                                }}</span>
+                            @endif
+                        </div>
+                        <i class="fas fa-chevron-down transition-transform text-sm" :class="{'rotate-180': filtersOpen}"></i>
+                    </button>
+                    <div class="hidden sm:flex flex-wrap items-center justify-between gap-4 mb-4">
                         <div>
                             <p class="text-sm font-semibold text-gray-900">Filter reports</p>
-                            <p class="text-sm text-gray-500">Refine the moderation queue. Filters update the table automatically.</p>
+                            <p class="text-xs text-gray-500">Refine the moderation queue. Filters update automatically.</p>
                         </div>
+                        @if(request('status') || request('incident_type') || request('date_from') || request('date_to') || request('search'))
                         <a href="{{ route('admin.incident-reports.index') }}" class="btn-muted text-sm">
                             Reset filters
                         </a>
-            </div>
+                        @endif
+                    </div>
 
-                    <form id="filters-form" method="GET" action="{{ route('admin.incident-reports.index') }}" class="space-y-6" novalidate>
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
-                            <label class="flex flex-col text-sm font-medium text-gray-700">
-                                <span>Status</span>
-                            <select id="status" name="status" class="mt-2 block w-full rounded-xl border-gray-200 focus:border-brand-teal focus:ring-brand-teal sm:text-sm" onchange="this.form.requestSubmit ? this.form.requestSubmit() : this.form.submit()">
+                    <form id="filters-form" method="GET" action="{{ route('admin.incident-reports.index') }}" class="space-y-3 sm:space-y-4 mt-3 sm:mt-0" x-show="filtersOpen || window.innerWidth >= 640" x-cloak novalidate>
+                        <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4 lg:gap-6">
+                            <label class="flex flex-col text-xs sm:text-sm font-medium text-gray-700">
+                                <span class="hidden sm:inline mb-1.5">Status</span>
+                            <select id="status" name="status" class="mt-0 sm:mt-2 block w-full rounded-lg sm:rounded-xl border border-gray-200 focus:border-brand-teal focus:ring-2 focus:ring-brand-teal text-sm px-3 py-2 min-h-[40px] sm:min-h-[44px] bg-white" onchange="this.form.requestSubmit ? this.form.requestSubmit() : this.form.submit()">
                                     <option value="">All statuses</option>
                                     @foreach($statuses as $key => $label)
                                         <option value="{{ $key }}" {{ request('status') == $key ? 'selected' : '' }}>{{ $label }}</option>
@@ -103,9 +121,9 @@
                                 </select>
                             </label>
 
-                            <label class="flex flex-col text-sm font-medium text-gray-700">
-                                <span>Incident type</span>
-                            <select id="incident_type" name="incident_type" class="mt-2 block w-full rounded-xl border-gray-200 focus:border-brand-teal focus:ring-brand-teal sm:text-sm" onchange="this.form.requestSubmit ? this.form.requestSubmit() : this.form.submit()">
+                            <label class="flex flex-col text-xs sm:text-sm font-medium text-gray-700">
+                                <span class="hidden sm:inline mb-1.5">Incident type</span>
+                            <select id="incident_type" name="incident_type" class="mt-0 sm:mt-2 block w-full rounded-lg sm:rounded-xl border border-gray-200 focus:border-brand-teal focus:ring-2 focus:ring-brand-teal text-sm px-3 py-2 min-h-[40px] sm:min-h-[44px] bg-white" onchange="this.form.requestSubmit ? this.form.requestSubmit() : this.form.submit()">
                                     <option value="">All types</option>
                                     @foreach($incidentTypes as $key => $label)
                                         <option value="{{ $key }}" {{ request('incident_type') == $key ? 'selected' : '' }}>{{ $label }}</option>
@@ -113,28 +131,36 @@
                                 </select>
                             </label>
     
-                            <label class="flex flex-col text-sm font-medium text-gray-700">
-                                <span>From date</span>
-                                <input type="date" id="date_from" name="date_from" value="{{ request('date_from') }}" class="mt-2 block w-full rounded-xl border-gray-200 focus:border-brand-teal focus:ring-brand-teal sm:text-sm" onchange="this.form.requestSubmit ? this.form.requestSubmit() : this.form.submit()">
+                            <label class="flex flex-col text-xs sm:text-sm font-medium text-gray-700">
+                                <span class="hidden sm:inline mb-1.5">From date</span>
+                                <input type="date" id="date_from" name="date_from" value="{{ request('date_from') }}" class="mt-0 sm:mt-2 block w-full rounded-lg sm:rounded-xl border border-gray-200 focus:border-brand-teal focus:ring-2 focus:ring-brand-teal text-sm px-3 py-2 min-h-[40px] sm:min-h-[44px]" onchange="this.form.requestSubmit ? this.form.requestSubmit() : this.form.submit()">
                             </label>
     
-                            <label class="flex flex-col text-sm font-medium text-gray-700">
-                                <span>To date</span>
-                                <input type="date" id="date_to" name="date_to" value="{{ request('date_to') }}" class="mt-2 block w-full rounded-xl border-gray-200 focus:border-brand-teal focus:ring-brand-teal sm:text-sm" onchange="this.form.requestSubmit ? this.form.requestSubmit() : this.form.submit()">
+                            <label class="flex flex-col text-xs sm:text-sm font-medium text-gray-700">
+                                <span class="hidden sm:inline mb-1.5">To date</span>
+                                <input type="date" id="date_to" name="date_to" value="{{ request('date_to') }}" class="mt-0 sm:mt-2 block w-full rounded-lg sm:rounded-xl border border-gray-200 focus:border-brand-teal focus:ring-2 focus:ring-brand-teal text-sm px-3 py-2 min-h-[40px] sm:min-h-[44px]" onchange="this.form.requestSubmit ? this.form.requestSubmit() : this.form.submit()">
                             </label>
                             </div>
 
-                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6 items-end">
-                            <label class="flex flex-col text-sm font-medium text-gray-700 lg:col-span-2">
-                                <span>Search</span>
-                                <div class="mt-2 relative">
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-2 sm:gap-4 lg:gap-6">
+                            <label class="flex flex-col text-xs sm:text-sm font-medium text-gray-700 lg:col-span-2">
+                                <span class="hidden sm:inline mb-1.5">Search</span>
+                                <div class="mt-0 sm:mt-2 relative">
                                     <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
                                         <i class="fas fa-search text-xs"></i>
                                     </span>
-                                    <input type="text" id="search" name="search" value="{{ request('search') }}" placeholder="Reporter or reported name, email, task title…" class="block w-full rounded-xl border-gray-200 pl-10 focus:border-brand-teal focus:ring-brand-teal sm:text-sm">
+                                    <input type="text" id="search" name="search" value="{{ request('search') }}" placeholder="Search..." class="block w-full rounded-lg sm:rounded-xl border border-gray-200 pl-10 pr-4 py-2 focus:border-brand-teal focus:ring-2 focus:ring-brand-teal text-sm min-h-[40px] sm:min-h-[44px]">
                             </div>
                             </label>
                         </div>
+                        @if(request('status') || request('incident_type') || request('date_from') || request('date_to') || request('search'))
+                        <div class="flex justify-end pt-2 sm:hidden">
+                            <a href="{{ route('admin.incident-reports.index') }}" class="inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium text-sm transition-colors min-h-[36px]">
+                                <i class="fas fa-times text-xs"></i>
+                                Clear
+                            </a>
+                        </div>
+                        @endif
                         <button type="submit" class="hidden" aria-hidden="true"></button>
                     </form>
                 </div>
@@ -142,31 +168,74 @@
 
             <!-- Reports Table -->
             <div class="card-surface" id="reports-table-container">
-                <div class="p-6" id="reports-content">
+                <div class="p-4 sm:p-6" id="reports-content">
                     @if($reports->count() > 0)
-                        <div class="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                        <div class="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mb-4">
                             {{ $reports->total() }} total reports
                         </div>
-                        <div class="overflow-x-auto">
+                        
+                        <!-- Mobile Card View -->
+                        <div class="grid grid-cols-1 sm:hidden gap-4 mb-4" id="reports-mobile-cards">
+                            @foreach($reports as $report)
+                                <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4 cursor-pointer hover:bg-brand-teal/5 transition-colors" onclick="window.location='{{ route('admin.incident-reports.show', $report) }}'">
+                                    <div class="flex items-start justify-between mb-3">
+                                        <div class="flex items-center gap-2">
+                                            <i class="fas fa-file-signature text-brand-teal-dark"></i>
+                                            <span class="text-sm font-medium text-gray-900 dark:text-gray-100">#{{ $report->reportId }}</span>
+                                        </div>
+                                        <span class="text-xs text-gray-500 dark:text-gray-400">{{ $report->report_date->format('M d, Y') }}</span>
+                                    </div>
+                                    <div class="space-y-2 mb-3">
+                                        <div>
+                                            <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Reporter</p>
+                                            <p class="text-sm font-medium text-gray-900 dark:text-gray-100">{{ $report->reporter->fullName }}</p>
+                                            <p class="text-xs text-gray-500 dark:text-gray-400 truncate">{{ $report->reporter->email }}</p>
+                                        </div>
+                                        <div>
+                                            <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Reported User</p>
+                                            <p class="text-sm font-medium text-gray-900 dark:text-gray-100">{{ $report->reportedUser->fullName }}</p>
+                                            <p class="text-xs text-gray-500 dark:text-gray-400 truncate">{{ $report->reportedUser->email }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex flex-wrap gap-2 pt-3 border-t border-gray-200 dark:border-gray-700">
+                                        @php
+                                            $typeClass = $typeStyles[$report->incident_type] ?? 'badge-soft badge-soft-slate';
+                                        @endphp
+                                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold tracking-wide {{ $typeClass }}">
+                                            {{ ucwords(str_replace('_', ' ', $report->incident_type)) }}
+                                        </span>
+                                        @php
+                                            $statusClass = $statusStyles[$report->status] ?? 'badge-soft badge-soft-slate';
+                                        @endphp
+                                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold tracking-wide {{ $statusClass }}">
+                                            {{ ucwords(str_replace('_', ' ', $report->status)) }}
+                                        </span>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                        
+                        <!-- Desktop Table View -->
+                        <div class="hidden sm:block overflow-x-auto">
                             <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                                 <thead class="bg-gray-50 dark:bg-gray-700">
                                     <tr>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                        <th class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                                             ID
                                         </th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                        <th class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                                             Reporter
                                         </th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                        <th class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                                             Reported User
                                         </th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                        <th class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                                             Type
                                         </th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                        <th class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                                             Status
                                         </th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                        <th class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                                             Date
                                         </th>
                                     </tr>
@@ -174,13 +243,13 @@
                                 <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                                     @foreach($reports as $report)
                                         <tr class="hover:bg-brand-teal/5 cursor-pointer" onclick="window.location='{{ route('admin.incident-reports.show', $report) }}'">
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
+                                            <td class="px-4 sm:px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
                                                 <span class="inline-flex items-center gap-2">
                                                     <i class="fas fa-file-signature text-brand-teal-dark"></i>
                                                     #{{ $report->reportId }}
                                                 </span>
                                             </td>
-                                            <td class="px-6 py-4 whitespace-nowrap">
+                                            <td class="px-4 sm:px-6 py-4 whitespace-nowrap">
                                                 <div class="text-sm font-medium text-gray-900 dark:text-gray-100">
                                                     {{ $report->reporter->fullName }}
                                                 </div>
@@ -188,7 +257,7 @@
                                                     {{ $report->reporter->email }}
                                                 </div>
                                             </td>
-                                            <td class="px-6 py-4 whitespace-nowrap">
+                                            <td class="px-4 sm:px-6 py-4 whitespace-nowrap">
                                                 <div class="text-sm font-medium text-gray-900 dark:text-gray-100">
                                                     {{ $report->reportedUser->fullName }}
                                                 </div>
@@ -196,7 +265,7 @@
                                                     {{ $report->reportedUser->email }}
                                                 </div>
                                             </td>
-                                            <td class="px-6 py-4 whitespace-nowrap">
+                                            <td class="px-4 sm:px-6 py-4 whitespace-nowrap">
                                                 @php
                                                     $typeClass = $typeStyles[$report->incident_type] ?? 'badge-soft badge-soft-slate';
                                                 @endphp
@@ -204,7 +273,7 @@
                                                     {{ ucwords(str_replace('_', ' ', $report->incident_type)) }}
                                                 </span>
                                             </td>
-                                            <td class="px-6 py-4 whitespace-nowrap">
+                                            <td class="px-4 sm:px-6 py-4 whitespace-nowrap">
                                                 @php
                                                     $statusClass = $statusStyles[$report->status] ?? 'badge-soft badge-soft-slate';
                                                 @endphp
@@ -212,7 +281,7 @@
                                                     {{ ucwords(str_replace('_', ' ', $report->status)) }}
                                                 </span>
                                             </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                                            <td class="px-4 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                                                 {{ $report->report_date->format('M d, Y') }}
                                             </td>
                                         </tr>
@@ -220,7 +289,7 @@
                                 </tbody>
                             </table>
                         </div>
-                        <div class="mt-6">
+                        <div class="mt-4 sm:mt-6">
                             {{ $reports->appends(request()->query())->links() }}
                         </div>
                     @else

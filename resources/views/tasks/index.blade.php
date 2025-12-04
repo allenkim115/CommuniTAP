@@ -37,33 +37,78 @@
             <!-- Task Filter Tabs -->
             <div class="mb-8">
                 <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-2 border border-gray-200 dark:border-gray-700">
-                    <nav class="flex space-x-2" aria-label="Tabs">
+                    <style>
+                        /* Custom scrollbar for mobile - subtle with brand colors, narrower width */
+                        .task-tabs-scroll-wrapper {
+                            position: relative;
+                            padding: 0 16px;
+                        }
+                        @media (min-width: 640px) {
+                            .task-tabs-scroll-wrapper {
+                                padding: 0;
+                            }
+                        }
+                        .task-tabs-scroll::-webkit-scrollbar {
+                            height: 2px;
+                            display: block;
+                        }
+                        .task-tabs-scroll::-webkit-scrollbar-track {
+                            background: rgba(229, 231, 235, 0.2);
+                            border-radius: 10px;
+                        }
+                        .task-tabs-scroll::-webkit-scrollbar-thumb {
+                            background: rgba(243, 162, 97, 0.4);
+                            border-radius: 10px;
+                        }
+                        .task-tabs-scroll::-webkit-scrollbar-thumb:hover {
+                            background: rgba(243, 162, 97, 0.6);
+                        }
+                        /* Hide scrollbar on larger screens */
+                        @media (min-width: 640px) {
+                            .task-tabs-scroll::-webkit-scrollbar {
+                                display: none;
+                            }
+                        }
+                        /* Firefox scrollbar styling */
+                        .task-tabs-scroll {
+                            scrollbar-width: thin;
+                            scrollbar-color: rgba(243, 162, 97, 0.4) rgba(229, 231, 235, 0.2);
+                        }
+                        @media (min-width: 640px) {
+                            .task-tabs-scroll {
+                                scrollbar-width: none;
+                            }
+                        }
+                    </style>
+                    <div class="task-tabs-scroll-wrapper">
+                        <nav class="task-tabs-scroll flex space-x-2 overflow-x-auto -mx-2 px-2 pb-0.5 sm:overflow-visible sm:mx-0 sm:px-0 sm:pb-0" aria-label="Tabs">
                         <a href="{{ route('tasks.index', ['filter' => 'available']) }}" 
-                           class="flex-1 text-center px-4 py-3 text-sm font-semibold rounded-xl transition-all duration-200 {{ $filter === 'available' ? 'text-white shadow-md' : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700' }}"
+                           class="flex-shrink-0 text-center px-3 py-2.5 sm:px-4 sm:py-3 text-xs sm:text-sm font-semibold rounded-xl transition-all duration-200 whitespace-nowrap min-w-fit sm:flex-1 {{ $filter === 'available' ? 'text-white shadow-md' : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700' }}"
                            @if($filter === 'available') style="background-color: #F3A261;" @endif>
                             Available ({{ $taskStats['available'] }})
                         </a>
                         <a href="{{ route('tasks.index', ['filter' => 'assigned']) }}" 
-                           class="flex-1 text-center px-4 py-3 text-sm font-semibold rounded-xl transition-all duration-200 {{ $filter === 'assigned' ? 'text-white shadow-md' : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700' }}"
+                           class="flex-shrink-0 text-center px-3 py-2.5 sm:px-4 sm:py-3 text-xs sm:text-sm font-semibold rounded-xl transition-all duration-200 whitespace-nowrap min-w-fit sm:flex-1 {{ $filter === 'assigned' ? 'text-white shadow-md' : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700' }}"
                            @if($filter === 'assigned') style="background-color: #F3A261;" @endif>
                             Assigned ({{ $taskStats['assigned'] }})
                         </a>
                         <a href="{{ route('tasks.index', ['filter' => 'submitted']) }}" 
-                           class="flex-1 text-center px-4 py-3 text-sm font-semibold rounded-xl transition-all duration-200 {{ $filter === 'submitted' ? 'text-white shadow-md' : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700' }}"
+                           class="flex-shrink-0 text-center px-3 py-2.5 sm:px-4 sm:py-3 text-xs sm:text-sm font-semibold rounded-xl transition-all duration-200 whitespace-nowrap min-w-fit sm:flex-1 {{ $filter === 'submitted' ? 'text-white shadow-md' : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700' }}"
                            @if($filter === 'submitted') style="background-color: #F3A261;" @endif>
                             Submitted ({{ $taskStats['submitted'] }})
                         </a>
                         <a href="{{ route('tasks.index', ['filter' => 'completed']) }}" 
-                           class="flex-1 text-center px-4 py-3 text-sm font-semibold rounded-xl transition-all duration-200 {{ $filter === 'completed' ? 'text-white shadow-md' : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700' }}"
+                           class="flex-shrink-0 text-center px-3 py-2.5 sm:px-4 sm:py-3 text-xs sm:text-sm font-semibold rounded-xl transition-all duration-200 whitespace-nowrap min-w-fit sm:flex-1 {{ $filter === 'completed' ? 'text-white shadow-md' : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700' }}"
                            @if($filter === 'completed') style="background-color: #F3A261;" @endif>
                             Completed ({{ $taskStats['completed'] }})
                         </a>
                         <a href="{{ route('tasks.index', ['filter' => 'all']) }}" 
-                           class="flex-1 text-center px-4 py-3 text-sm font-semibold rounded-xl transition-all duration-200 {{ $filter === 'all' ? 'text-white shadow-md' : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700' }}"
+                           class="flex-shrink-0 text-center px-3 py-2.5 sm:px-4 sm:py-3 text-xs sm:text-sm font-semibold rounded-xl transition-all duration-200 whitespace-nowrap min-w-fit sm:flex-1 {{ $filter === 'all' ? 'text-white shadow-md' : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700' }}"
                            @if($filter === 'all') style="background-color: #F3A261;" @endif>
                             All ({{ $taskStats['all'] }})
                         </a>
                     </nav>
+                    </div>
                 </div>
             </div>
 
@@ -127,9 +172,9 @@
                                     </button>
                                 </div>
                                 <!-- Task Type Filter -->
-                                <div class="px-4 py-2 bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200 dark:border-gray-700">
+                                <div class="w-full sm:w-auto px-4 py-2 bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200 dark:border-gray-700">
                                     <select id="task-type-filter" 
-                                            class="text-sm font-semibold text-gray-700 dark:text-gray-300 bg-transparent border-none focus:outline-none focus:ring-0 cursor-pointer"
+                                            class="w-full text-sm font-semibold text-gray-700 dark:text-gray-300 bg-transparent border-none focus:outline-none focus:ring-0 cursor-pointer"
                                             onchange="if(typeof applyFilters === 'function') applyFilters();">
                                         <option value="all">All Types</option>
                                         <option value="daily">Daily Tasks</option>

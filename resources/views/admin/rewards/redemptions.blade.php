@@ -8,9 +8,9 @@
         </div>
     </x-slot>
 
-    <div class="py-10">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
-            <div class="card-surface p-6 space-y-6">
+    <div class="py-4 sm:py-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-4 sm:space-y-6">
+            <div class="card-surface p-3 sm:p-6 space-y-4 sm:space-y-6">
                 <div class="flex flex-col gap-4">
                     <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                         <div>
@@ -42,24 +42,24 @@
                         @endforeach
                     </div>
 
-                    <form method="GET" action="{{ route('admin.redemptions.index') }}" class="flex flex-col gap-3 rounded-2xl border border-gray-100 bg-gray-50/60 p-4 sm:flex-row sm:items-center" novalidate>
+                    <form method="GET" action="{{ route('admin.redemptions.index') }}" class="flex flex-col gap-2 sm:gap-3 rounded-xl sm:rounded-2xl border border-gray-100 bg-gray-50/60 p-3 sm:p-4 sm:flex-row sm:items-center" novalidate>
                         <input type="hidden" name="status" value="{{ $activeTab }}">
-                        <label class="flex flex-1 items-center gap-3 rounded-full bg-white px-4 py-2 shadow-sm focus-within:ring-2 focus-within:ring-brand-teal/40">
-                            <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <label class="flex flex-1 items-center gap-2 sm:gap-3 rounded-lg sm:rounded-full bg-white px-3 sm:px-4 py-2 shadow-sm focus-within:ring-2 focus-within:ring-brand-teal/40 min-h-[40px] sm:min-h-[44px]">
+                            <svg class="h-4 w-4 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M16.65 16.65A7 7 0 1012 19a7 7 0 004.65-2.35z" />
                             </svg>
                             <input
                                 type="text"
                                 name="search"
                                 value="{{ $search }}"
-                                placeholder="Search by volunteer name or email"
+                                placeholder="Search..."
                                 class="w-full border-0 bg-transparent text-sm focus:outline-none focus:ring-0"
                             >
                         </label>
                         @if($search)
                             <a href="{{ route('admin.redemptions.index', ['status' => $activeTab]) }}"
-                               class="text-sm font-semibold text-brand-teal hover:underline">
-                                Clear search
+                               class="text-sm font-semibold text-brand-teal hover:underline px-2 py-2 text-center sm:text-left">
+                                Clear
                             </a>
                         @endif
                     </form>

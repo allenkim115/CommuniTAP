@@ -33,28 +33,28 @@
         }
     @endphp
 
-    <div class="py-12 bg-gray-50 dark:bg-gray-900">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-            <div class="card-surface p-6 lg:p-8">
+    <div class="py-6 sm:py-12 bg-gray-50 dark:bg-gray-900">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 sm:space-y-8">
+            <div class="card-surface p-4 sm:p-6 lg:p-8">
                 <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                    <div>
-                        <p class="section-heading">Incident oversight</p>
-                        <h3 class="mt-1 text-2xl font-semibold text-gray-900 dark:text-white">Your recent incident activity</h3>
-                        <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                    <div class="flex-1 min-w-0">
+                        <p class="section-heading text-xs sm:text-sm">Incident oversight</p>
+                        <h3 class="mt-1 text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white">Your recent incident activity</h3>
+                        <p class="mt-2 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
                             Track reports you've submitted and follow up on moderation progress.
                         </p>
                     </div>
-                    <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
-                        <a href="{{ route('incident-reports.create') }}" class="btn-brand">
+                    <div class="flex flex-col gap-2 sm:gap-3 sm:flex-row sm:items-center md:flex-shrink-0">
+                        <a href="{{ route('incident-reports.create') }}" class="btn-brand text-sm sm:text-base w-full sm:w-auto">
                             Report a user
                         </a>
-                        <a href="{{ route('incident-reports.index') }}#incident-report-list" class="btn-muted">
+                        <a href="{{ route('incident-reports.index') }}#incident-report-list" class="btn-muted text-sm sm:text-base w-full sm:w-auto">
                             Jump to list
                         </a>
                     </div>
                 </div>
 
-                <div class="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                <div class="mt-6 sm:mt-8 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
                     @foreach($statusCounts as $status => $count)
                         @php
                             $labels = [
@@ -65,41 +65,41 @@
                             ];
                             $chipClass = $statusClasses[$status] ?? 'badge-soft badge-soft-slate';
                         @endphp
-                        <div class="stat-card">
-                            <div class="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
-                                <span>{{ $labels[$status] }}</span>
-                                <span class="{{ $chipClass }}">{{ ucfirst(str_replace('_', ' ', $status)) }}</span>
+                        <div class="stat-card p-3 sm:p-4">
+                            <div class="flex items-center justify-between text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+                                <span class="truncate pr-1">{{ $labels[$status] }}</span>
+                                <span class="{{ $chipClass }} text-xs flex-shrink-0">{{ ucfirst(str_replace('_', ' ', $status)) }}</span>
                             </div>
-                            <p class="mt-4 text-3xl font-semibold text-gray-900 dark:text-white">{{ $count }}</p>
+                            <p class="mt-3 sm:mt-4 text-2xl sm:text-3xl font-semibold text-gray-900 dark:text-white">{{ $count }}</p>
                             <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">On this page</p>
                         </div>
                     @endforeach
                 </div>
             </div>
 
-            <div class="card-surface p-6 lg:p-8 space-y-6">
-                <div class="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+            <div class="card-surface p-4 sm:p-6 lg:p-8 space-y-4 sm:space-y-6">
+                <div class="flex flex-col gap-4 sm:gap-6 md:flex-row md:items-end md:justify-between">
                     <div class="w-full md:max-w-md">
-                        <label for="report-search" class="section-heading">Quick search</label>
+                        <label for="report-search" class="section-heading text-xs sm:text-sm">Quick search</label>
                         <div class="relative mt-2">
                             <input
                                 id="report-search"
                                 type="search"
                                 placeholder="Search by user, incident type, or task"
-                                class="w-full rounded-2xl border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 px-4 py-2.5 text-sm text-gray-900 dark:text-gray-100 focus:border-brand-teal focus:ring-brand-teal"
+                                class="w-full rounded-2xl border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 px-3 sm:px-4 py-2 sm:py-2.5 text-sm text-gray-900 dark:text-gray-100 focus:border-brand-teal focus:ring-brand-teal"
                             >
-                            <span class="pointer-events-none absolute inset-y-0 right-4 flex items-center text-gray-400">
-                                <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <span class="pointer-events-none absolute inset-y-0 right-3 sm:right-4 flex items-center text-gray-400">
+                                <svg class="h-4 w-4 sm:h-5 sm:w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                                 </svg>
                             </span>
                         </div>
                     </div>
                     <div class="w-full md:w-56">
-                        <label for="report-status-filter" class="section-heading">Filter by status</label>
+                        <label for="report-status-filter" class="section-heading text-xs sm:text-sm">Filter by status</label>
                         <select
                             id="report-status-filter"
-                            class="mt-2 w-full rounded-2xl border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 px-4 py-2.5 text-sm text-gray-900 dark:text-gray-100 focus:border-brand-teal focus:ring-brand-teal"
+                            class="mt-2 w-full rounded-2xl border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 px-3 sm:px-4 py-2 sm:py-2.5 text-sm text-gray-900 dark:text-gray-100 focus:border-brand-teal focus:ring-brand-teal"
                         >
                             <option value="all">All statuses</option>
                             <option value="pending">Pending</option>
@@ -135,7 +135,7 @@
                                 }
                             @endphp
                             <article
-                                class="card-surface p-5 lg:p-6 transition hover:shadow-lg focus-visible:ring-2 focus-visible:ring-brand-teal cursor-pointer"
+                                class="card-surface p-4 sm:p-5 lg:p-6 transition hover:shadow-lg focus-visible:ring-2 focus-visible:ring-brand-teal cursor-pointer"
                                 data-report-card
                                 data-status="{{ $report->status }}"
                                 data-search="{{ $searchText }}"
@@ -143,85 +143,87 @@
                                 tabindex="0"
                                 role="link"
                             >
-                                <div class="flex flex-col gap-5 md:flex-row md:items-start md:justify-between">
-                                    <div class="flex-1 space-y-4">
+                                <div class="flex flex-col gap-4 sm:gap-5 md:flex-row md:items-start md:justify-between">
+                                    <div class="flex-1 space-y-3 sm:space-y-4 min-w-0">
                                         <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                                            <div class="flex items-center gap-3">
+                                            <div class="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
                                                 <x-user-avatar
                                                     :user="$report->reportedUser"
-                                                    size="h-12 w-12"
-                                                    text-size="text-base"
-                                                    class="bg-brand-peach/60 text-brand-orange-dark font-semibold"
+                                                    size="h-10 w-10 sm:h-12 sm:w-12"
+                                                    text-size="text-sm sm:text-base"
+                                                    class="bg-brand-peach/60 text-brand-orange-dark font-semibold flex-shrink-0"
                                                 />
-                                                <div>
-                                                    <p class="text-base font-semibold text-gray-900 dark:text-white">{{ $report->reportedUser->fullName }}</p>
-                                                    <p class="text-sm text-gray-500 dark:text-gray-400">{{ $report->reportedUser->email }}</p>
+                                                <div class="min-w-0 flex-1">
+                                                    <p class="text-sm sm:text-base font-semibold text-gray-900 dark:text-white truncate">{{ $report->reportedUser->fullName }}</p>
+                                                    <p class="text-xs sm:text-sm text-gray-500 dark:text-gray-400 truncate">{{ $report->reportedUser->email }}</p>
                                                 </div>
                                             </div>
-                                            <div class="flex flex-wrap gap-2">
-                                                <span class="{{ $typeChip }}">
+                                            <div class="flex flex-wrap gap-2 flex-shrink-0">
+                                                <span class="{{ $typeChip }} text-xs sm:text-sm">
                                                     {{ ucwords(str_replace('_', ' ', $report->incident_type)) }}
                                                 </span>
-                                                <span class="{{ $statusChip }}">
+                                                <span class="{{ $statusChip }} text-xs sm:text-sm">
                                                     {{ ucwords(str_replace('_', ' ', $report->status)) }}
                                                 </span>
                                             </div>
                                         </div>
-                                        <div class="grid gap-4 sm:grid-cols-2">
-                                            <div class="rounded-2xl border border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/40 p-4">
+                                        <div class="grid gap-3 sm:gap-4 sm:grid-cols-2">
+                                            <div class="rounded-2xl border border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/40 p-3 sm:p-4">
                                                 <p class="text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">Date reported</p>
-                                                <p class="mt-2 text-sm font-semibold text-gray-900 dark:text-gray-100">{{ $report->report_date->format('M d, Y') }}</p>
+                                                <p class="mt-2 text-xs sm:text-sm font-semibold text-gray-900 dark:text-gray-100">{{ $report->report_date->format('M d, Y') }}</p>
                                                 <p class="text-xs text-gray-500 dark:text-gray-400">{{ $report->report_date->format('g:i A') }}</p>
                                             </div>
-                                            <div class="rounded-2xl border border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/40 p-4">
+                                            <div class="rounded-2xl border border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/40 p-3 sm:p-4">
                                                 <p class="text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">Related task</p>
                                                 @if($report->task)
-                                                    <p class="mt-2 text-sm font-semibold text-gray-900 dark:text-gray-100">
+                                                    <p class="mt-2 text-xs sm:text-sm font-semibold text-gray-900 dark:text-gray-100 break-words">
                                                         {{ Str::limit($report->task->title, 40) }}
                                                     </p>
                                                     <p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mt-1">
                                                         {{ ucwords(str_replace('_', ' ', $report->task->task_type)) }}
                                                     </p>
                                                 @else
-                                                    <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">No task linked</p>
+                                                    <p class="mt-2 text-xs sm:text-sm text-gray-500 dark:text-gray-400">No task linked</p>
                                                 @endif
                                             </div>
                                         </div>
-                                        <p class="text-sm text-gray-600 dark:text-gray-300">
+                                        <p class="text-xs sm:text-sm text-gray-600 dark:text-gray-300 line-clamp-2 sm:line-clamp-none">
                                             {{ Str::limit($report->description, 180) }}
                                         </p>
                                     </div>
-                                    <div class="flex flex-col items-start gap-4 md:items-end md:text-right">
-                                        <div class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">Progress</div>
-                                        <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
-                                            <span class="h-2 w-2 rounded-full bg-brand-teal"></span>
-                                            {{ $report->status === 'resolved' ? 'Completed' : 'Awaiting moderation' }}
+                                    <div class="flex flex-row items-center justify-between gap-4 sm:flex-col sm:items-start md:items-end md:text-right md:flex-shrink-0 pt-2 sm:pt-0 border-t border-gray-100 dark:border-gray-700 sm:border-t-0">
+                                        <div class="flex flex-col gap-1 sm:gap-2">
+                                            <div class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">Progress</div>
+                                            <div class="flex items-center gap-2 text-xs sm:text-sm text-gray-600 dark:text-gray-300">
+                                                <span class="h-2 w-2 rounded-full bg-brand-teal flex-shrink-0"></span>
+                                                <span class="whitespace-nowrap">{{ $report->status === 'resolved' ? 'Completed' : 'Awaiting moderation' }}</span>
+                                            </div>
                                         </div>
-                                        <div class="text-xs font-medium uppercase tracking-wide text-brand-teal dark:text-brand-peach">Click card to view details</div>
+                                        <div class="text-xs font-medium uppercase tracking-wide text-brand-teal dark:text-brand-peach whitespace-nowrap sm:whitespace-normal">Click to view</div>
                                     </div>
                                 </div>
                             </article>
                         @endforeach
                     </div>
 
-                    <div id="report-empty-state" class="hidden rounded-2xl border border-dashed border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-900/60 p-8 text-center">
-                        <h4 class="text-base font-semibold text-gray-900 dark:text-white">No reports match your filters</h4>
-                        <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">Try clearing the search or selecting a different status.</p>
+                    <div id="report-empty-state" class="hidden rounded-2xl border border-dashed border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-900/60 p-6 sm:p-8 text-center">
+                        <h4 class="text-sm sm:text-base font-semibold text-gray-900 dark:text-white">No reports match your filters</h4>
+                        <p class="mt-2 text-xs sm:text-sm text-gray-500 dark:text-gray-400">Try clearing the search or selecting a different status.</p>
                     </div>
 
-                    <div class="pt-6 border-t border-gray-100 dark:border-gray-700">
+                    <div class="pt-4 sm:pt-6 border-t border-gray-100 dark:border-gray-700">
                         {{ $reports->links() }}
                     </div>
                 @else
-                    <div class="flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900/60 px-6 py-16 text-center">
-                        <svg class="h-16 w-16 text-brand-peach" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <div class="flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900/60 px-4 sm:px-6 py-12 sm:py-16 text-center">
+                        <svg class="h-12 w-12 sm:h-16 sm:w-16 text-brand-peach" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 17v2a2 2 0 01-2 2H7a2 2 0 01-2-2v-2m14 0v2a2 2 0 01-2 2h-.001a2 2 0 01-2-2v-2M9 7V5a2 2 0 012-2h2a2 2 0 012 2v2m-9 4h10m-5-5v10" />
                         </svg>
-                        <h3 class="mt-6 text-lg font-semibold text-gray-900 dark:text-white">No incident reports yet</h3>
-                        <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                        <h3 class="mt-4 sm:mt-6 text-base sm:text-lg font-semibold text-gray-900 dark:text-white">No incident reports yet</h3>
+                        <p class="mt-2 text-xs sm:text-sm text-gray-500 dark:text-gray-400 px-2">
                             When you submit an incident report, you'll see the moderation journey right here.
                         </p>
-                        <a href="{{ route('incident-reports.create') }}" class="mt-6 btn-brand">
+                        <a href="{{ route('incident-reports.create') }}" class="mt-4 sm:mt-6 btn-brand text-sm sm:text-base w-full sm:w-auto">
                             Create your first report
                         </a>
                     </div>

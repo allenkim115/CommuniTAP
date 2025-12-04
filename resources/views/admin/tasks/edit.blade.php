@@ -1,23 +1,23 @@
 <x-admin-layout>
     <x-slot name="header">
-        <div class="flex justify-between items-center">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+            <h2 class="font-semibold text-lg sm:text-xl text-gray-800 leading-tight">
                 {{ __('Edit Task') }}
             </h2>
             <a href="{{ route('admin.tasks.index') }}"
-                class="inline-flex items-center gap-2 text-white text-sm font-medium py-2 px-4 rounded-lg transition-colors"
+                class="w-full sm:w-auto inline-flex items-center justify-center gap-2 text-white text-sm font-semibold py-3 sm:py-2 px-4 rounded-lg transition-colors min-h-[44px]"
                 style="background-color: #2B9D8D;"
                 onmouseover="this.style.backgroundColor='#248A7C'"
                 onmouseout="this.style.backgroundColor='#2B9D8D'">
-                <i class="fas fa-arrow-left"></i>
+                <i class="fas fa-arrow-left text-base"></i>
                 Back
             </a>
         </div>
     </x-slot>
 
-    <div class="py-8">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-6 lg:p-8 space-y-6">
+    <div class="py-4 sm:py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-4 sm:p-6 lg:p-8 space-y-4 sm:space-y-6">
                 
                 <!-- Form Section -->
                 <form action="{{ route('admin.tasks.update', $task) }}" method="POST" class="space-y-8" novalidate>
@@ -187,21 +187,21 @@
                         $isUncompleted = !in_array($task->status, ['completed']) && !in_array($task->status, ['approved', 'published']);
                         $showTwoButtons = $isUncompleted || $task->status === 'inactive';
                     @endphp
-                    <div class="flex justify-end gap-4 pt-6 border-t border-gray-200 dark:border-gray-700">
+                    <div class="flex flex-col sm:flex-row justify-end gap-3 sm:gap-4 pt-6 border-t border-gray-200 dark:border-gray-700">
                         <a href="{{ route('admin.tasks.index') }}"
-                            class="px-5 py-2.5 rounded-md text-sm font-medium border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+                            class="w-full sm:w-auto inline-flex items-center justify-center px-5 py-3 sm:py-2.5 rounded-lg text-sm font-semibold border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition min-h-[44px]">
                             Cancel
                         </a>
                         @if($showTwoButtons)
                             <button type="submit" name="action" value="update"
-                                class="px-6 py-2.5 text-sm font-semibold rounded-md text-white shadow-md transition focus:ring-2 focus:ring-orange-400 focus:ring-offset-2"
+                                class="w-full sm:w-auto px-6 py-3 sm:py-2.5 text-sm font-semibold rounded-lg text-white shadow-md transition focus:ring-2 focus:ring-orange-400 focus:ring-offset-2 min-h-[44px] whitespace-nowrap"
                                 style="background-color: #F3A261;"
                                 onmouseover="this.style.backgroundColor='#E8944F'"
                                 onmouseout="this.style.backgroundColor='#F3A261'">
                                 Update Task
                             </button>
                             <button type="submit" name="action" value="publish"
-                                class="px-6 py-2.5 text-sm font-semibold rounded-md text-white shadow-md transition focus:ring-2 focus:ring-orange-400 focus:ring-offset-2"
+                                class="w-full sm:w-auto px-6 py-3 sm:py-2.5 text-sm font-semibold rounded-lg text-white shadow-md transition focus:ring-2 focus:ring-orange-400 focus:ring-offset-2 min-h-[44px] whitespace-nowrap"
                                 style="background-color: #F3A261;"
                                 onmouseover="this.style.backgroundColor='#E8944F'"
                                 onmouseout="this.style.backgroundColor='#F3A261'">
@@ -209,7 +209,7 @@
                             </button>
                         @else
                             <button type="submit" name="action" value="update"
-                                class="px-6 py-2.5 text-sm font-semibold rounded-md text-white shadow-md transition focus:ring-2 focus:ring-orange-400 focus:ring-offset-2"
+                                class="w-full sm:w-auto px-6 py-3 sm:py-2.5 text-sm font-semibold rounded-lg text-white shadow-md transition focus:ring-2 focus:ring-orange-400 focus:ring-offset-2 min-h-[44px] whitespace-nowrap"
                                 style="background-color: #F3A261;"
                                 onmouseover="this.style.backgroundColor='#E8944F'"
                                 onmouseout="this.style.backgroundColor='#F3A261'">
