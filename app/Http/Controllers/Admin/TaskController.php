@@ -20,6 +20,9 @@ class TaskController extends Controller
      */
     public function index()
     {
+        // Auto-complete tasks where all participants have finished (regardless of end time)
+        \App\Models\Task::completeTasksWithAllParticipantsDone();
+        
         // Auto-complete expired tasks before listing
         \App\Models\Task::completeExpiredTasks();
         
@@ -689,6 +692,10 @@ class TaskController extends Controller
             'completed_at' => now(),
         ]);
 
+        // Check if all participants have completed - if so, mark task as completed
+        $task->refresh();
+        $task->markAsCompletedIfAllParticipantsDone();
+
         // Award points to the user (respecting points cap)
         $pointsResult = $assignment->user->addPoints($task->points_awarded);
         
@@ -724,6 +731,9 @@ class TaskController extends Controller
      */
     public function filter(Request $request)
     {
+        // Auto-complete tasks where all participants have finished (regardless of end time)
+        \App\Models\Task::completeTasksWithAllParticipantsDone();
+        
         // Auto-complete expired tasks before filtering
         \App\Models\Task::completeExpiredTasks();
         

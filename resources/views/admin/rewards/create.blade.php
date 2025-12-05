@@ -59,8 +59,8 @@
                     <div class="space-y-2">
                         <label class="text-sm font-semibold text-gray-700">Image upload</label>
                         <div class="rounded-2xl border-2 border-dashed border-gray-200 p-6 text-center">
-                            <input type="file" name="image" accept="image/*" class="w-full text-sm text-gray-600">
-                            <p class="mt-2 text-xs text-gray-400">Use 1200x800 JPG or PNG for best presentation.</p>
+                            <input type="file" name="image" accept="image/*,.webp,image/webp" class="w-full text-sm text-gray-600">
+                            <p class="mt-2 text-xs text-gray-400">Use 1200x800 JPG, PNG, or WEBP for best presentation.</p>
                         </div>
                         @error('image') <p class="text-xs text-red-500">{{ $message }}</p> @enderror
                     </div>

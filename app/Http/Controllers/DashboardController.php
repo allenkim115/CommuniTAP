@@ -565,7 +565,8 @@ class DashboardController extends Controller
                 break;
 
             default:
-                abort(404);
+                return redirect()->route('admin.dashboard')
+                    ->with('error', 'Invalid chart type requested.');
         }
 
         return view('admin.dashboard.chart-details', [

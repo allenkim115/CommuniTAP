@@ -58,20 +58,40 @@
                     <div>
                         <h3 class="text-2xl font-semibold text-gray-900">Manage Rewards</h3>
                     </div>
-                    <div class="flex flex-wrap gap-2 text-xs text-gray-500">
-                        <span class="inline-flex items-center gap-2 rounded-full bg-gray-100 px-3 py-1 font-semibold">
-                            <i class="fas fa-box-open text-brand-teal"></i>
-                            {{ $totalRewards }} total
-                        </span>
-                        <span class="inline-flex items-center gap-2 rounded-full bg-gray-100 px-3 py-1 font-semibold">
-                            <i class="fas fa-circle text-xs text-green-500"></i>
-                            {{ $activeRewards }} active
-                        </span>
-                        <span class="inline-flex items-center gap-2 rounded-full bg-gray-100 px-3 py-1 font-semibold">
-                            <i class="fas fa-triangle-exclamation text-amber-500"></i>
-                            {{ $outOfStock }} out of stock
-                        </span>
+                    <div class="w-full sm:w-auto sm:flex sm:items-center sm:gap-3">
+                        <div class="relative w-full sm:w-72">
+                            <input
+                                type="text"
+                                id="reward-search"
+                                placeholder="Search rewards..."
+                                class="w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-teal focus:border-brand-teal text-sm min-h-[40px]"
+                            >
+                            <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+                            <button
+                                type="button"
+                                id="clearRewardSearch"
+                                class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                                aria-label="Clear search"
+                            >
+                                <i class="fas fa-times text-sm"></i>
+                            </button>
+                        </div>
                     </div>
+                </div>
+
+                <div class="flex flex-wrap gap-2 text-xs text-gray-500 mb-4 sm:mb-6">
+                    <span class="inline-flex items-center gap-2 rounded-full bg-gray-100 px-3 py-1 font-semibold">
+                        <i class="fas fa-box-open text-brand-teal"></i>
+                        {{ $totalRewards }} total
+                    </span>
+                    <span class="inline-flex items-center gap-2 rounded-full bg-gray-100 px-3 py-1 font-semibold">
+                        <i class="fas fa-circle text-xs text-green-500"></i>
+                        {{ $activeRewards }} active
+                    </span>
+                    <span class="inline-flex items-center gap-2 rounded-full bg-gray-100 px-3 py-1 font-semibold">
+                        <i class="fas fa-triangle-exclamation text-amber-500"></i>
+                        {{ $outOfStock }} out of stock
+                    </span>
                 </div>
 
                 <div class="mt-4 sm:mt-6 grid gap-4 sm:gap-6 sm:grid-cols-2 xl:grid-cols-3">
@@ -79,11 +99,14 @@
                         @php
                             $isOutOfStock = $reward->QTY === 0;
                         @endphp
-                        <div @class([
-                            'card-surface overflow-hidden flex flex-col border transition-shadow',
-                            'border-gray-100 hover:shadow-md' => ! $isOutOfStock,
-                            'border-red-500 ring-2 ring-red-200 bg-red-50/60 shadow-lg shadow-red-100/60' => $isOutOfStock,
-                        ])>
+                        <div
+                            data-reward-card
+                            data-search="{{ strtolower(($reward->reward_name ?? '') . ' ' . ($reward->sponsor_name ?? '') . ' ' . ($reward->description ?? '') . ' ' . ($reward->status ?? '')) }}"
+                            @class([
+                                'card-surface overflow-hidden flex flex-col border transition-shadow',
+                                'border-gray-100 hover:shadow-md' => ! $isOutOfStock,
+                                'border-red-500 ring-2 ring-red-200 bg-red-50/60 shadow-lg shadow-red-100/60' => $isOutOfStock,
+                            ])>
                             @if($reward->image_path)
                                 <div class="relative">
                                     <img src="{{ route('rewards.image', $reward) }}" alt="{{ $reward->reward_name }}" class="h-44 w-full object-cover {{ $isOutOfStock ? 'grayscale contrast-75 opacity-70' : '' }}">
@@ -163,6 +186,14 @@
                     @endforelse
                 </div>
 
+                <div id="rewards-search-empty" class="hidden bg-white rounded-lg border border-dashed border-gray-200 shadow-sm p-12 text-center">
+                    <div class="mx-auto h-16 w-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                        <i class="fas fa-search text-gray-400 text-2xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">No rewards match your search</h3>
+                    <p class="text-gray-600">Try a different keyword.</p>
+                </div>
+
                 @if(method_exists($rewards, 'links'))
                     <div class="mt-8">
                         {{ $rewards->links() }}
@@ -171,4 +202,53 @@
             </div>
         </div>
     </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const searchInput = document.getElementById('reward-search');
+        const clearBtn = document.getElementById('clearRewardSearch');
+        const cards = Array.from(document.querySelectorAll('[data-reward-card]'));
+        const emptyState = document.getElementById('rewards-search-empty');
+
+        if (!searchInput || cards.length === 0) return;
+
+        const applyFilter = () => {
+            const query = (searchInput.value || '').trim().toLowerCase();
+            let visibleCount = 0;
+
+            cards.forEach(card => {
+                const haystack = (card.dataset.search || '').toLowerCase();
+                const matches = !query || haystack.includes(query);
+                card.classList.toggle('hidden', !matches);
+                if (matches) visibleCount++;
+            });
+
+            if (emptyState) {
+                emptyState.classList.toggle('hidden', visibleCount !== 0);
+            }
+
+            if (clearBtn) {
+                clearBtn.classList.toggle('hidden', !query);
+            }
+        };
+
+        searchInput.addEventListener('input', applyFilter);
+        searchInput.addEventListener('keyup', applyFilter);
+        searchInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+            }
+        });
+
+        if (clearBtn) {
+            clearBtn.addEventListener('click', () => {
+                searchInput.value = '';
+                applyFilter();
+                searchInput.focus();
+            });
+        }
+
+        applyFilter();
+    });
+</script>
 </x-admin-layout>

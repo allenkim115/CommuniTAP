@@ -43,8 +43,12 @@ class TaskSubmissionController extends Controller
                               ->orWhere('description', 'LIKE', '%' . $search . '%');
                 })
                 ->orWhereHas('user', function ($userQuery) use ($search) {
-                    $userQuery->where('name', 'LIKE', '%' . $search . '%')
-                              ->orWhere('email', 'LIKE', '%' . $search . '%');
+                    $userQuery->where(function ($nameQuery) use ($search) {
+                        $nameQuery->where('firstName', 'LIKE', '%' . $search . '%')
+                                  ->orWhere('lastName', 'LIKE', '%' . $search . '%')
+                                  ->orWhereRaw("CONCAT(firstName, ' ', lastName) LIKE ?", ['%' . $search . '%']);
+                    })
+                    ->orWhere('email', 'LIKE', '%' . $search . '%');
                 });
             });
         }
@@ -117,6 +121,10 @@ class TaskSubmissionController extends Controller
             'completed_at' => now(),
             'completion_notes' => $finalNotes
         ]);
+
+        // Check if all participants have completed - if so, mark task as completed
+        $submission->task->refresh();
+        $submission->task->markAsCompletedIfAllParticipantsDone();
 
         // Award points to user (respecting points cap)
         $user = $submission->user;
@@ -245,8 +253,12 @@ class TaskSubmissionController extends Controller
                               ->orWhere('description', 'LIKE', '%' . $search . '%');
                 })
                 ->orWhereHas('user', function ($userQuery) use ($search) {
-                    $userQuery->where('name', 'LIKE', '%' . $search . '%')
-                              ->orWhere('email', 'LIKE', '%' . $search . '%');
+                    $userQuery->where(function ($nameQuery) use ($search) {
+                        $nameQuery->where('firstName', 'LIKE', '%' . $search . '%')
+                                  ->orWhere('lastName', 'LIKE', '%' . $search . '%')
+                                  ->orWhereRaw("CONCAT(firstName, ' ', lastName) LIKE ?", ['%' . $search . '%']);
+                    })
+                    ->orWhere('email', 'LIKE', '%' . $search . '%');
                 });
             });
         }

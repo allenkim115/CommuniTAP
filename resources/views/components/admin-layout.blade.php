@@ -57,5 +57,7 @@
         
         <!-- Global Confirmation Modal -->
         <x-confirmation-modal />
+
+        @stack('scripts')
     </body>
 </html>

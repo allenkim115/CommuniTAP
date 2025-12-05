@@ -60,8 +60,8 @@
                     <div class="space-y-3">
                         <label class="text-sm font-semibold text-gray-700">Image upload</label>
                         <div class="rounded-2xl border-2 border-dashed border-gray-200 p-6 text-center">
-                            <input type="file" name="image" accept="image/*" class="w-full text-sm text-gray-600">
-                            <p class="mt-2 text-xs text-gray-400">Upload a refreshed banner if the visual has changed.</p>
+                            <input type="file" name="image" accept="image/*,.webp,image/webp" class="w-full text-sm text-gray-600">
+                            <p class="mt-2 text-xs text-gray-400">Upload a refreshed banner if the visual has changed. JPG, PNG, or WEBP preferred.</p>
                         </div>
                         @if($reward->image_path)
                             <div class="rounded-2xl border border-gray-100 p-3">

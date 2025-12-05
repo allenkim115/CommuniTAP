@@ -186,11 +186,14 @@
                                 @endif
 
                                 <a href="{{ $targetUrl }}" 
-                                   class="group relative block rounded-xl border border-gray-200 px-4 py-3.5 transition-all duration-150 notification-row
+                                   class="group relative block rounded-xl border border-gray-200 px-4 py-3.5 transition-all duration-150 notification-row notification-link
                                     {{ $notification->status === 'unread'
                                         ? 'bg-gray-50 border-l-4 hover:shadow-md'
                                         : 'bg-white hover:bg-gray-50 hover:shadow-sm' }}"
                                      data-status="{{ $notification->status }}"
+                                     data-notification-status="{{ $notification->status }}"
+                                     data-mark-read-url="{{ route('notifications.mark-read', $notification) }}"
+                                     data-target-url="{{ $targetUrl }}"
                                      @if($notification->status === 'unread')
                                          style="border-left-color: {{ $accentColor }}; background-color: {{ $highlightBackground }};"
                                      @endif>
@@ -327,8 +330,49 @@
                     });
                 });
 
-                // No need for click handler - entire card is now an <a> tag
-                // The "Mark as read" form has onclick="event.stopPropagation()" to prevent navigation
+                // Auto-mark notifications as read when clicked
+                const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+                document.querySelectorAll('.notification-link').forEach(link => {
+                    if (link.dataset.autoReadBound === 'true') {
+                        return;
+                    }
+
+                    link.dataset.autoReadBound = 'true';
+
+                    link.addEventListener('click', event => {
+                        // Don't interfere with the "Mark as read" button
+                        if (event.target.closest('form, button')) {
+                            return;
+                        }
+
+                        const markUrl = link.dataset.markReadUrl;
+                        const isUnread = link.dataset.notificationStatus === 'unread';
+                        const targetUrl = link.dataset.targetUrl || link.href;
+
+                        if (!csrfToken || !markUrl || !isUnread) {
+                            return;
+                        }
+
+                        event.preventDefault();
+
+                        const formData = new URLSearchParams();
+                        formData.append('_token', csrfToken);
+
+                        fetch(markUrl, {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': csrfToken,
+                                'Accept': 'application/json',
+                            },
+                            body: formData,
+                            credentials: 'same-origin',
+                        }).catch(() => {
+                            // Swallow errors; navigation continues regardless.
+                        }).finally(() => {
+                            window.location.href = targetUrl;
+                        });
+                    });
+                });
 
                 // Initial state
                 updateFilter(initialFilter);

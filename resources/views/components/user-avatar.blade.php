@@ -10,9 +10,11 @@
 @endphp
 
 <div {{ $attributes->class([
-        'rounded-full flex items-center justify-center overflow-hidden text-white font-semibold',
+        'rounded-full flex items-center justify-center overflow-hidden font-semibold ring-1 ring-gray-200',
         $size,
         $textSize,
+        'bg-brand-teal/15 text-brand-teal-dark' => !$profilePictureUrl,
+        'bg-gray-50 text-white' => $profilePictureUrl,
     ]) }}>
     @if($profilePictureUrl)
         <img src="{{ $profilePictureUrl }}" alt="{{ $user?->name ?? 'User' }} avatar" class="w-full h-full object-cover">

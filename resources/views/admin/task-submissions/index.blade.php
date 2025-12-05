@@ -77,98 +77,37 @@
                 </div>
             </div>
 
-            <!-- Filters -->
-            <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-3 sm:p-6 mb-4 sm:mb-6">
-                <div x-data="{ filtersOpen: false }" class="w-full">
-                    <button type="button" @click="filtersOpen = !filtersOpen" class="w-full sm:hidden flex items-center justify-between py-2.5 px-3 bg-gray-50 rounded-lg mb-0">
-                        <div class="flex items-center gap-2">
-                            <i class="fas fa-filter text-base" style="color: #2B9D8D;"></i>
-                            <span class="text-sm font-semibold text-gray-900">Filters</span>
-                            @if(request('search') || (request('task_type') && request('task_type') !== 'all'))
-                                <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-brand-teal text-white text-xs font-bold">{{ 
-                                    (request('search') ? 1 : 0) + 
-                                    (request('task_type') && request('task_type') !== 'all' ? 1 : 0) 
-                                }}</span>
-                            @endif
-                        </div>
-                        <i class="fas fa-chevron-down transition-transform text-sm" :class="{'rotate-180': filtersOpen}"></i>
+            <!-- Quick search + Task type filter -->
+            <div class="mb-4 sm:mb-6 flex flex-col sm:flex-row gap-3 sm:gap-4 sm:items-center sm:justify-between">
+                <div class="w-full sm:w-64">
+                    <label for="submissions-task-type" class="block text-xs font-semibold text-gray-600 mb-1">Task Type</label>
+                    <select id="submissions-task-type" class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-teal focus:border-brand-teal text-sm min-h-[40px] bg-white">
+                        <option value="all">All Types</option>
+                        <option value="daily">Daily Task</option>
+                        <option value="one_time">One-Time Task</option>
+                    </select>
+                </div>
+                <div class="relative w-full sm:w-96">
+                    <input
+                        type="text"
+                        id="submissions-search"
+                        placeholder="Search submissions..."
+                        class="w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-teal focus:border-brand-teal text-sm min-h-[40px]"
+                    >
+                    <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+                    <button
+                        type="button"
+                        id="clearSubmissionsSearch"
+                        class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                        aria-label="Clear search"
+                    >
+                        <i class="fas fa-times text-sm"></i>
                     </button>
-                    <div class="hidden sm:block mb-3 sm:mb-4">
-                        <h3 class="text-base sm:text-lg font-semibold text-gray-900 mb-1 flex items-center gap-2">
-                            <i class="fas fa-filter" style="color: #2B9D8D;"></i>
-                            Filter Submissions
-                        </h3>
-                        <p class="text-xs sm:text-sm text-gray-600">Refine your submission list by task type or search</p>
-                    </div>
-                <form action="{{ route('admin.task-submissions.index') }}" method="GET" id="filterForm" class="space-y-3 sm:space-y-4 mt-3 sm:mt-0" x-show="filtersOpen || window.innerWidth >= 640" x-cloak novalidate>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                        <!-- Search Input -->
-                        <div>
-                            <label for="search" class="hidden sm:block text-sm font-medium text-gray-700 mb-1.5">
-                                <i class="fas fa-search" style="color: #2B9D8D;"></i> Search
-                            </label>
-                            <div class="relative">
-                                <input type="text" 
-                                       name="search" 
-                                       id="search" 
-                                       value="{{ request('search') }}" 
-                                       placeholder="Search..."
-                                       class="w-full pl-10 pr-10 sm:pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm min-h-[40px] sm:min-h-[44px]">
-                                <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm"></i>
-                                @if(request('search'))
-                                    <button type="button" 
-                                            onclick="document.getElementById('search').value=''; document.getElementById('filterForm').submit();"
-                                            class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1 min-w-[28px] min-h-[28px] flex items-center justify-center">
-                                        <i class="fas fa-times text-sm"></i>
-                                    </button>
-                                @endif
-                            </div>
-                        </div>
-                        
-                        <!-- Task Type Filter -->
-                        <div>
-                            <label for="task_type" class="hidden sm:block text-sm font-medium text-gray-700 mb-1.5">Task Type</label>
-                            <select name="task_type" id="task_type" onchange="document.getElementById('filterForm').submit();" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm min-h-[40px] sm:min-h-[44px] bg-white">
-                                <option value="all" {{ request('task_type') === 'all' || !request('task_type') ? 'selected' : '' }}>All Types</option>
-                                <option value="daily" {{ request('task_type') === 'daily' ? 'selected' : '' }}>Daily Task</option>
-                                <option value="one_time" {{ request('task_type') === 'one_time' ? 'selected' : '' }}>One-Time Task</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    @if(request('search') || (request('task_type') && request('task_type') !== 'all'))
-                    <div class="flex justify-end pt-2">
-                        <a href="{{ route('admin.task-submissions.index') }}" class="inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium text-sm transition-colors min-h-[36px] sm:min-h-[40px]">
-                            <i class="fas fa-times text-xs"></i>
-                            <span class="hidden sm:inline">Clear</span>
-                        </a>
-                    </div>
-                    @endif
-                </form>
                 </div>
-                
-                <!-- Active Filters Display -->
-                @if(request('search') || (request('task_type') && request('task_type') !== 'all'))
-                <div class="mt-6 pt-6 border-t border-gray-200">
-                    <div class="flex flex-wrap items-center gap-2">
-                        <span class="text-sm font-medium text-gray-700">Active Filters:</span>
-                        @if(request('search'))
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
-                                <i class="fas fa-search mr-1"></i>
-                                Search: "{{ request('search') }}"
-                            </span>
-                        @endif
-                        @if(request('task_type') && request('task_type') !== 'all')
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium" style="background-color: rgba(43, 157, 141, 0.2); color: #2B9D8D;">
-                                Type: {{ ucfirst(str_replace('_', ' ', request('task_type'))) }}
-                            </span>
-                        @endif
-                    </div>
-                </div>
-                @endif
             </div>
 
             <!-- Submissions Table -->
+            <div id="submissions-table-container">
             <div class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
                 <div class="px-6 py-4 border-b border-gray-200">
                     <h3 class="text-lg font-semibold text-gray-900">Pending Submissions</h3>
@@ -189,9 +128,20 @@
                                 </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
                                     @foreach($submissions as $submission)
+                                    @php
+                                        $searchBlob = strtolower(
+                                            ($submission->user->name ?? '') . ' ' .
+                                            ($submission->user->email ?? '') . ' ' .
+                                            ($submission->task->title ?? '') . ' ' .
+                                            ($submission->task->task_type ?? '') . ' pending'
+                                        );
+                                    @endphp
                                     <tr onclick="window.location='{{ route('admin.task-submissions.show', $submission) }}'" class="transition-colors cursor-pointer"
                                         onmouseover="this.style.backgroundColor='rgba(43, 157, 141, 0.1)';"
-                                        onmouseout="this.style.backgroundColor='';">
+                                        onmouseout="this.style.backgroundColor='';"
+                                        data-submission-row
+                                        data-task-type="{{ $submission->task->task_type }}"
+                                        data-search="{{ $searchBlob }}">
                                         <td class="px-6 py-4">
                                                 <div class="flex items-center">
                                                 <x-user-avatar
@@ -267,7 +217,73 @@
                         <p class="text-sm text-gray-500">All task submissions have been reviewed.</p>
                         </div>
                     @endif
+                    <div id="submissions-search-empty" class="hidden text-center py-12 border-t border-gray-200">
+                        <div class="mx-auto h-14 w-14 bg-gray-100 rounded-full flex items-center justify-center mb-3 text-gray-400">
+                            <i class="fas fa-search text-xl"></i>
+                        </div>
+                        <h3 class="text-lg font-semibold text-gray-900 mb-1">No submissions match your search</h3>
+                        <p class="text-sm text-gray-500">Try a different keyword.</p>
+                    </div>
+            </div>
             </div>
         </div>
     </div>
 </x-admin-layout>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const clientSearch = document.getElementById('submissions-search');
+    const clearClientBtn = document.getElementById('clearSubmissionsSearch');
+    const emptyState = document.getElementById('submissions-search-empty');
+    const typeFilter = document.getElementById('submissions-task-type');
+
+    const applyClientFilter = () => {
+        const rows = Array.from(document.querySelectorAll('[data-submission-row]'));
+        if (!clientSearch || rows.length === 0) return;
+
+        const query = (clientSearch.value || '').trim().toLowerCase();
+        const selectedType = (typeFilter && typeFilter.value) || 'all';
+        let visible = 0;
+
+        rows.forEach(row => {
+            const haystack = (row.dataset.search || '').toLowerCase();
+            const rowType = (row.dataset.taskType || '').toLowerCase();
+            const typeMatches = selectedType === 'all' || rowType === selectedType;
+            const searchMatches = !query || haystack.includes(query);
+            const matches = typeMatches && searchMatches;
+            row.classList.toggle('hidden', !matches);
+            if (matches) visible++;
+        });
+
+        if (emptyState) {
+            emptyState.classList.toggle('hidden', visible !== 0);
+        }
+
+        if (clearClientBtn) {
+            clearClientBtn.classList.toggle('hidden', !query);
+        }
+    };
+
+    if (clientSearch) {
+        clientSearch.addEventListener('input', applyClientFilter);
+        clientSearch.addEventListener('keyup', applyClientFilter);
+        clientSearch.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') e.preventDefault();
+        });
+    }
+
+    if (clearClientBtn) {
+        clearClientBtn.addEventListener('click', () => {
+            clientSearch.value = '';
+            applyClientFilter();
+            clientSearch.focus();
+        });
+    }
+
+    if (typeFilter) {
+        typeFilter.addEventListener('change', applyClientFilter);
+    }
+
+    applyClientFilter();
+});
+</script>

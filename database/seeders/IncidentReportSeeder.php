@@ -33,7 +33,7 @@ class IncidentReportSeeder extends Seeder
         ];
 
         $statuses = ['pending', 'under_review', 'resolved', 'dismissed'];
-        $actionsTaken = ['warning', 'suspension', 'no_action', 'dismissed'];
+        $actionsTaken = ['warning', 'suspension', 'no_action'];
 
         // Create sample incident reports
         for ($i = 0; $i < 10; $i++) {

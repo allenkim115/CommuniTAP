@@ -38,10 +38,31 @@
             </div>
             
             @if($rewards->count() > 0)
-                <div class="mb-6 flex items-center justify-between">
+                <div class="mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                     <div>
                         <h3 class="text-xl font-bold text-gray-900 dark:text-gray-100">Available Rewards</h3>
                         <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Redeem your points for exciting rewards</p>
+                    </div>
+                    <div class="relative w-full sm:w-72">
+                        <input
+                            type="text"
+                            id="reward-search"
+                            placeholder="Search rewards..."
+                            class="w-full pl-10 pr-10 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-teal focus:border-brand-teal text-sm min-h-[40px] bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                        >
+                        <svg class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
+                        <button
+                            type="button"
+                            id="clearRewardSearch"
+                            class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
+                            aria-label="Clear search"
+                        >
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </button>
                     </div>
                 </div>
 
@@ -51,7 +72,9 @@
                             $user = auth()->user();
                             $hasEnoughPoints = $user && $user->points >= $reward->points_cost;
                         @endphp
-                        <div class="group bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-md transition-all duration-300 transform hover:-translate-y-1">
+                        <div class="group bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-md transition-all duration-300 transform hover:-translate-y-1"
+                             data-reward-card
+                             data-search="{{ strtolower(($reward->reward_name ?? '') . ' ' . ($reward->sponsor_name ?? '') . ' ' . ($reward->description ?? '')) }}">
                             <!-- Image Section -->
                             <div class="relative h-28 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 overflow-hidden">
                                 @if($reward->image_path)
@@ -155,6 +178,20 @@
                         </div>
                     @endforeach
                 </div>
+
+                <div id="rewards-search-empty" class="hidden bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+                    <div class="p-12 text-center">
+                        <div class="mx-auto w-24 h-24 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 rounded-full flex items-center justify-center mb-6">
+                            <svg class="w-12 h-12 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">No Rewards Match Your Search</h3>
+                        <p class="text-gray-600 dark:text-gray-400 mb-1 max-w-md mx-auto">
+                            Try a different keyword.
+                        </p>
+                    </div>
+                </div>
             @else
                 <!-- Empty State -->
                 <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
@@ -176,5 +213,54 @@
             @endif
         </div>
     </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const searchInput = document.getElementById('reward-search');
+        const clearBtn = document.getElementById('clearRewardSearch');
+        const cards = Array.from(document.querySelectorAll('[data-reward-card]'));
+        const emptyState = document.getElementById('rewards-search-empty');
+
+        if (!searchInput || cards.length === 0) return;
+
+        const applyFilter = () => {
+            const query = (searchInput.value || '').trim().toLowerCase();
+            let visibleCount = 0;
+
+            cards.forEach(card => {
+                const haystack = (card.dataset.search || '').toLowerCase();
+                const matches = !query || haystack.includes(query);
+                card.classList.toggle('hidden', !matches);
+                if (matches) visibleCount++;
+            });
+
+            if (emptyState) {
+                emptyState.classList.toggle('hidden', visibleCount !== 0);
+            }
+
+            if (clearBtn) {
+                clearBtn.classList.toggle('hidden', !query);
+            }
+        };
+
+        searchInput.addEventListener('input', applyFilter);
+        searchInput.addEventListener('keyup', applyFilter);
+        searchInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+            }
+        });
+
+        if (clearBtn) {
+            clearBtn.addEventListener('click', () => {
+                searchInput.value = '';
+                applyFilter();
+                searchInput.focus();
+            });
+        }
+
+        applyFilter();
+    });
+</script>
 </x-app-layout>
 

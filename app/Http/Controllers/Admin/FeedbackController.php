@@ -28,31 +28,36 @@ class FeedbackController extends Controller
     // Admins are not allowed to create task feedback
     public function create(Task $task)
     {
-        abort(403, 'Admins cannot create task feedback.');
+        return redirect()->route('admin.feedback.index')
+            ->with('error', 'Admins cannot create task feedback.');
     }
     
     // Admins are not allowed to store task feedback
     public function store(Request $request, Task $task)
     {
-        abort(403, 'Admins cannot create task feedback.');
+        return redirect()->route('admin.feedback.index')
+            ->with('error', 'Admins cannot create task feedback.');
     }
     
     // Admins are not allowed to edit feedback
     public function edit(Feedback $feedback)
     {
-        abort(403, 'Admins cannot edit task feedback.');
+        return redirect()->route('admin.feedback.index')
+            ->with('error', 'Admins cannot edit task feedback.');
     }
     
     // Admins are not allowed to update feedback
     public function update(Request $request, Feedback $feedback)
     {
-        abort(403, 'Admins cannot edit task feedback.');
+        return redirect()->route('admin.feedback.index')
+            ->with('error', 'Admins cannot edit task feedback.');
     }
     
     // Admins are not allowed to delete feedback
     public function destroy(Feedback $feedback)
     {
-        abort(403, 'Admins cannot delete task feedback.');
+        return redirect()->route('admin.feedback.index')
+            ->with('error', 'Admins cannot delete task feedback.');
     }
     
     /**

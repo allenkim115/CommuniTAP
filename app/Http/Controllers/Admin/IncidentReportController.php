@@ -89,6 +89,14 @@ class IncidentReportController extends Controller
     public function edit(UserIncidentReport $incidentReport)
     {
         $incidentReport->load(['reporter', 'reportedUser', 'task']);
+
+        // Prevent editing of finalized reports
+        if ($incidentReport->isResolved() || $incidentReport->isDismissed()) {
+            return redirect()
+                ->route('admin.incident-reports.show', $incidentReport)
+                ->with('error', 'Resolved or dismissed reports can no longer be edited.');
+        }
+
         $statuses = UserIncidentReport::getStatuses();
         $actionsTaken = UserIncidentReport::getActionsTaken();
         
@@ -100,10 +108,17 @@ class IncidentReportController extends Controller
      */
     public function update(Request $request, UserIncidentReport $incidentReport)
     {
+        // Prevent updates if already finalized
+        if ($incidentReport->isResolved() || $incidentReport->isDismissed()) {
+            return redirect()
+                ->route('admin.incident-reports.show', $incidentReport)
+                ->with('error', 'Resolved or dismissed reports can no longer be edited.');
+        }
+
         $request->validate([
             'status' => 'required|string|in:pending,under_review,resolved,dismissed',
             'moderator_notes' => 'nullable|string|max:1000',
-            'action_taken' => 'nullable|string|in:warning,suspension,no_action,dismissed',
+            'action_taken' => 'nullable|string|in:warning,suspension,no_action',
         ]);
 
         try {
@@ -145,6 +160,37 @@ class IncidentReportController extends Controller
                     [
                         'url' => route('incident-reports.show', $incidentReport),
                         'description' => $description,
+                    ]
+                );
+            }
+
+            // Notify the reported user when a warning is issued and deduct points
+            if ($request->action_taken === 'warning' && $incidentReport->reportedUser) {
+                $reportedUser = $incidentReport->reportedUser;
+                
+                // Deduct points for warning (default: 10 points)
+                $pointsToDeduct = 10;
+                $previousPoints = $reportedUser->points;
+                $reportedUser->points = max(0, $reportedUser->points - $pointsToDeduct);
+                $reportedUser->save();
+                $pointsDeducted = $previousPoints - $reportedUser->points;
+                
+                $warningMessage = 'You have received a warning. Repeated violations may result in account suspension.';
+                $warningDescription = $request->moderator_notes
+                    ? "Moderator notes: {$request->moderator_notes} • Please review the community guidelines. Repeated violations may result in account suspension."
+                    : 'Please review the community guidelines. Repeated violations may result in account suspension.';
+                
+                if ($pointsDeducted > 0) {
+                    $warningDescription .= " {$pointsDeducted} point" . ($pointsDeducted > 1 ? 's have' : ' has') . " been deducted from your account.";
+                }
+
+                $this->notificationService->notify(
+                    $reportedUser,
+                    'incident_warning',
+                    $warningMessage,
+                    [
+                        'url' => route('profile.edit', ['notice' => 'incident_warning']),
+                        'description' => $warningDescription,
                     ]
                 );
             }

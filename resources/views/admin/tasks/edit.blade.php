@@ -201,10 +201,10 @@
                                 Update Task
                             </button>
                             <button type="submit" name="action" value="publish"
-                                class="w-full sm:w-auto px-6 py-3 sm:py-2.5 text-sm font-semibold rounded-lg text-white shadow-md transition focus:ring-2 focus:ring-orange-400 focus:ring-offset-2 min-h-[44px] whitespace-nowrap"
-                                style="background-color: #F3A261;"
-                                onmouseover="this.style.backgroundColor='#E8944F'"
-                                onmouseout="this.style.backgroundColor='#F3A261'">
+                                class="w-full sm:w-auto px-6 py-3 sm:py-2.5 text-sm font-semibold rounded-lg text-white shadow-md transition focus:ring-2 focus:ring-teal-400 focus:ring-offset-2 min-h-[44px] whitespace-nowrap"
+                                style="background-color: #2B9D8D;"
+                                onmouseover="this.style.backgroundColor='#248A7C'"
+                                onmouseout="this.style.backgroundColor='#2B9D8D'">
                                 Update & Publish
                             </button>
                         @else

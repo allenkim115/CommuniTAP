@@ -37,6 +37,10 @@ class ProcessTaskDeadlines extends Command
         // Step 2: Mark expired task assignments as uncompleted (user-side cleanup + notifications)
         $this->markExpiredTasksAsUncompleted($notificationService);
 
+        // Step 2.5: Complete tasks where all participants have finished (regardless of end time)
+        $allCompletedUpdates = Task::completeTasksWithAllParticipantsDone();
+        $this->info("Completed processing for {$allCompletedUpdates} task(s) where all participants finished (status updated to completed).");
+
         // Step 3: Update task-level statuses for all expired tasks (including user-uploaded)
         // This ensures:
         // - Tasks with no participants are marked as "uncompleted" instead of staying "published/live"
@@ -204,10 +208,15 @@ class ProcessTaskDeadlines extends Command
 
         if ($task->end_time) {
             // Combine due_date date with end_time
-            $deadline = Carbon::parse($task->due_date->toDateString() . ' ' . $task->end_time);
+            // Parse in the application timezone (Asia/Manila) to ensure correct comparison
+            $deadline = Carbon::createFromFormat(
+                'Y-m-d H:i:s',
+                $task->due_date->toDateString() . ' ' . $task->end_time . ':00',
+                config('app.timezone')
+            );
         } else {
-            // Use due_date directly
-            $deadline = Carbon::parse($task->due_date);
+            // Use due_date directly - it's already a Carbon instance with timezone
+            $deadline = $task->due_date->copy()->setTimezone(config('app.timezone'));
         }
 
         return $deadline;

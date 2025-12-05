@@ -179,9 +179,23 @@
                                 @if($trimmed !== '')
                                     @if(strpos($trimmed, 'Image: ') === 0)
                                         @php $path = trim(substr($trimmed, 7)); @endphp
+                                        @php $photoUrl = asset('storage/' . $path); @endphp
                                         <div class="rounded-2xl border border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/40 p-3 sm:p-4 sm:col-span-2 lg:col-span-1">
-                                            <img src="{{ asset('storage/' . $path) }}" alt="Incident evidence image" class="h-48 sm:h-64 w-full rounded-2xl object-cover">
-                                            <div class="mt-2 text-xs text-gray-500 break-all">{{ $path }}</div>
+                                            <div class="relative overflow-hidden rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer group"
+                                                 onclick="openImageModal('{{ $photoUrl }}')">
+                                                <img
+                                                    src="{{ $photoUrl }}"
+                                                    alt="Incident evidence image"
+                                                    class="w-full h-48 sm:h-64 object-cover bg-white rounded-2xl transition-transform duration-200 group-hover:scale-[1.02]"
+                                                    data-photo-url="{{ $photoUrl }}"
+                                                    onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0zMCAzMEg3MFY3MEgzMFYzMFoiIHN0cm9rZT0iIzlDQTNBRiIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KPHBhdGggZD0iTTQwIDQwTDUwIDUwTDYwIDQwIiBzdHJva2U9IiM5Q0EzQUYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+CjxjaXJjbGUgY3g9IjQ1IiBjeT0iNDUiIHI9IjMiIGZpbGw9IiM5Q0EzQUYiLz4KPC9zdmc+';"
+                                                >
+                                                <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 flex items-center justify-center">
+                                                    <div class="bg-white rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                                        <i class="fas fa-search-plus text-gray-800"></i>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     @else
                                         <div class="rounded-2xl border border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-900/60 p-3 sm:p-4 sm:col-span-2">
@@ -230,4 +244,153 @@
             </div>
         </div>
     </div>
+
+    <div id="imageModal" class="fixed inset-0 bg-black bg-opacity-95 z-50 hidden flex items-center justify-center p-4" style="display: none;">
+        <div class="relative max-w-7xl max-h-full w-full h-full flex items-center justify-center">
+            <button onclick="closeImageModal()" class="absolute top-4 right-4 text-white hover:bg-white hover:bg-opacity-20 z-10 bg-black bg-opacity-60 rounded-full p-3 transition-all">
+                <span class="sr-only">Close</span>
+                <i class="fas fa-times text-lg"></i>
+            </button>
+
+            <button id="prevButton" onclick="previousImage()" class="absolute left-4 top-1/2 transform -translate-y-1/2 text-white hover:bg-white hover:bg-opacity-20 z-10 bg-black bg-opacity-60 rounded-full p-3 transition-all">
+                <i class="fas fa-chevron-left text-lg"></i>
+            </button>
+
+            <button id="nextButton" onclick="nextImage()" class="absolute right-4 top-1/2 transform -translate-y-1/2 text-white hover:bg-white hover:bg-opacity-20 z-10 bg-black bg-opacity-60 rounded-full p-3 transition-all">
+                <i class="fas fa-chevron-right text-lg"></i>
+            </button>
+
+            <div class="flex items-center justify-center w-full h-full">
+                <img id="modalImage" src="" alt="Incident evidence" class="max-w-full max-h-full object-contain rounded-lg shadow-2xl">
+            </div>
+
+            <div id="imageCounter" class="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-white bg-black bg-opacity-70 px-4 py-2 rounded-full text-sm font-medium">
+                <span id="currentImageIndex">1</span> / <span id="totalImages">1</span>
+            </div>
+
+            <button id="downloadButton" onclick="downloadImage()" class="absolute bottom-4 right-4 text-white hover:bg-white hover:bg-opacity-20 z-10 bg-black bg-opacity-60 rounded-full p-3 transition-all">
+                <i class="fas fa-download text-lg"></i>
+            </button>
+        </div>
+    </div>
+
+    @push('scripts')
+    <script>
+        let currentImageIndex = 0;
+        let imageSources = [];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const imageElements = document.querySelectorAll('img[data-photo-url]');
+            imageSources = Array.from(imageElements).map(img => img.getAttribute('data-photo-url'));
+
+            imageElements.forEach((img) => {
+                img.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const photoUrl = this.getAttribute('data-photo-url');
+                    openImageModal(photoUrl);
+                });
+            });
+        });
+
+        function openImageModal(imageSrc) {
+            currentImageIndex = imageSources.indexOf(imageSrc);
+            if (currentImageIndex === -1) currentImageIndex = 0;
+
+            updateModalImage();
+            const modal = document.getElementById('imageModal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                modal.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function closeImageModal() {
+            const modal = document.getElementById('imageModal');
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        function nextImage() {
+            if (imageSources.length > 1) {
+                currentImageIndex = (currentImageIndex + 1) % imageSources.length;
+                updateModalImage();
+            }
+        }
+
+        function previousImage() {
+            if (imageSources.length > 1) {
+                currentImageIndex = (currentImageIndex - 1 + imageSources.length) % imageSources.length;
+                updateModalImage();
+            }
+        }
+
+        function updateModalImage() {
+            const modalImage = document.getElementById('modalImage');
+            const currentIndexSpan = document.getElementById('currentImageIndex');
+            const totalImagesSpan = document.getElementById('totalImages');
+            const prevButton = document.getElementById('prevButton');
+            const nextButton = document.getElementById('nextButton');
+
+            if (imageSources.length > 0 && modalImage) {
+                modalImage.src = imageSources[currentImageIndex];
+                if (currentIndexSpan) currentIndexSpan.textContent = currentImageIndex + 1;
+                if (totalImagesSpan) totalImagesSpan.textContent = imageSources.length;
+
+                if (imageSources.length === 1) {
+                    if (prevButton) prevButton.style.display = 'none';
+                    if (nextButton) nextButton.style.display = 'none';
+                } else {
+                    if (prevButton) prevButton.style.display = 'block';
+                    if (nextButton) nextButton.style.display = 'block';
+                }
+            }
+        }
+
+        function downloadImage() {
+            if (imageSources.length > 0) {
+                const link = document.createElement('a');
+                link.href = imageSources[currentImageIndex];
+                link.download = `incident-evidence-${currentImageIndex + 1}.jpg`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+        }
+
+        document.addEventListener('click', function(e) {
+            const modal = document.getElementById('imageModal');
+            if (modal && e.target === modal) {
+                closeImageModal();
+            }
+        });
+
+        document.addEventListener('keydown', function(e) {
+            const modal = document.getElementById('imageModal');
+            if (modal && !modal.classList.contains('hidden')) {
+                switch(e.key) {
+                    case 'Escape':
+                        closeImageModal();
+                        break;
+                    case 'ArrowLeft':
+                        previousImage();
+                        break;
+                    case 'ArrowRight':
+                        nextImage();
+                        break;
+                }
+            }
+        });
+
+        document.addEventListener('click', function(e) {
+            if (e.target.id === 'modalImage') {
+                e.stopPropagation();
+            }
+        });
+    </script>
+    @endpush
 </x-app-layout>

@@ -42,7 +42,8 @@ class NotificationController extends Controller
         $user = $request->user();
 
         if ($notification->FK1_userId !== $user->userId) {
-            abort(403);
+            return redirect()->route('notifications.index')
+                ->with('error', 'You can only mark your own notifications as read.');
         }
 
         $notification->markAsRead();
