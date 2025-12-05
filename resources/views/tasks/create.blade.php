@@ -143,17 +143,54 @@
 
                             <!-- Location -->
                             <div>
-                                <label for="location" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                     Location <span class="text-red-500">*</span>
                                 </label>
-                                <select name="location" id="location"
-                                    class="w-full px-4 py-2 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 dark:bg-gray-800 dark:text-white transition-all"
-                                    required>
-                                    <option value="" disabled selected hidden>Select a sitio</option>
-                                    @foreach(['Pig Vendor','Ermita Proper','Kastilaan','Sitio Bato','YHC','Eyeseekers','Panagdait','Kawit'] as $loc)
-                                        <option value="{{ $loc }}" {{ old('location') == $loc ? 'selected' : '' }}>{{ $loc }}</option>
-                                    @endforeach
-                                </select>
+                                
+                                <!-- Location Type Selection -->
+                                <div class="flex gap-4 mb-3">
+                                    <label class="flex items-center">
+                                        <input type="radio" name="location_type" value="sitio" id="location_type_sitio" 
+                                            class="mr-2" 
+                                            {{ old('location_type', 'sitio') === 'sitio' ? 'checked' : '' }}
+                                            onchange="toggleLocationInput()">
+                                        <span class="text-sm text-gray-700 dark:text-gray-300">Sitio</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="radio" name="location_type" value="full_address" id="location_type_full_address"
+                                            class="mr-2"
+                                            {{ old('location_type') === 'full_address' ? 'checked' : '' }}
+                                            onchange="toggleLocationInput()">
+                                        <span class="text-sm text-gray-700 dark:text-gray-300">Full Address</span>
+                                    </label>
+                                </div>
+
+                                <!-- Sitio Dropdown -->
+                                <div id="location_sitio_container">
+                                    <select {{ old('location_type', 'sitio') === 'sitio' ? 'name="location"' : '' }} id="location_sitio"
+                                        class="w-full px-4 py-2 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 dark:bg-gray-800 dark:text-white transition-all"
+                                        {{ old('location_type', 'sitio') === 'sitio' ? 'required' : 'style="display:none;"' }}>
+                                        <option value="" disabled selected hidden>Select a sitio</option>
+                                        @foreach(['Pig Vendor','Ermita Proper','Kastilaan','Sitio Bato','YHC','Eyeseekers','Panagdait','Kawit'] as $loc)
+                                            <option value="{{ $loc }}" {{ old('location') == $loc ? 'selected' : '' }}>{{ $loc }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                <!-- Full Address Input -->
+                                <div id="location_address_container">
+                                    <input type="text" {{ old('location_type', 'sitio') === 'full_address' ? 'name="location"' : '' }} id="location_address" 
+                                        value="{{ old('location') }}"
+                                        class="w-full px-4 py-2 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 dark:bg-gray-800 dark:text-white transition-all"
+                                        placeholder="Enter full address (e.g., Street, Barangay, City)"
+                                        maxlength="255"
+                                        {{ old('location_type', 'sitio') === 'full_address' ? 'required' : 'style="display:none;"' }}>
+                                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Enter the complete address of the task location.</p>
+                                </div>
+
+                                @error('location')
+                                    <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                                @enderror
                             </div>
 
                             <!-- Participant Limit -->
@@ -201,5 +238,37 @@
                 update();
             }
         })();
+
+        function toggleLocationInput() {
+            const sitioRadio = document.getElementById('location_type_sitio');
+            const fullAddressRadio = document.getElementById('location_type_full_address');
+            const sitioSelect = document.getElementById('location_sitio');
+            const addressInput = document.getElementById('location_address');
+
+            if (sitioRadio && fullAddressRadio && sitioSelect && addressInput) {
+                if (sitioRadio.checked) {
+                    sitioSelect.style.display = 'block';
+                    sitioSelect.required = true;
+                    sitioSelect.setAttribute('name', 'location');
+                    addressInput.style.display = 'none';
+                    addressInput.required = false;
+                    addressInput.removeAttribute('name');
+                    addressInput.value = ''; // Clear address when switching to sitio
+                } else if (fullAddressRadio.checked) {
+                    sitioSelect.style.display = 'none';
+                    sitioSelect.required = false;
+                    sitioSelect.removeAttribute('name');
+                    sitioSelect.value = ''; // Clear sitio when switching to address
+                    addressInput.style.display = 'block';
+                    addressInput.required = true;
+                    addressInput.setAttribute('name', 'location');
+                }
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            toggleLocationInput();
+        });
     </script>
 </x-app-layout>
