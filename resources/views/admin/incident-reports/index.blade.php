@@ -244,10 +244,7 @@
                                     @foreach($reports as $report)
                                         <tr class="hover:bg-brand-teal/5 cursor-pointer" onclick="window.location='{{ route('admin.incident-reports.show', $report) }}'">
                                             <td class="px-4 sm:px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
-                                                <span class="inline-flex items-center gap-2">
-                                                    <i class="fas fa-file-signature text-brand-teal-dark"></i>
-                                                    #{{ $report->reportId }}
-                                                </span>
+                                                #{{ $report->reportId }}
                                             </td>
                                             <td class="px-4 sm:px-6 py-4 whitespace-nowrap">
                                                 <div class="text-sm font-medium text-gray-900 dark:text-gray-100">

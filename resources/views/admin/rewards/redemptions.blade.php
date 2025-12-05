@@ -5,6 +5,13 @@
                 <h2 class="text-3xl font-semibold text-gray-900 leading-tight">{{ __('Reward Redemptions') }}</h2>
                 <p class="text-sm text-gray-500">Track fulfillment without leaving the CommuniTAP visual language.</p>
             </div>
+            <div class="flex items-center gap-2">
+                <a href="{{ route('admin.rewards.index') }}"
+                   class="inline-flex items-center gap-2 rounded-lg border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-teal">
+                    <i class="fas fa-arrow-left"></i>
+                    Back to Rewards
+                </a>
+            </div>
         </div>
     </x-slot>
 
@@ -42,27 +49,27 @@
                         @endforeach
                     </div>
 
-                    <form method="GET" action="{{ route('admin.redemptions.index') }}" class="flex flex-col gap-2 sm:gap-3 rounded-xl sm:rounded-2xl border border-gray-100 bg-gray-50/60 p-3 sm:p-4 sm:flex-row sm:items-center" novalidate>
-                        <input type="hidden" name="status" value="{{ $activeTab }}">
-                        <label class="flex flex-1 items-center gap-2 sm:gap-3 rounded-lg sm:rounded-full bg-white px-3 sm:px-4 py-2 shadow-sm focus-within:ring-2 focus-within:ring-brand-teal/40 min-h-[40px] sm:min-h-[44px]">
-                            <svg class="h-4 w-4 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M16.65 16.65A7 7 0 1012 19a7 7 0 004.65-2.35z" />
-                            </svg>
+                    <div class="flex flex-col gap-2 sm:gap-3 rounded-xl sm:rounded-2xl border border-gray-100 bg-gray-50/60 p-3 sm:p-4 sm:flex-row sm:items-center">
+                        <div class="relative w-full sm:w-96">
                             <input
                                 type="text"
-                                name="search"
-                                value="{{ $search }}"
-                                placeholder="Search..."
-                                class="w-full border-0 bg-transparent text-sm focus:outline-none focus:ring-0"
+                                id="redemption-search"
+                                placeholder="Search redemptions..."
+                                class="w-full pl-10 pr-10 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-teal focus:border-brand-teal text-sm min-h-[40px]"
                             >
-                        </label>
-                        @if($search)
-                            <a href="{{ route('admin.redemptions.index', ['status' => $activeTab]) }}"
-                               class="text-sm font-semibold text-brand-teal hover:underline px-2 py-2 text-center sm:text-left">
-                                Clear
-                            </a>
-                        @endif
-                    </form>
+                            <svg class="h-4 w-4 text-gray-400 flex-shrink-0 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M16.65 16.65A7 7 0 1012 19a7 7 0 004.65-2.35z" />
+                            </svg>
+                            <button
+                                type="button"
+                                id="clearRedemptionSearch"
+                                class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                                aria-label="Clear search"
+                            >
+                                <i class="fas fa-times text-sm"></i>
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="overflow-x-auto">
@@ -84,7 +91,17 @@
                                         $couponCode = trim(\Illuminate\Support\Str::after($red->admin_notes, 'Coupon:'));
                                     }
                                 @endphp
-                                <tr class="hover:bg-gray-50">
+                                <tr
+                                    class="hover:bg-gray-50"
+                                    data-redemption-row
+                                    data-search="{{ strtolower(
+                                        ($red->user?->name ?? '') . ' ' .
+                                        ($red->user?->email ?? '') . ' ' .
+                                        ($red->reward?->reward_name ?? '') . ' ' .
+                                        ($couponCode ?? '') . ' ' .
+                                        ($red->status ?? '')
+                                    ) }}"
+                                >
                                     <td class="px-4 py-4">
                                         <p class="text-sm font-semibold text-gray-900">{{ $red->user?->name ?? '—' }}</p>
                                         <p class="text-xs text-gray-500">{{ $red->user?->email ?? '—' }}</p>
@@ -143,6 +160,14 @@
                     </table>
                 </div>
 
+                <div id="redemptions-search-empty" class="hidden bg-white rounded-lg border border-dashed border-gray-200 shadow-sm p-8 text-center text-sm text-gray-600">
+                    <div class="mx-auto h-12 w-12 bg-gray-100 rounded-full flex items-center justify-center mb-3 text-gray-400">
+                        <i class="fas fa-search text-lg"></i>
+                    </div>
+                    <p class="font-semibold text-gray-900">No redemptions match your search</p>
+                    <p>Try a different keyword.</p>
+                </div>
+
                 <div>
                     {{ $redemptions->links() }}
                 </div>
@@ -150,3 +175,52 @@
         </div>
     </div>
 </x-admin-layout>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const searchInput = document.getElementById('redemption-search');
+        const clearBtn = document.getElementById('clearRedemptionSearch');
+        const rows = Array.from(document.querySelectorAll('[data-redemption-row]'));
+        const emptyState = document.getElementById('redemptions-search-empty');
+
+        if (!searchInput || rows.length === 0) return;
+
+        const applyFilter = () => {
+            const query = (searchInput.value || '').trim().toLowerCase();
+            let visibleCount = 0;
+
+            rows.forEach(row => {
+                const haystack = (row.dataset.search || '').toLowerCase();
+                const matches = !query || haystack.includes(query);
+                row.classList.toggle('hidden', !matches);
+                if (matches) visibleCount++;
+            });
+
+            if (emptyState) {
+                emptyState.classList.toggle('hidden', visibleCount !== 0);
+            }
+
+            if (clearBtn) {
+                clearBtn.classList.toggle('hidden', !query);
+            }
+        };
+
+        searchInput.addEventListener('input', applyFilter);
+        searchInput.addEventListener('keyup', applyFilter);
+        searchInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+            }
+        });
+
+        if (clearBtn) {
+            clearBtn.addEventListener('click', () => {
+                searchInput.value = '';
+                applyFilter();
+                searchInput.focus();
+            });
+        }
+
+        applyFilter();
+    });
+</script>

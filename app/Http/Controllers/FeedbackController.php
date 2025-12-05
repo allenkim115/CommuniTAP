@@ -6,7 +6,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Feedback;
 use App\Models\Task;
-use App\Models\User;
 use App\Rules\HalfStarRating;
 
 class FeedbackController extends Controller
@@ -86,21 +85,10 @@ class FeedbackController extends Controller
             'feedback_date' => now(),
         ]);
         
-        // Award points for submitting feedback (respecting points cap)
-        $pointsResult = $user->addPoints(1);
-        
-        $successMessage = $pointsResult['added'] > 0
-            ? 'Feedback submitted successfully! You earned 1 point.'
-            : 'Feedback submitted successfully! However, you have reached the points cap (500 points), so no points were added.';
-        
-        $pointsEarned = $pointsResult['added'] > 0 ? $pointsResult['added'] : 0;
-        $successMessage = "Feedback for '{$task->title}' submitted successfully";
-        if ($pointsEarned > 0) {
-            $successMessage .= "! You earned {$pointsEarned} point" . ($pointsEarned > 1 ? 's' : '') . " for providing feedback.";
-        } else {
-            $successMessage .= ". Note: You've reached the points cap (500 points), so no additional points were awarded.";
-        }
-        return redirect()->route('tasks.show', $task)->with('success', $successMessage);
+        // Points are no longer awarded for feedback submissions
+        return redirect()
+            ->route('tasks.show', $task)
+            ->with('success', "Feedback for '{$task->title}' submitted successfully.");
     }
     
     /**

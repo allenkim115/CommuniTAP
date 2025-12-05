@@ -172,7 +172,6 @@ class UserIncidentReport extends Model
             'warning' => 'Warning Issued',
             'suspension' => 'User Suspended',
             'no_action' => 'No Action Required',
-            'dismissed' => 'Report Dismissed',
         ];
     }
 }

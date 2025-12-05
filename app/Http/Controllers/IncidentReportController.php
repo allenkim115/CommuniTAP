@@ -76,6 +76,7 @@ class IncidentReportController extends Controller
         $request->validate([
             'reported_user_id' => 'required|exists:users,userId',
             'incident_type' => 'required|string|max:50',
+            'incident_type_specification' => 'required_if:incident_type,other|string|min:3|max:50',
             'description' => 'required|string|min:10|max:1000',
             'evidence' => 'nullable|string|max:1000',
             'evidence_images' => 'nullable|array',
@@ -88,10 +89,16 @@ class IncidentReportController extends Controller
             return back()->withErrors(['reported_user_id' => 'You cannot report yourself.']);
         }
 
+        // Determine the incident type to store
+        $incidentTypeToStore = $request->incident_type;
+        if ($request->incident_type === 'other' && $request->filled('incident_type_specification')) {
+            $incidentTypeToStore = trim($request->incident_type_specification);
+        }
+
         // Check if user has already reported this user for the same incident type recently
         $existingReport = UserIncidentReport::where('FK1_reporterId', Auth::user()->userId)
             ->where('FK2_reportedUserId', $request->reported_user_id)
-            ->where('incident_type', $request->incident_type)
+            ->where('incident_type', $incidentTypeToStore)
             ->where('created_at', '>=', now()->subDays(7))
             ->first();
 
@@ -104,7 +111,7 @@ class IncidentReportController extends Controller
                 'FK1_reporterId' => Auth::user()->userId,
                 'FK2_reportedUserId' => $request->reported_user_id,
                 'FK3_taskId' => $request->task_id ?: null,
-                'incident_type' => $request->incident_type,
+                'incident_type' => $incidentTypeToStore,
                 'description' => $request->description,
                 'evidence' => $request->evidence,
                 'status' => 'pending',
@@ -154,7 +161,8 @@ class IncidentReportController extends Controller
         
         // Users can only view their own reports unless they're admin
         if (!$user->isAdmin() && $incidentReport->FK1_reporterId !== $user->userId) {
-            abort(403, 'Unauthorized access to incident report.');
+            return redirect()->route('incident-reports.index')
+                ->with('error', 'You can only view your own incident reports.');
         }
 
         $incidentReport->load(['reporter', 'reportedUser', 'task', 'moderator']);
@@ -167,7 +175,11 @@ class IncidentReportController extends Controller
      */
     public function edit(UserIncidentReport $incidentReport)
     {
-        $this->authorize('update', $incidentReport);
+        $user = Auth::user();
+        if (!$user->isAdmin()) {
+            return redirect()->route('incident-reports.index')
+                ->with('error', 'Only administrators can edit incident reports.');
+        }
         
         $incidentReport->load(['reporter', 'reportedUser', 'task']);
         $statuses = UserIncidentReport::getStatuses();
@@ -181,7 +193,11 @@ class IncidentReportController extends Controller
      */
     public function update(Request $request, UserIncidentReport $incidentReport)
     {
-        $this->authorize('update', $incidentReport);
+        $user = Auth::user();
+        if (!$user->isAdmin()) {
+            return redirect()->route('incident-reports.index')
+                ->with('error', 'Only administrators can update incident reports.');
+        }
         
         $request->validate([
             'status' => 'required|string|in:pending,under_review,resolved,dismissed',
@@ -224,7 +240,11 @@ class IncidentReportController extends Controller
      */
     public function destroy(UserIncidentReport $incidentReport)
     {
-        $this->authorize('delete', $incidentReport);
+        $user = Auth::user();
+        if (!$user->isAdmin()) {
+            return redirect()->route('incident-reports.index')
+                ->with('error', 'Only administrators can delete incident reports.');
+        }
         
         try {
             $incidentReport->delete();

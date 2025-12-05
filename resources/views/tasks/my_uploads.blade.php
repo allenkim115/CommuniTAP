@@ -64,7 +64,7 @@
             <!-- Stats -->
             <div class="grid grid-cols-3 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 mb-6 sm:mb-8">
                 @php 
-                    $labels = ['pending','live','rejected','completed','uncompleted','all'];
+                    $labels = ['pending','published','rejected','completed','uncompleted','all'];
                 @endphp
                 @foreach($labels as $label)
                 <button type="button" onclick="setStatusFilter('{{ $label }}')" 
@@ -85,7 +85,7 @@
                         <label for="status" class="block text-xs font-bold text-gray-600 dark:text-gray-300 mb-1.5">Status</label>
                         <div class="relative">
                             <select id="status" name="status" class="w-full border-2 border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 rounded-lg sm:rounded-xl shadow-sm pl-3 pr-10 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all appearance-none bg-white dark:bg-gray-900">
-                                @php $options = ['all' => 'All', 'pending' => 'Pending', 'live' => 'Live', 'rejected' => 'Rejected', 'completed' => 'Completed', 'uncompleted' => 'Uncompleted']; @endphp
+                                @php $options = ['all' => 'All', 'pending' => 'Pending', 'published' => 'Published', 'rejected' => 'Rejected', 'completed' => 'Completed', 'uncompleted' => 'Uncompleted']; @endphp
                                 @foreach($options as $value => $text)
                                     <option value="{{ $value }}" {{ ($activeStatus ?? 'all') === $value ? 'selected' : '' }}>{{ $text }}</option>
                                 @endforeach
@@ -133,10 +133,8 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="tasks-grid">
                     @foreach($uploads as $task)
                     @php
-                        // A task is "Live" only if it's approved/published AND not expired
-                        $isLive = in_array($task->status, ['approved','published']) && !$task->isExpired();
-                        // Exclude pending, completed, and live tasks from uncompleted
-                        $isUncompleted = !in_array($task->status, ['completed', 'pending']) && !$isLive;
+                        // Exclude pending, completed, approved, and published tasks from uncompleted
+                        $isUncompleted = !in_array($task->status, ['completed', 'pending', 'approved', 'published']);
                         
                         // Check if inactive task has been edited (updated after deactivation)
                         // Edited inactive tasks should show as pending (waiting for publishing) instead of cancelled
@@ -153,7 +151,8 @@
                         
                         // Determine display status: if inactive and edited, show as pending
                         $displayStatus = $inactiveButEdited ? 'pending' : $task->status;
-                        $taskStatus = $isLive ? 'live' : ($task->status === 'draft' || ($task->status === 'inactive' && !$inactiveButEdited) ? 'cancelled' : $displayStatus);
+                        // Convert approved status to published for display
+                        $taskStatus = in_array($task->status, ['approved', 'published']) ? 'published' : ($task->status === 'draft' || ($task->status === 'inactive' && !$inactiveButEdited) ? 'cancelled' : $displayStatus);
                     @endphp
                     <div class="group relative bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 border-2 border-gray-200 dark:border-gray-700 cursor-pointer task-card overflow-hidden" 
                          data-task-id="{{ $task->taskId }}"
@@ -179,14 +178,16 @@
                                         'pending' => ['bg' => 'rgba(254, 210, 179, 0.2)', 'color' => '#FED2B3'],
                                         'draft' => ['bg' => 'rgba(229, 231, 235, 0.5)', 'color' => '#6B7280'],
                                         'inactive' => ['bg' => 'rgba(229, 231, 235, 0.5)', 'color' => '#6B7280'],
-                                        'live' => ['bg' => '#2B9D8D', 'color' => '#FFFFFF'],
+                                        'published' => ['bg' => '#2B9D8D', 'color' => '#FFFFFF'],
                                         'completed' => ['bg' => '#2B9D8D', 'color' => '#FFFFFF'],
                                         'rejected' => ['bg' => '#2B9D8D', 'color' => '#FFFFFF'],
                                     ];
                                     // Use displayStatus for badge display (pending for edited inactive tasks)
                                     $badgeStatus = $inactiveButEdited ? 'pending' : $task->status;
-                                    $statusStyle = $isLive ? $statusConfig['live'] : ($badgeStatus === 'draft' || ($badgeStatus === 'inactive' && !$inactiveButEdited) ? $statusConfig['draft'] : ($statusConfig[$badgeStatus] ?? $statusConfig['pending']));
-                                    $badgeText = $isLive ? 'Live' : ($badgeStatus === 'draft' || ($badgeStatus === 'inactive' && !$inactiveButEdited) ? 'Cancelled' : ($inactiveButEdited ? 'Pending' : ucfirst($badgeStatus)));
+                                    // Convert approved status to published for badge display
+                                    $badgeStatus = in_array($badgeStatus, ['approved', 'published']) ? 'published' : $badgeStatus;
+                                    $statusStyle = ($badgeStatus === 'draft' || ($badgeStatus === 'inactive' && !$inactiveButEdited) ? $statusConfig['draft'] : ($statusConfig[$badgeStatus] ?? $statusConfig['pending']));
+                                    $badgeText = ($badgeStatus === 'draft' || ($badgeStatus === 'inactive' && !$inactiveButEdited) ? 'Cancelled' : ($inactiveButEdited ? 'Pending' : ucfirst($badgeStatus)));
                                 @endphp
                                 <span class="px-3 py-1.5 text-xs font-bold rounded-full shadow-sm whitespace-nowrap flex-shrink-0" style="background-color: {{ $statusStyle['bg'] }}; color: {{ $statusStyle['color'] }};">
                                     {{ $badgeText }}
@@ -245,9 +246,9 @@
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="button" onclick="showConfirmModal('Cancel this task proposal?', 'Cancel Task Proposal', 'Cancel', 'Keep', 'red').then(confirmed => { if(confirmed) document.getElementById('cancel-task-form-{{ $task->id }}').submit(); });" class="px-3 py-1.5 text-white text-xs font-bold rounded-xl shadow-md hover:shadow-lg transition-all duration-200"
-                                                            style="background-color: #2B9D8D;"
-                                                            onmouseover="this.style.backgroundColor='#248A7C'"
-                                                            onmouseout="this.style.backgroundColor='#2B9D8D'">Cancel</button>
+                                                            style="background-color: #F3A261;"
+                                                            onmouseover="this.style.backgroundColor='#E8944F'"
+                                                            onmouseout="this.style.backgroundColor='#F3A261'">Cancel</button>
                                                 </form>
                                             @endif
                                         @else
@@ -325,9 +326,6 @@
                     isExpired = new Date() > dueDate;
                 }
             }
-            
-            // A task is "Live" only if it's approved/published AND not expired
-            const isLive = ['approved', 'published'].includes(task.status) && !isExpired;
 
             contentEl.innerHTML = `
                 <div class="border-b border-gray-200 dark:border-gray-700 -mt-2 -mx-6 px-6 pb-4">

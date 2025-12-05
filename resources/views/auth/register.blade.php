@@ -90,30 +90,6 @@
                 <x-input-error :messages="$errors->get('lastName')" class="mt-2 text-red-500 text-xs" />
             </div>
 
-            <!-- Sitio Dropdown (FIXED) -->
-            <div class="input-group">
-                <select 
-                    id="sitio" 
-                    name="sitio" 
-                    class="w-full px-4 pt-5 pb-2 bg-transparent border-b-2 border-gray-300 text-gray-800 text-base font-medium focus:border-primary focus:outline-none transition-all duration-300 appearance-none cursor-pointer"
-                    required
-                >
-                    <option value="" disabled selected hidden>Select a sitio</option>
-                    <option value="Pig Vendor">Pig Vendor</option>
-                    <option value="Ermita Proper">Ermita Proper</option>
-                    <option value="Kastilaan">Kastilaan</option>
-                    <option value="Sitio Bato">Sitio Bato</option>
-                    <option value="YHC">YHC</option>
-                    <option value="Eyeseekers">Eyeseekers</option>
-                    <option value="Panagdait">Panagdait</option>
-                    <option value="Kawit">Kawit</option>
-                </select>
-                <label for="sitio" class="pointer-events-none">
-                    {{ __('Sitio') }}
-                </label>
-                <x-input-error :messages="$errors->get('sitio')" class="mt-2 text-red-500 text-xs" />
-            </div>
-
             <!-- Email -->
             <div class="input-group">
                 <x-text-input 

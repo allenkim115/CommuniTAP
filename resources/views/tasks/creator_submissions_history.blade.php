@@ -9,41 +9,41 @@
             </div>
             
             <a href="{{ route('tasks.creator.submissions') }}" 
-               class="inline-flex items-center px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white text-sm font-medium rounded-lg transition-colors"
+               class="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2.5 sm:py-2 bg-gray-600 hover:bg-gray-700 text-white text-sm font-semibold rounded-lg transition-colors min-h-[44px]"
                style="color: white !important;">
-                <i class="fas fa-arrow-left mr-2" style="color: white !important;"></i>
+                <i class="fas fa-arrow-left mr-2 text-base" style="color: white !important;"></i>
                 Back to Pending
             </a>
         </div>
     </x-slot>
 
-    <div class="py-8">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+    <div class="py-4 sm:py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <!-- Toast Notifications -->
             <x-session-toast />
             
             <!-- Statistics Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-5 hover:shadow-md transition-shadow">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-4 sm:mb-6">
+                <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-4 sm:p-5 hover:shadow-md transition-shadow">
                     <div class="flex items-center justify-between">
                         <div>
-                            <p class="text-sm font-medium text-gray-600 mb-1">Total Completed</p>
-                            <p class="text-2xl font-bold text-gray-900">{{ $stats['total_completed'] }}</p>
+                            <p class="text-xs sm:text-sm font-medium text-gray-600 mb-1">Total Completed</p>
+                            <p class="text-xl sm:text-2xl font-bold text-gray-900">{{ $stats['total_completed'] }}</p>
                             </div>
-                        <div class="h-12 w-12 rounded-lg bg-green-50 flex items-center justify-center">
-                            <i class="fas fa-check-circle text-green-600 text-xl"></i>
+                        <div class="h-10 w-10 sm:h-12 sm:w-12 rounded-lg flex items-center justify-center flex-shrink-0" style="background-color: rgba(43, 157, 141, 0.2);">
+                            <i class="fas fa-check-circle text-lg sm:text-xl" style="color: #2B9D8D;"></i>
                         </div>
                     </div>
                 </div>
 
-                <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-5 hover:shadow-md transition-shadow">
+                <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-4 sm:p-5 hover:shadow-md transition-shadow">
                     <div class="flex items-center justify-between">
                         <div>
-                            <p class="text-sm font-medium text-gray-600 mb-1">Total Rejected</p>
-                            <p class="text-2xl font-bold text-gray-900">{{ $stats['total_rejected'] }}</p>
+                            <p class="text-xs sm:text-sm font-medium text-gray-600 mb-1">Total Rejected</p>
+                            <p class="text-xl sm:text-2xl font-bold text-gray-900">{{ $stats['total_rejected'] }}</p>
                             </div>
-                        <div class="h-12 w-12 rounded-lg bg-red-50 flex items-center justify-center">
-                            <i class="fas fa-times-circle text-red-600 text-xl"></i>
+                        <div class="h-10 w-10 sm:h-12 sm:w-12 rounded-lg flex items-center justify-center flex-shrink-0" style="background-color: rgba(43, 157, 141, 0.2);">
+                            <i class="fas fa-times-circle text-lg sm:text-xl" style="color: #2B9D8D;"></i>
                         </div>
                     </div>
                 </div>
@@ -54,103 +54,63 @@
                 <div class="border-b border-gray-200">
                     <nav class="flex" aria-label="Tabs">
                         <a href="{{ route('tasks.creator.history', ['type' => 'completed']) }}" 
-                           class="@if($type === 'completed') border-green-500 text-green-600 bg-green-50 @else border-transparent text-gray-600 hover:text-gray-800 hover:border-gray-300 @endif flex-1 text-center py-4 px-4 border-b-2 font-medium text-sm transition-colors">
+                           class="@if($type === 'completed') @else border-transparent text-gray-600 hover:text-gray-800 hover:border-gray-300 @endif flex-1 text-center py-3 sm:py-4 px-2 sm:px-4 border-b-2 font-medium text-xs sm:text-sm transition-colors min-h-[44px] sm:min-h-auto flex items-center justify-center"
+                           @if($type === 'completed') style="border-color: #2B9D8D; color: #2B9D8D; background-color: rgba(43, 157, 141, 0.1);" @endif>
                             <div class="flex items-center justify-center">
-                                <i class="fas fa-check-circle mr-2"></i>
-                                Completed ({{ $stats['total_completed'] }})
+                                <i class="fas fa-check-circle mr-1 sm:mr-2 text-xs sm:text-sm"></i>
+                                <span class="hidden sm:inline">Completed</span>
+                                <span class="sm:hidden">Done</span>
+                                <span class="ml-1 sm:ml-2">({{ $stats['total_completed'] }})</span>
                             </div>
                         </a>
                         <a href="{{ route('tasks.creator.history', ['type' => 'rejected']) }}" 
-                           class="@if($type === 'rejected') border-red-500 text-red-600 bg-red-50 @else border-transparent text-gray-600 hover:text-gray-800 hover:border-gray-300 @endif flex-1 text-center py-4 px-4 border-b-2 font-medium text-sm transition-colors">
+                           class="@if($type === 'rejected') @else border-transparent text-gray-600 hover:text-gray-800 hover:border-gray-300 @endif flex-1 text-center py-3 sm:py-4 px-2 sm:px-4 border-b-2 font-medium text-xs sm:text-sm transition-colors min-h-[44px] sm:min-h-auto flex items-center justify-center"
+                           @if($type === 'rejected') style="border-color: #2B9D8D; color: #2B9D8D; background-color: rgba(43, 157, 141, 0.1);" @endif>
                             <div class="flex items-center justify-center">
-                                <i class="fas fa-times-circle mr-2"></i>
-                                Rejected ({{ $stats['total_rejected'] }})
+                                <i class="fas fa-times-circle mr-1 sm:mr-2 text-xs sm:text-sm"></i>
+                                <span class="hidden sm:inline">Rejected</span>
+                                <span class="sm:hidden">Rej</span>
+                                <span class="ml-1 sm:ml-2">({{ $stats['total_rejected'] }})</span>
                             </div>
                         </a>
                     </nav>
                 </div>
             </div>
 
-            <!-- Filters -->
-            <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-6 mb-6">
-                <div class="mb-4">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-1 flex items-center gap-2">
-                        <i class="fas fa-filter text-blue-600"></i>
-                        Filter Submissions
-                    </h3>
-                    <p class="text-sm text-gray-600">Refine your submission list by task type or search</p>
+            <!-- Quick search + Task type filter -->
+            <div class="mb-4 sm:mb-6 flex flex-col sm:flex-row gap-3 sm:gap-4 sm:items-center sm:justify-between">
+                <div class="w-full sm:w-64">
+                    <label for="history-task-type" class="block text-xs font-semibold text-gray-600 mb-1">Task Type</label>
+                    <select id="history-task-type" class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-teal focus:border-brand-teal text-sm min-h-[40px] bg-white">
+                        <option value="all">All Types</option>
+                        <option value="daily">Daily Task</option>
+                        <option value="one_time">One-Time Task</option>
+                    </select>
                 </div>
-                <form action="{{ route('tasks.creator.history') }}" method="GET" id="filterForm" class="space-y-4" novalidate>
-                    <input type="hidden" name="type" value="{{ $type }}">
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <!-- Search Input -->
-                        <div>
-                            <label for="search" class="block text-sm font-medium text-gray-700 mb-2">
-                                <i class="fas fa-search text-blue-600"></i> Search
-                            </label>
-                            <div class="relative">
-                                <input type="text" 
-                                       name="search" 
-                                       id="search" 
-                                       value="{{ request('search') }}" 
-                                       placeholder="Search by task title, user name, or email..."
-                                       class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                                <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                                @if(request('search'))
-                                    <button type="button" 
-                                            onclick="document.getElementById('search').value=''; document.getElementById('filterForm').submit();"
-                                            class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                                        <i class="fas fa-times"></i>
-                                    </button>
-                                @endif
-                            </div>
-                        </div>
-                        
-                        <!-- Task Type Filter -->
-                        <div>
-                            <label for="task_type" class="block text-sm font-medium text-gray-700 mb-2">Task Type</label>
-                            <select name="task_type" id="task_type" onchange="document.getElementById('filterForm').submit();" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                                <option value="all" {{ request('task_type') === 'all' || !request('task_type') ? 'selected' : '' }}>All Types</option>
-                                <option value="daily" {{ request('task_type') === 'daily' ? 'selected' : '' }}>Daily Task</option>
-                                <option value="one_time" {{ request('task_type') === 'one_time' ? 'selected' : '' }}>One-Time Task</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <div class="flex justify-end mt-4">
-                        <a href="{{ route('tasks.creator.history', ['type' => $type]) }}" class="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium transition-colors">
-                            <i class="fas fa-times"></i>
-                            Clear Filters
-                        </a>
-                    </div>
-                </form>
-                
-                <!-- Active Filters Display -->
-                @if(request('search') || (request('task_type') && request('task_type') !== 'all'))
-                <div class="mt-6 pt-6 border-t border-gray-200">
-                    <div class="flex flex-wrap items-center gap-2">
-                        <span class="text-sm font-medium text-gray-700">Active Filters:</span>
-                        @if(request('search'))
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
-                                <i class="fas fa-search mr-1"></i>
-                                Search: "{{ request('search') }}"
-                            </span>
-                        @endif
-                        @if(request('task_type') && request('task_type') !== 'all')
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                Type: {{ ucfirst(str_replace('_', ' ', request('task_type'))) }}
-                            </span>
-                        @endif
-                    </div>
+                <div class="relative w-full sm:w-96">
+                    <input
+                        type="text"
+                        id="history-search"
+                        placeholder="Search submissions..."
+                        class="w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-teal focus:border-brand-teal text-sm min-h-[40px]"
+                    >
+                    <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+                    <button
+                        type="button"
+                        id="clearHistorySearch"
+                        class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                        aria-label="Clear search"
+                    >
+                        <i class="fas fa-times text-sm"></i>
+                    </button>
                 </div>
-                @endif
             </div>
 
             <!-- Submissions Table -->
+            <div id="submissions-table-container">
             <div class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
-                <div class="px-6 py-4 border-b border-gray-200">
-                    <h3 class="text-lg font-semibold text-gray-900">
+                <div class="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200">
+                    <h3 class="text-base sm:text-lg font-semibold text-gray-900">
                         @if($type === 'completed')
                             Completed Submissions
                         @else
@@ -160,7 +120,8 @@
                 </div>
                     
                     @if($submissions->count() > 0)
-                        <div class="overflow-x-auto">
+                        <!-- Desktop Table View -->
+                        <div class="hidden sm:block overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead class="bg-gray-50">
                                     <tr>
@@ -183,7 +144,19 @@
                                 </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
                                     @foreach($submissions as $submission)
-                                    <tr onclick="window.location='{{ route('tasks.creator.show', $submission) }}'" class="hover:bg-blue-50 transition-colors cursor-pointer">
+                                    @php
+                                        $searchBlob = strtolower(
+                                            ($submission->user->name ?? '') . ' ' .
+                                            ($submission->user->email ?? '') . ' ' .
+                                            ($submission->task->title ?? '') . ' ' .
+                                            ($submission->task->task_type ?? '') . ' ' .
+                                            ($type === 'completed' ? 'completed' : 'rejected')
+                                        );
+                                    @endphp
+                                    <tr onclick="window.location='{{ route('tasks.creator.show', $submission) }}'" class="hover:bg-blue-50 transition-colors cursor-pointer"
+                                        data-history-row
+                                        data-task-type="{{ $submission->task->task_type }}"
+                                        data-search="{{ $searchBlob }}">
                                         <td class="px-6 py-4">
                                                 <div class="flex items-center">
                                                 <x-user-avatar
@@ -191,7 +164,7 @@
                                                     size="h-10 w-10"
                                                     text-size="text-sm"
                                                     class="flex-shrink-0 text-white font-semibold"
-                                                    style="background-image: linear-gradient(to bottom right, {{ $type === 'completed' ? '#22c55e' : '#ef4444' }}, {{ $type === 'completed' ? '#16a34a' : '#dc2626' }});"
+                                                    style="background-image: linear-gradient(to bottom right, {{ $type === 'completed' ? '#22c55e' : '#ef4444' }}, {{ $type === 'completed' ? '#16a34a' : '#dc2626' }}); color: #fff;"
                                                 />
                                                 <div class="ml-3">
                                                     <div class="text-sm font-medium text-gray-900">{{ $submission->user->name }}</div>
@@ -249,6 +222,90 @@
                                 </tbody>
                             </table>
                         </div>
+                        
+                        <!-- Mobile Card View -->
+                        <div class="sm:hidden space-y-3 p-4">
+                            @foreach($submissions as $submission)
+                                @php
+                                    $searchBlob = strtolower(
+                                        ($submission->user->name ?? '') . ' ' .
+                                        ($submission->user->email ?? '') . ' ' .
+                                        ($submission->task->title ?? '') . ' ' .
+                                        ($submission->task->task_type ?? '') . ' ' .
+                                        ($type === 'completed' ? 'completed' : 'rejected')
+                                    );
+                                @endphp
+                                <div onclick="window.location='{{ route('tasks.creator.show', $submission) }}'" class="bg-white border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+                                    data-history-row
+                                    data-task-type="{{ $submission->task->task_type }}"
+                                    data-search="{{ $searchBlob }}">
+                                    <div class="flex items-start justify-between mb-3">
+                                        <div class="flex items-center flex-1 min-w-0">
+                                            <x-user-avatar
+                                                :user="$submission->user"
+                                                size="h-10 w-10"
+                                                text-size="text-sm"
+                                                class="flex-shrink-0 text-white font-semibold"
+                                                style="background-image: linear-gradient(to bottom right, {{ $type === 'completed' ? '#22c55e' : '#ef4444' }}, {{ $type === 'completed' ? '#16a34a' : '#dc2626' }}); color: #fff;"
+                                            />
+                                            <div class="ml-3 min-w-0 flex-1">
+                                                <div class="text-sm font-semibold text-gray-900 truncate">{{ $submission->user->name }}</div>
+                                                <div class="text-xs text-gray-500 truncate">{{ $submission->user->email }}</div>
+                                            </div>
+                                        </div>
+                                        <i class="fas fa-chevron-right text-gray-400 flex-shrink-0 ml-2"></i>
+                                    </div>
+                                    
+                                    <div class="space-y-2">
+                                        <div>
+                                            <div class="text-xs font-medium text-gray-500 mb-0.5">Task</div>
+                                            <div class="text-sm font-semibold text-gray-900">{{ $submission->task->title }}</div>
+                                            <div class="text-xs text-gray-500">{{ ucfirst(str_replace('_', ' ', $submission->task->task_type)) }}</div>
+                                        </div>
+                                        
+                                        <div class="flex items-center justify-between pt-2 border-t border-gray-100">
+                                            <div class="flex flex-wrap gap-2">
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium
+                                                    @if($submission->photos && count($submission->photos) > 0) bg-green-100 text-green-800
+                                                    @else bg-gray-100 text-gray-600
+                                                    @endif">
+                                                    <i class="fas fa-images mr-1 text-xs"></i>
+                                                    {{ $submission->photos ? count($submission->photos) : 0 }}
+                                                </span>
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded-lg text-xs font-semibold bg-blue-50 text-blue-700">
+                                                    <i class="fas fa-star mr-1 text-xs"></i>
+                                                    {{ $submission->task->points_awarded }}
+                                                </span>
+                                                @if($type === 'rejected')
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                                    <i class="fas fa-exclamation-triangle mr-1 text-xs"></i>
+                                                    {{ $submission->rejection_count ?? 0 }}/3
+                                                </span>
+                                                @endif
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="text-xs text-gray-500 pt-1">
+                                            @if($type === 'completed')
+                                                @if($submission->completed_at)
+                                                    <i class="fas fa-check-circle mr-1"></i>
+                                                    {{ is_string($submission->completed_at) ? \Carbon\Carbon::parse($submission->completed_at)->format('M j, Y g:i A') : $submission->completed_at->format('M j, Y g:i A') }}
+                                                @else
+                                                    <span class="text-gray-400">N/A</span>
+                                                @endif
+                                            @else
+                                                @if($submission->updated_at)
+                                                    <i class="fas fa-times-circle mr-1"></i>
+                                                    {{ is_string($submission->updated_at) ? \Carbon\Carbon::parse($submission->updated_at)->format('M j, Y g:i A') : $submission->updated_at->format('M j, Y g:i A') }}
+                                                @else
+                                                    <span class="text-gray-400">N/A</span>
+                                                @endif
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
 
                         <!-- Pagination -->
                     <div class="px-6 py-4 border-t border-gray-200">
@@ -275,8 +332,73 @@
                             </p>
                         </div>
                     @endif
+                    <div id="history-search-empty" class="hidden text-center py-12 border-t border-gray-200">
+                        <div class="mx-auto h-14 w-14 bg-gray-100 rounded-full flex items-center justify-center mb-3 text-gray-400">
+                            <i class="fas fa-search text-xl"></i>
+                        </div>
+                        <h3 class="text-lg font-semibold text-gray-900 mb-1">No submissions match your search</h3>
+                        <p class="text-sm text-gray-500">Try a different keyword.</p>
+                    </div>
+            </div>
             </div>
         </div>
     </div>
 </x-app-layout>
 
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const clientSearch = document.getElementById('history-search');
+    const clearClientBtn = document.getElementById('clearHistorySearch');
+    const emptyState = document.getElementById('history-search-empty');
+    const typeFilter = document.getElementById('history-task-type');
+
+    const applyClientFilter = () => {
+        const rows = Array.from(document.querySelectorAll('[data-history-row]'));
+        if (!clientSearch || rows.length === 0) return;
+
+        const query = (clientSearch.value || '').trim().toLowerCase();
+        const selectedType = (typeFilter && typeFilter.value) || 'all';
+        let visible = 0;
+
+        rows.forEach(row => {
+            const haystack = (row.dataset.search || '').toLowerCase();
+            const rowType = (row.dataset.taskType || '').toLowerCase();
+            const typeMatches = selectedType === 'all' || rowType === selectedType;
+            const searchMatches = !query || haystack.includes(query);
+            const matches = typeMatches && searchMatches;
+            row.classList.toggle('hidden', !matches);
+            if (matches) visible++;
+        });
+
+        if (emptyState) {
+            emptyState.classList.toggle('hidden', visible !== 0);
+        }
+
+        if (clearClientBtn) {
+            clearClientBtn.classList.toggle('hidden', !query);
+        }
+    };
+
+    if (clientSearch) {
+        clientSearch.addEventListener('input', applyClientFilter);
+        clientSearch.addEventListener('keyup', applyClientFilter);
+        clientSearch.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') e.preventDefault();
+        });
+    }
+
+    if (clearClientBtn) {
+        clearClientBtn.addEventListener('click', () => {
+            clientSearch.value = '';
+            applyClientFilter();
+            clientSearch.focus();
+        });
+    }
+
+    if (typeFilter) {
+        typeFilter.addEventListener('change', applyClientFilter);
+    }
+
+    applyClientFilter();
+});
+</script>

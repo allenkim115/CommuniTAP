@@ -49,6 +49,9 @@
         
         <!-- Global Confirmation Modal -->
         <x-confirmation-modal />
+
+        {{-- Page-specific scripts --}}
+        @stack('scripts')
     </body>
 </html>
 

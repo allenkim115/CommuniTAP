@@ -21,7 +21,8 @@ class AdminMiddleware
         }
 
         if (!Auth::user()->isAdmin()) {
-            return redirect()->route('dashboard');
+            return redirect()->route('dashboard')
+                ->with('error', 'You do not have permission to access the admin area.');
         }
 
         return $next($request);

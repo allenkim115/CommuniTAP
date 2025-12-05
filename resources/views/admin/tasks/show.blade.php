@@ -269,6 +269,13 @@
                                             </div>
                                         @endforeach
                                     </div>
+
+                                    <div class="mt-3 sm:mt-4">
+                                        <button onclick="openParticipantsModal()" class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold rounded-lg transition-all duration-200 shadow-sm hover:shadow-md" style="background-color: #F3A261; color: white;" onmouseover="this.style.backgroundColor='#E8944F';" onmouseout="this.style.backgroundColor='#F3A261';">
+                                            <i class="fas fa-users"></i>
+                                            View All Participants
+                                        </button>
+                                    </div>
                                     
                                 @else
                                     <div class="text-center py-6 sm:py-8">

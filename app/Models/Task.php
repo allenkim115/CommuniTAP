@@ -153,15 +153,18 @@ class Task extends Model
     public function scopeExpired($query)
     {
         // If end_time exists, use DATE(due_date) + end_time; otherwise use due_date directly
-        return $query->where(function ($q) {
-            $q->where(function ($q2) {
+        // Use Laravel's timezone-aware now() instead of MySQL's NOW() to respect Asia/Manila timezone
+        $now = now(); // This uses the configured timezone (Asia/Manila)
+        
+        return $query->where(function ($q) use ($now) {
+            $q->where(function ($q2) use ($now) {
                 $q2->whereNotNull('end_time')
-                   ->whereRaw("CONCAT(DATE(due_date), ' ', end_time) < NOW()");
+                   ->whereRaw("CONCAT(DATE(due_date), ' ', end_time) < ?", [$now->format('Y-m-d H:i:s')]);
             })
-            ->orWhere(function ($q3) {
+            ->orWhere(function ($q3) use ($now) {
                 $q3->whereNull('end_time')
                    ->whereNotNull('due_date')
-                   ->where('due_date', '<', now());
+                   ->where('due_date', '<', $now);
             });
         });
     }
@@ -171,16 +174,19 @@ class Task extends Model
      */
     public function scopeNotExpired($query)
     {
-        return $query->where(function ($q) {
-            $q->where(function ($q2) {
+        // Use Laravel's timezone-aware now() instead of MySQL's NOW() to respect Asia/Manila timezone
+        $now = now(); // This uses the configured timezone (Asia/Manila)
+        
+        return $query->where(function ($q) use ($now) {
+            $q->where(function ($q2) use ($now) {
                 $q2->whereNotNull('end_time')
-                   ->whereRaw("CONCAT(DATE(due_date), ' ', end_time) >= NOW()");
+                   ->whereRaw("CONCAT(DATE(due_date), ' ', end_time) >= ?", [$now->format('Y-m-d H:i:s')]);
             })
-            ->orWhere(function ($q3) {
+            ->orWhere(function ($q3) use ($now) {
                 $q3->whereNull('end_time')
-                   ->where(function ($q4) {
+                   ->where(function ($q4) use ($now) {
                         $q4->whereNull('due_date')
-                           ->orWhere('due_date', '>=', now());
+                           ->orWhere('due_date', '>=', $now);
                    });
             });
         });
@@ -388,5 +394,40 @@ class Task extends Model
         }
         
         return false;
+    }
+
+    /**
+     * Check and mark all tasks as completed if all their participants have finished
+     * This runs regardless of expiration time - if everyone is done, task is complete
+     */
+    public static function completeTasksWithAllParticipantsDone(): int
+    {
+        $updatedCount = 0;
+
+        // Get all active tasks that have participants and aren't already completed
+        $activeTasks = static::whereIn('status', ['published', 'assigned', 'submitted', 'approved'])
+            ->whereHas('assignments')
+            ->with('assignments')
+            ->get();
+
+        foreach ($activeTasks as $task) {
+            // Check if all participants have completed their assignments
+            $totalAssignments = $task->assignments()->count();
+            
+            if ($totalAssignments > 0) {
+                $completedAssignments = $task->assignments()
+                    ->where('status', 'completed')
+                    ->count();
+                
+                // If all assignments are completed, mark the task as completed
+                if ($completedAssignments === $totalAssignments) {
+                    $task->status = 'completed';
+                    $task->save();
+                    $updatedCount++;
+                }
+            }
+        }
+
+        return $updatedCount;
     }
 }

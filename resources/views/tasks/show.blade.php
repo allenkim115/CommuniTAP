@@ -1059,7 +1059,7 @@
                                 </div>
 
                                 <!-- File input for photos (max 3) -->
-                                <input type="file" id="photos" name="photos[]" multiple accept="image/*" class="hidden" aria-describedby="photos-help">
+                                <input type="file" id="photos" name="photos[]" multiple accept="image/*,.webp,image/webp" class="hidden" aria-describedby="photos-help">
                                 
                                 <!-- In-form Upload Area (only when progress is done) -->
                                 <div id="form-upload-area" class="mt-4 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center hover:border-gray-400 dark:hover:border-gray-500 transition-colors cursor-pointer">
@@ -1068,7 +1068,7 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                                         </svg>
                                         <p id="form-upload-text" class="text-sm text-gray-600 dark:text-gray-400 mb-1">Click to select photos or drag and drop (2–3 photos)</p>
-                                        <p id="photos-help" class="text-xs text-gray-500 dark:text-gray-400">Max 3 images. Accepted: jpeg, png, jpg, gif.</p>
+                                        <p id="photos-help" class="text-xs text-gray-500 dark:text-gray-400">Max 3 images. Accepted: jpeg, png, jpg, gif, webp.</p>
                                     </div>
                                 </div>
                                 @error('photos')

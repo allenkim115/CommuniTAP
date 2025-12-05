@@ -135,7 +135,13 @@
                                     $fullName = $user->full_name ?? ($user->firstName.' '.$user->lastName);
                                     $searchBlob = strtolower($fullName . ' ' . $user->email . ' ' . ($user->role ?? '') . ' ' . ($user->status ?? ''));
                                 @endphp
-                                <div data-user-row data-search="{{ $searchBlob }}" class="bg-white rounded-lg border border-gray-200 p-4 cursor-pointer transition-colors hover:bg-brand-teal/5 hover:border-brand-teal" onclick="window.location='{{ route('admin.users.show', $user) }}'">
+                                <div
+                                    data-user-row
+                                    data-search="{{ $searchBlob }}"
+                                    data-url="{{ route('admin.users.show', $user) }}"
+                                    class="bg-white rounded-lg border border-gray-200 p-4 cursor-pointer transition-colors hover:bg-brand-teal/5 hover:border-brand-teal"
+                                    onclick="window.location='{{ route('admin.users.show', $user) }}'"
+                                >
                                     <div class="flex items-start gap-3 mb-3">
                                         <x-user-avatar
                                             :user="$user"
@@ -146,12 +152,6 @@
                                         <div class="flex-1 min-w-0">
                                             <p class="text-sm font-semibold text-gray-900 truncate">{{ $fullName }}</p>
                                             <p class="text-xs text-gray-600 truncate mt-1">{{ $user->email }}</p>
-                                            @if($user->role)
-                                                <span class="inline-flex items-center gap-1 rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-medium text-gray-500 capitalize mt-1">
-                                                    <i class="fas fa-user text-[9px]"></i>
-                                                    {{ $user->role }}
-                                                </span>
-                                            @endif
                                         </div>
                                     </div>
                                     <div class="flex items-center justify-between pt-3 border-t border-gray-100">
@@ -194,7 +194,13 @@
                                             $fullName = $user->full_name ?? ($user->firstName.' '.$user->lastName);
                                             $searchBlob = strtolower($fullName . ' ' . $user->email . ' ' . ($user->role ?? '') . ' ' . ($user->status ?? ''));
                                         @endphp
-                                        <tr data-user-row data-search="{{ $searchBlob }}" class="group cursor-pointer transition-colors hover:bg-brand-teal/5" onclick="window.location='{{ route('admin.users.show', $user) }}'">
+                                        <tr
+                                            data-user-row
+                                            data-search="{{ $searchBlob }}"
+                                            data-url="{{ route('admin.users.show', $user) }}"
+                                            class="group cursor-pointer transition-colors hover:bg-brand-teal/5"
+                                            onclick="window.location='{{ route('admin.users.show', $user) }}'"
+                                        >
                                             <td class="px-4 sm:px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">
                                                 <div class="flex items-center gap-3">
                                                     <x-user-avatar
@@ -205,12 +211,6 @@
                                                     />
                                                     <div>
                                                         <p>{{ $fullName }}</p>
-                                                        @if($user->role)
-                                                            <span class="inline-flex items-center gap-1 rounded-full bg-gray-100 px-2 py-0.5 text-[11px] font-medium text-gray-500 capitalize">
-                                                                <i class="fas fa-user text-[10px]"></i>
-                                                                {{ $user->role }}
-                                                            </span>
-                                                        @endif
                                                     </div>
                                                 </div>
                                             </td>
@@ -241,8 +241,12 @@
                             </tbody>
                         </table>
                     </div>
-                        <div id="user-search-empty" class="hidden border border-dashed border-gray-200 rounded-2xl text-center py-8 mt-6 text-sm text-gray-500">
-                            No users match your current filters.
+                        <div id="user-search-empty" class="hidden bg-white rounded-2xl border border-dashed border-gray-200 shadow-sm p-10 text-center mt-6">
+                            <div class="mx-auto h-16 w-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                                <i class="fas fa-search text-gray-400 text-2xl"></i>
+                            </div>
+                            <h3 class="text-lg font-semibold text-gray-900 mb-2">No users match your search</h3>
+                            <p class="text-gray-600 text-sm">Try a different keyword.</p>
                         </div>
                     @else
                         <div class="text-center py-12 text-gray-500">
@@ -256,44 +260,49 @@
 
     @push('scripts')
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        (() => {
             const searchInput = document.getElementById('user-search');
-            const rows = document.querySelectorAll('[data-user-row]');
+            const entries = Array.from(document.querySelectorAll('[data-user-row]'));
             const emptyState = document.getElementById('user-search-empty');
 
-            if (!searchInput || rows.length === 0) {
+            if (!searchInput || entries.length === 0) {
+                console.info('User search: missing input or entries', { hasInput: !!searchInput, entries: entries.length });
                 return;
             }
 
-            function applyFilter() {
-                const query = searchInput.value.trim().toLowerCase();
+            const applyFilter = () => {
+                const query = (searchInput.value || '').trim().toLowerCase();
                 let visibleCount = 0;
 
-                rows.forEach(row => {
-                    const haystack = row.dataset.search || '';
+                entries.forEach(entry => {
+                    const haystack = (entry.dataset.search || '').toLowerCase();
                     const matches = !query || haystack.includes(query);
-                    row.classList.toggle('hidden', !matches);
-                    if (matches) {
-                        visibleCount++;
-                    }
-                });
-
-                // Also filter mobile cards
-                const mobileCards = document.querySelectorAll('#user-mobile-cards [data-user-row]');
-                mobileCards.forEach(card => {
-                    const haystack = card.dataset.search || '';
-                    const matches = !query || haystack.includes(query);
-                    card.classList.toggle('hidden', !matches);
+                    entry.classList.toggle('hidden', !matches);
+                    if (matches) visibleCount++;
                 });
 
                 if (emptyState) {
                     emptyState.classList.toggle('hidden', visibleCount !== 0);
                 }
-            }
+            };
+
+            const navigateToFirstVisible = () => {
+                const firstVisible = entries.find(entry => !entry.classList.contains('hidden') && entry.dataset.url);
+                if (firstVisible && firstVisible.dataset.url) {
+                    window.location = firstVisible.dataset.url;
+                }
+            };
 
             searchInput.addEventListener('input', applyFilter);
+            searchInput.addEventListener('keyup', applyFilter);
+            searchInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    navigateToFirstVisible();
+                }
+            });
             applyFilter();
-        });
+        })();
     </script>
     @endpush
 </x-admin-layout>

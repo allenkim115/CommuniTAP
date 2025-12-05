@@ -86,11 +86,10 @@
                         <div class="flex items-center gap-2">
                             <i class="fas fa-filter text-base" style="color: #2B9D8D;"></i>
                             <span class="text-sm font-semibold text-gray-900">Filters</span>
-                            @if(request('search') || request('task_type') && request('task_type') !== 'all' || request('assignment_progress') && request('assignment_progress') !== 'all' || request('date_from') || request('date_to'))
+                            @if(request('search') || request('task_type') && request('task_type') !== 'all' || request('date_from') || request('date_to'))
                                 <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-brand-teal text-white text-xs font-bold">{{ 
                                     (request('search') ? 1 : 0) + 
                                     (request('task_type') && request('task_type') !== 'all' ? 1 : 0) + 
-                                    (request('assignment_progress') && request('assignment_progress') !== 'all' ? 1 : 0) + 
                                     (request('date_from') ? 1 : 0) + 
                                     (request('date_to') ? 1 : 0) 
                                 }}</span>
@@ -133,7 +132,7 @@
                         </div>
                     </div>
                     
-                    <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3">
+                    <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3">
                         <div>
                             <label for="task_type" class="hidden sm:block text-sm font-semibold text-gray-700 mb-1.5">Task Type</label>
                             <select name="task_type" id="task_type" class="w-full px-3 py-2 sm:px-4 sm:py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm min-h-[40px] sm:min-h-[44px] bg-white">
@@ -141,17 +140,6 @@
                                 <option value="daily" {{ request('task_type') === 'daily' ? 'selected' : '' }}>Daily Task</option>
                                 <option value="one_time" {{ request('task_type') === 'one_time' ? 'selected' : '' }}>One-Time Task</option>
                                 <option value="user_uploaded" {{ request('task_type') === 'user_uploaded' ? 'selected' : '' }}>User-Uploaded Task</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label for="assignment_progress" class="hidden sm:block text-sm font-semibold text-gray-700 mb-1.5">Progress</label>
-                            <select name="assignment_progress" id="assignment_progress" class="w-full px-3 py-2 sm:px-4 sm:py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm min-h-[40px] sm:min-h-[44px] bg-white">
-                                <option value="all" {{ request('assignment_progress') === 'all' || !request('assignment_progress') ? 'selected' : '' }}>All Progress</option>
-                                <option value="accepted" {{ request('assignment_progress') === 'accepted' ? 'selected' : '' }}>Accepted</option>
-                                <option value="on_the_way" {{ request('assignment_progress') === 'on_the_way' ? 'selected' : '' }}>On the way</option>
-                                <option value="working" {{ request('assignment_progress') === 'working' ? 'selected' : '' }}>Working</option>
-                                <option value="done" {{ request('assignment_progress') === 'done' ? 'selected' : '' }}>Task done</option>
-                                <option value="submitted_proof" {{ request('assignment_progress') === 'submitted_proof' ? 'selected' : '' }}>Submitted proof</option>
                             </select>
                         </div>
                         <div>
@@ -163,7 +151,7 @@
                             <input type="date" name="date_to" id="date_to" value="{{ request('date_to') }}" class="w-full px-3 py-2 sm:px-4 sm:py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm min-h-[40px] sm:min-h-[44px]">
                         </div>
                     </div>
-                    @if(request('search') || request('task_type') && request('task_type') !== 'all' || request('assignment_progress') && request('assignment_progress') !== 'all' || request('date_from') || request('date_to'))
+                    @if(request('search') || request('task_type') && request('task_type') !== 'all' || request('date_from') || request('date_to'))
                     <div class="flex justify-end pt-2">
                         <a href="{{ route('admin.tasks.index') }}" class="inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium text-sm transition-colors min-h-[36px] sm:min-h-[40px]">
                             <i class="fas fa-times text-xs"></i>
@@ -176,7 +164,7 @@
                 
                 <!-- Active Filters Display -->
                 <div class="mt-6 pt-6 border-t border-gray-200" id="active-filters">
-                    @if(request('status') && request('status') !== 'all' || request('task_type') && request('task_type') !== 'all' || request('assignment_progress') && request('assignment_progress') !== 'all' || request('date_from') || request('date_to') || request('search'))
+                    @if(request('status') && request('status') !== 'all' || request('task_type') && request('task_type') !== 'all' || request('date_from') || request('date_to') || request('search'))
                     <div class="flex flex-wrap items-center gap-2">
                         <span class="text-sm font-medium text-gray-700">Active Filters:</span>
                         @if(request('search'))
@@ -193,11 +181,6 @@
                         @if(request('task_type') && request('task_type') !== 'all')
                             <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium" style="background-color: rgba(43, 157, 141, 0.2); color: #2B9D8D;">
                                 Type: {{ ucfirst(str_replace('_', ' ', request('task_type'))) }}
-                            </span>
-                        @endif
-                        @if(request('assignment_progress') && request('assignment_progress') !== 'all')
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
-                                Progress: {{ ucfirst(str_replace('_', ' ', request('assignment_progress'))) }}
                             </span>
                         @endif
                         @if(request('date_from') || request('date_to'))
@@ -221,7 +204,19 @@
                 @if($tasks->count() > 0)
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 mb-4 sm:mb-6">
                         @foreach($tasks as $task)
-                        <a href="{{ route('admin.tasks.show', $task) }}" class="group bg-white rounded-lg border-2 border-gray-200 p-5 sm:p-6 hover:border-blue-500 hover:shadow-md transition-all block min-h-[200px] sm:min-h-[180px]
+                            @php
+                                $searchBlob = strtolower(
+                                    ($task->title ?? '') . ' ' .
+                                    ($task->description ?? '') . ' ' .
+                                    ($task->task_type ?? '') . ' ' .
+                                    ($task->status ?? '')
+                                );
+                            @endphp
+                        <a href="{{ route('admin.tasks.show', $task) }}"
+                           data-task-card
+                           data-url="{{ route('admin.tasks.show', $task) }}"
+                           data-search="{{ $searchBlob }}"
+                           class="group bg-white rounded-lg border-2 border-gray-200 p-5 sm:p-6 hover:border-blue-500 hover:shadow-md transition-all block min-h-[200px] sm:min-h-[180px]
                             @if($task->status === 'pending') border-l-4 border-l-yellow-500
                             @elseif($task->status === 'approved') border-l-4 border-l-green-500
                             @elseif($task->status === 'published') border-l-4 border-l-blue-500
@@ -325,6 +320,14 @@
                         </a>
                     </div>
                 @endif
+
+                <div id="tasks-search-empty" class="hidden bg-white rounded-lg border border-dashed border-gray-200 shadow-sm p-12 text-center">
+                    <div class="mx-auto h-16 w-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                        <i class="fas fa-search text-gray-400 text-2xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">No tasks match your search</h3>
+                    <p class="text-gray-600">Try a different keyword.</p>
+                </div>
                 
                 <!-- Pagination -->
                 <div class="mt-4 sm:mt-6 flex justify-center" id="tasks-pagination">
@@ -341,7 +344,6 @@
         // Update tasks via AJAX when filters change (no page refresh)
         document.addEventListener('DOMContentLoaded', function() {
             const taskTypeSelect = document.getElementById('task_type');
-            const assignmentProgressSelect = document.getElementById('assignment_progress');
             const dateFromInput = document.getElementById('date_from');
             const dateToInput = document.getElementById('date_to');
             const searchInput = document.getElementById('search');
@@ -456,12 +458,6 @@
                 });
             }
 
-            if (assignmentProgressSelect) {
-                assignmentProgressSelect.addEventListener('change', function() {
-                    updateTasks();
-                });
-            }
-
             if (dateFromInput) {
                 dateFromInput.addEventListener('change', function() {
                     // Validate date range
@@ -487,5 +483,54 @@
             }
         });
     </script>
+
+    @push('scripts')
+    <script>
+        (() => {
+            const searchInput = document.getElementById('search');
+            const cards = Array.from(document.querySelectorAll('[data-task-card]'));
+            const emptyState = document.getElementById('tasks-search-empty');
+
+            if (!searchInput || cards.length === 0) {
+                console.info('Task search: missing input or cards', { hasInput: !!searchInput, cards: cards.length });
+                return;
+            }
+
+            const applyFilter = () => {
+                const query = (searchInput.value || '').trim().toLowerCase();
+                let visibleCount = 0;
+
+                cards.forEach(card => {
+                    const haystack = (card.dataset.search || '').toLowerCase();
+                    const matches = !query || haystack.includes(query);
+                    card.classList.toggle('hidden', !matches);
+                    if (matches) visibleCount++;
+                });
+
+                if (emptyState) {
+                    emptyState.classList.toggle('hidden', visibleCount !== 0);
+                }
+            };
+
+            const navigateToFirstVisible = () => {
+                const firstVisible = cards.find(card => !card.classList.contains('hidden') && card.dataset.url);
+                if (firstVisible && firstVisible.dataset.url) {
+                    window.location = firstVisible.dataset.url;
+                }
+            };
+
+            searchInput.addEventListener('input', applyFilter);
+            searchInput.addEventListener('keyup', applyFilter);
+            searchInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    navigateToFirstVisible();
+                }
+            });
+
+            applyFilter();
+        })();
+    </script>
+    @endpush
 
 </x-admin-layout>

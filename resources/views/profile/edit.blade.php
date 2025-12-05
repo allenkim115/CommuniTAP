@@ -14,6 +14,17 @@
 
     <div class="py-8 bg-gradient-to-br from-gray-50 via-teal-50/20 to-orange-50/20 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 min-h-screen">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            @if(request('notice') === 'incident_warning')
+                <div class="mb-4 rounded-xl border border-orange-200 bg-orange-50 text-orange-800 px-4 py-3 flex items-start gap-3 shadow-sm">
+                    <div class="mt-0.5 text-orange-600">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                    </div>
+                    <div class="text-sm leading-relaxed">
+                        <p class="font-semibold">Account Warning</p>
+                        <p>Please review the community guidelines. Repeated violations may result in account suspension.</p>
+                    </div>
+                </div>
+            @endif
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
                 <!-- Left Column: Profile Card -->
                 <div class="lg:col-span-1">
@@ -46,7 +57,7 @@
                                     <input type="file"
                                            id="profile_picture"
                                            name="profile_picture"
-                                           accept="image/*"
+                                           accept="image/*,.webp,image/webp"
                                            class="hidden"
                                            form="profile-update-form"
                                            onchange="previewImage(this)">

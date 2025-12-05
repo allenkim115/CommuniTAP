@@ -31,7 +31,8 @@ class TaskController extends Controller
             ->first();
 
         if (!$assignment) {
-            abort(403, 'You can only update progress for tasks assigned to you.');
+            return redirect()->route('tasks.index')
+                ->with('error', 'You can only update progress for tasks assigned to you.');
         }
 
         // Prevent moving to submitted_proof via this endpoint; that happens on submit
@@ -87,6 +88,15 @@ class TaskController extends Controller
      */
     public function index(Request $request)
     {
+        // Auto-complete tasks where all participants have finished (regardless of end time)
+        \App\Models\Task::completeTasksWithAllParticipantsDone();
+        
+        // Auto-complete expired tasks before listing
+        \App\Models\Task::completeExpiredTasks();
+        
+        // Fix incorrectly marked completed tasks (tasks with no participants or no completed participants)
+        \App\Models\Task::fixIncorrectlyCompletedTasks();
+
         $user = Auth::user();
         $filter = $request->get('filter', 'available'); // Default to available tasks
         
@@ -228,9 +238,18 @@ class TaskController extends Controller
      */
     public function myUploads(Request $request)
     {
+        // Auto-complete tasks where all participants have finished (regardless of end time)
+        \App\Models\Task::completeTasksWithAllParticipantsDone();
+        
+        // Auto-complete expired tasks before listing
+        \App\Models\Task::completeExpiredTasks();
+        
+        // Fix incorrectly marked completed tasks (tasks with no participants or no completed participants)
+        \App\Models\Task::fixIncorrectlyCompletedTasks();
+
         $user = Auth::user();
 
-        $status = $request->get('status'); // pending | live | rejected | completed | all
+        $status = $request->get('status'); // pending | published | rejected | completed | all
         $search = trim((string) $request->get('q', ''));
 
         // Base query for this user's uploaded tasks
@@ -256,10 +275,9 @@ class TaskController extends Controller
 
         // Apply status filter
         if ($status && $status !== 'all') {
-            if ($status === 'live') {
-                // Live tasks are approved/published AND not expired
-                $query->whereIn('status', ['approved', 'published'])
-                      ->notExpired();
+            if ($status === 'published') {
+                // Published tasks are approved or published status
+                $query->whereIn('status', ['approved', 'published']);
             } else {
                 $query->where('status', $status);
             }
@@ -310,20 +328,19 @@ class TaskController extends Controller
             return false;
         })->count();
 
-        // Calculate uncompleted count (exclude pending, completed, and live tasks)
+        // Calculate uncompleted count (exclude pending, completed, approved, and published tasks)
         $uncompletedCount = $allForStats->filter(function($task) {
-            $isLive = in_array($task->status, ['approved','published']) && !$task->isExpired();
-            return !in_array($task->status, ['completed', 'pending']) && !$isLive;
+            return !in_array($task->status, ['completed', 'pending', 'approved', 'published']);
         })->count();
 
-        // Count live tasks: approved/published AND not expired
-        $liveCount = $allForStats->filter(function($task) {
-            return in_array($task->status, ['approved', 'published']) && !$task->isExpired();
+        // Count published tasks: approved or published status
+        $publishedCount = $allForStats->filter(function($task) {
+            return in_array($task->status, ['approved', 'published']);
         })->count();
 
         $stats = [
             'pending' => $pendingCount,
-            'live' => $liveCount,
+            'published' => $publishedCount,
             'rejected' => $allForStats->where('status', 'rejected')->count(),
             'completed' => $allForStats->where('status', 'completed')->count(),
             'uncompleted' => $uncompletedCount,
@@ -369,7 +386,8 @@ class TaskController extends Controller
         $user = Auth::user();
         $submission->load(['task', 'user']);
         if (!$submission->task || $submission->task->task_type !== 'user_uploaded' || $submission->task->FK1_userId !== $user->userId) {
-            abort(403, 'Unauthorized');
+            return redirect()->route('tasks.my-uploads')
+                ->with('error', 'You can only view submissions for your own user-uploaded tasks.');
         }
         return view('tasks.creator_submission_show', compact('submission'));
     }
@@ -383,7 +401,8 @@ class TaskController extends Controller
         // Ensure this submission belongs to a task created by this user and is user_uploaded
         $task = $submission->task;
         if (!$task || $task->task_type !== 'user_uploaded' || $task->FK1_userId !== $user->userId) {
-            abort(403, 'You can only approve submissions for your user-uploaded tasks.');
+            return redirect()->route('tasks.my-uploads')
+                ->with('error', 'You can only approve submissions for your user-uploaded tasks.');
         }
 
         // Prevent approving already completed submissions
@@ -421,6 +440,10 @@ class TaskController extends Controller
             'completed_at' => now(),
             'completion_notes' => $finalNotes
         ]);
+
+        // Check if all participants have completed - if so, mark task as completed
+        $submission->task->refresh();
+        $submission->task->markAsCompletedIfAllParticipantsDone();
 
         // Award points to the assignee (respecting points cap)
         $assignee = $submission->user;
@@ -467,7 +490,8 @@ class TaskController extends Controller
         $user = Auth::user();
         $task = $submission->task;
         if (!$task || $task->task_type !== 'user_uploaded' || $task->FK1_userId !== $user->userId) {
-            abort(403, 'You can only reject submissions for your user-uploaded tasks.');
+            return redirect()->route('tasks.my-uploads')
+                ->with('error', 'You can only reject submissions for your user-uploaded tasks.');
         }
 
         $request->validate([
@@ -707,6 +731,18 @@ class TaskController extends Controller
      */
     public function show(Request $request, Task $task)
     {
+        // Auto-complete tasks where all participants have finished (regardless of end time)
+        \App\Models\Task::completeTasksWithAllParticipantsDone();
+        
+        // Auto-complete expired tasks before displaying
+        \App\Models\Task::completeExpiredTasks();
+        
+        // Fix incorrectly marked completed tasks (tasks with no participants or no completed participants)
+        \App\Models\Task::fixIncorrectlyCompletedTasks();
+        
+        // Refresh the task to get updated status
+        $task->refresh();
+        
         $user = Auth::user();
         
         // Block access to inactive/deactivated tasks for regular users (even if they joined)
@@ -714,24 +750,45 @@ class TaskController extends Controller
         if ($task->status === 'inactive' && !$user->isAdmin()) {
             $isCreator = !is_null($task->FK1_userId) && $task->FK1_userId === $user->userId;
             if (!$isCreator) {
-                abort(404, 'Task not found or has been deactivated.');
+                return redirect()->route('tasks.index')
+                    ->with('error', 'This task has been deactivated and is no longer available.');
             }
         }
         
         // Check if user can view this task
         // Users can view:
         // - tasks they created (user-uploaded), regardless of status
-        // - tasks they're assigned to (but not if inactive)
+        // - tasks they're assigned to (regardless of status, except inactive)
         // - published tasks
         // - admins can view all
         $isCreator = !is_null($task->FK1_userId) && $task->FK1_userId === $user->userId;
+        $isAssigned = $task->isAssignedTo($user->userId);
         $canView = $user->isAdmin() || 
                    $isCreator ||
-                   ($task->isAssignedTo($user->userId) && $task->status !== 'inactive') || 
+                   ($isAssigned && $task->status !== 'inactive') || 
                    $task->status === 'published';
         
         if (!$canView) {
-            abort(403, 'Unauthorized access to task.');
+            // Check if task has expired or been completed/uncompleted
+            $isExpired = $task->isExpired();
+            $isCompleted = $task->status === 'completed';
+            $isUncompleted = $task->status === 'uncompleted';
+            
+            if ($isExpired || $isCompleted || $isUncompleted) {
+                // Task has expired or been completed - redirect with friendly message
+                $message = $isCompleted 
+                    ? "This task has been completed and is no longer available for new participants."
+                    : ($isUncompleted 
+                        ? "This task has expired and is no longer available."
+                        : "This task has expired and is no longer available for new participants.");
+                
+                return redirect()->route('tasks.index')
+                    ->with('error', $message);
+            }
+            
+            // For other cases (e.g., rejected, draft), show generic message
+            return redirect()->route('tasks.index')
+                ->with('error', 'This task is no longer available or you do not have permission to view it.');
         }
 
         // Load necessary relationships
@@ -776,7 +833,8 @@ class TaskController extends Controller
     {
         // Only allow editing user-uploaded tasks by the creator
         if ($task->FK1_userId !== Auth::id() || $task->task_type !== 'user_uploaded') {
-            abort(403, 'You can only edit your own user-uploaded tasks.');
+            return redirect()->route('tasks.my-uploads')
+                ->with('error', 'You can only edit your own user-uploaded tasks.');
         }
 
         // Don't allow editing if task is already approved/published/completed
@@ -795,7 +853,8 @@ class TaskController extends Controller
     {
         // Only allow editing user-uploaded tasks by the creator
         if ($task->FK1_userId !== Auth::id() || $task->task_type !== 'user_uploaded') {
-            abort(403, 'You can only edit your own user-uploaded tasks.');
+            return redirect()->route('tasks.my-uploads')
+                ->with('error', 'You can only edit your own user-uploaded tasks.');
         }
 
         // Don't allow editing if task is already approved/published/completed
@@ -925,7 +984,8 @@ class TaskController extends Controller
     {
         // Only allow canceling user-uploaded tasks by the creator
         if ($task->FK1_userId !== Auth::id() || $task->task_type !== 'user_uploaded') {
-            abort(403, 'You can only cancel your own user-uploaded tasks.');
+            return redirect()->route('tasks.my-uploads')
+                ->with('error', 'You can only cancel your own user-uploaded tasks.');
         }
 
         // Don't allow canceling if task is already approved/published/completed
@@ -946,7 +1006,8 @@ class TaskController extends Controller
     {
         // Only the creator can reactivate their user-uploaded task
         if ($task->FK1_userId !== Auth::id() || $task->task_type !== 'user_uploaded') {
-            abort(403, 'You can only reactivate your own user-uploaded tasks.');
+            return redirect()->route('tasks.my-uploads')
+                ->with('error', 'You can only reactivate your own user-uploaded tasks.');
         }
         if ($task->status !== 'inactive') {
             return redirect()->back()->with('error', "Cannot reactivate '{$task->title}': Only tasks that have been deactivated can be reactivated. This task is currently {$task->status}.");
@@ -1073,7 +1134,8 @@ class TaskController extends Controller
             ->first();
 
         if (!$assignment) {
-            abort(403, 'You can only submit tasks assigned to you.');
+            return redirect()->route('tasks.index')
+                ->with('error', 'You can only submit tasks assigned to you.');
         }
 
         $request->validate(

@@ -103,6 +103,24 @@
                             <x-input-error class="mt-2" :messages="$errors->get('incident_type')" />
                         </div>
 
+                        <div id="incident_type_specification_wrapper" class="hidden">
+                            <div class="flex items-center justify-between flex-wrap gap-1">
+                                <x-input-label for="incident_type_specification" :value="__('Specify Incident Type')" class="text-sm sm:text-base" />
+                                <span class="text-xs text-gray-500">Required</span>
+                            </div>
+                            <input
+                                type="text"
+                                id="incident_type_specification"
+                                name="incident_type_specification"
+                                placeholder="Please specify the incident type..."
+                                value="{{ old('incident_type_specification') }}"
+                                maxlength="50"
+                                class="mt-2 block w-full rounded-2xl border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:border-brand-teal focus:ring-brand-teal text-sm px-3 sm:px-4 py-2 sm:py-2.5"
+                            >
+                            <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">Provide a brief description of the incident type (max 50 characters).</p>
+                            <x-input-error class="mt-2" :messages="$errors->get('incident_type_specification')" />
+                        </div>
+
                         <div>
                             <div class="flex items-center justify-between flex-wrap gap-1">
                                 <x-input-label for="description" :value="__('Description')" class="text-sm sm:text-base" />
@@ -126,13 +144,13 @@
                             <x-input-label for="evidence_images" :value="__('Additional Evidence (Optional)')" class="text-sm sm:text-base" />
                             <span class="text-xs text-gray-500">Up to 3 images</span>
                         </div>
-                        <input type="file" id="evidence_images" name="evidence_images[]" multiple accept="image/*" class="hidden" aria-describedby="evidence-help">
+                        <input type="file" id="evidence_images" name="evidence_images[]" multiple accept="image/*,.webp,image/webp" class="hidden" aria-describedby="evidence-help">
                         <div id="evidence-upload-area" class="rounded-3xl border-2 border-dashed border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900/40 p-4 sm:p-6 text-center transition cursor-pointer">
                             <svg class="mx-auto h-8 w-8 sm:h-10 sm:w-10 text-brand-teal" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                             </svg>
                             <p id="evidence-upload-text" class="mt-2 sm:mt-3 text-xs sm:text-sm font-medium text-gray-900 dark:text-gray-100 px-2">Click to select photos or drag and drop (up to 3)</p>
-                            <p id="evidence-help" class="mt-1 text-xs text-gray-500 dark:text-gray-400 px-2">Accepted: jpeg, png, jpg, gif • Max 5MB each</p>
+                            <p id="evidence-help" class="mt-1 text-xs text-gray-500 dark:text-gray-400 px-2">Accepted: jpeg, png, jpg, gif, webp • Max 5MB each</p>
                         </div>
                         @error('evidence_images')
                             <p class="text-xs sm:text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
@@ -168,6 +186,8 @@
                 const taskIdInput = document.getElementById('task_id');
                 const incidentTypeInput = document.getElementById('incident_type');
                 const descriptionInput = document.getElementById('description');
+                const incidentTypeSpecificationWrapper = document.getElementById('incident_type_specification_wrapper');
+                const incidentTypeSpecificationInput = document.getElementById('incident_type_specification');
 
                 [reportedUserIdInput, taskIdInput, incidentTypeInput, descriptionInput].forEach((field) => {
                     if (!field) return;
@@ -175,6 +195,30 @@
                         event.preventDefault();
                     });
                 });
+
+                // Show/hide incident type specification field when "other" is selected
+                if (incidentTypeInput && incidentTypeSpecificationWrapper) {
+                    const toggleSpecificationField = () => {
+                        if (incidentTypeInput.value === 'other') {
+                            incidentTypeSpecificationWrapper.classList.remove('hidden');
+                            if (incidentTypeSpecificationInput) {
+                                incidentTypeSpecificationInput.setAttribute('required', 'required');
+                            }
+                        } else {
+                            incidentTypeSpecificationWrapper.classList.add('hidden');
+                            if (incidentTypeSpecificationInput) {
+                                incidentTypeSpecificationInput.removeAttribute('required');
+                                incidentTypeSpecificationInput.value = '';
+                            }
+                        }
+                    };
+
+                    // Check on page load (for old values)
+                    toggleSpecificationField();
+
+                    // Listen for changes
+                    incidentTypeInput.addEventListener('change', toggleSpecificationField);
+                }
 
                 const collectValidationErrors = () => {
                     const errors = [];
@@ -186,6 +230,12 @@
                     }
                     if (!incidentTypeInput.value) {
                         errors.push('Choose an incident type');
+                    } else if (incidentTypeInput.value === 'other') {
+                        if (!incidentTypeSpecificationInput || !incidentTypeSpecificationInput.value.trim()) {
+                            errors.push('Specify the incident type when "Other" is selected');
+                        } else if (incidentTypeSpecificationInput.value.trim().length < 3) {
+                            errors.push('Incident type specification must be at least 3 characters');
+                        }
                     }
                     if (!descriptionInput.value) {
                         errors.push('Provide a description');
