@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\TaskAssignment;
 use Illuminate\Http\Request;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 use App\Services\NotificationService;
@@ -70,9 +71,12 @@ class TaskSubmissionController extends Controller
     /**
      * Display the specified task submission
      */
-    public function show(TaskAssignment $submission)
+    public function show(int $submission)
     {
-        $submission->load(['task', 'user']);
+        $submission = $this->findSubmissionOrRedirect($submission);
+        if ($submission instanceof RedirectResponse) {
+            return $submission;
+        }
         
         return view('admin.task-submissions.show', compact('submission'));
     }
@@ -80,8 +84,13 @@ class TaskSubmissionController extends Controller
     /**
      * Approve a task submission
      */
-    public function approve(Request $request, TaskAssignment $submission)
+    public function approve(Request $request, int $submission)
     {
+        $submission = $this->findSubmissionOrRedirect($submission);
+        if ($submission instanceof RedirectResponse) {
+            return $submission;
+        }
+
         // Block admin from approving user-uploaded tasks; only the creator may approve
         $task = $submission->task;
         if ($task && $task->task_type === 'user_uploaded' && !is_null($task->FK1_userId)) {
@@ -168,8 +177,13 @@ class TaskSubmissionController extends Controller
     /**
      * Reject a task submission
      */
-    public function reject(Request $request, TaskAssignment $submission)
+    public function reject(Request $request, int $submission)
     {
+        $submission = $this->findSubmissionOrRedirect($submission);
+        if ($submission instanceof RedirectResponse) {
+            return $submission;
+        }
+
         // Block admin from rejecting user-uploaded tasks; only the creator may reject
         $task = $submission->task;
         if ($task && $task->task_type === 'user_uploaded' && !is_null($task->FK1_userId)) {
@@ -333,5 +347,21 @@ class TaskSubmissionController extends Controller
         ];
 
         return response()->json($stats);
+    }
+
+    /**
+     * Safely retrieve a submission or redirect with a friendly error instead of 404
+     */
+    private function findSubmissionOrRedirect(int $submissionId)
+    {
+        $submission = TaskAssignment::with(['task', 'user'])->find($submissionId);
+
+        if (!$submission) {
+            return redirect()
+                ->route('admin.task-submissions.index')
+                ->with('error', 'Task submission not found. It may have been removed or already processed.');
+        }
+
+        return $submission;
     }
 }

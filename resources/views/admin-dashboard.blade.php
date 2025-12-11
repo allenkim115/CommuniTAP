@@ -222,7 +222,9 @@
                                 <p class="text-xs sm:text-sm text-gray-500 mt-0.5 sm:mt-1">New user registrations over time</p>
                             </div>
                         </div>
-                        <span class="px-2.5 sm:px-3 py-1 sm:py-1.5 bg-green-100 text-green-700 rounded-full text-[10px] sm:text-xs font-semibold border border-green-200 whitespace-nowrap self-start sm:self-auto">Last 6 months</span>
+                        <span class="px-2.5 sm:px-3 py-1 sm:py-1.5 bg-green-100 text-green-700 rounded-full text-[10px] sm:text-xs font-semibold border border-green-200 whitespace-nowrap self-start sm:self-auto">
+                            {{ $periodLabel ?? 'Current period' }}
+                        </span>
                     </div>
                     <div id="userGrowthChart" style="height: 250px; min-height: 250px;" class="sm:h-[300px]"></div>
                 </div>
@@ -239,7 +241,9 @@
                                 <p class="text-xs sm:text-sm text-gray-500 mt-0.5 sm:mt-1">Completed tasks over time</p>
                             </div>
                         </div>
-                        <span class="px-2.5 sm:px-3 py-1 sm:py-1.5 bg-blue-100 text-blue-700 rounded-full text-[10px] sm:text-xs font-semibold border border-blue-200 whitespace-nowrap self-start sm:self-auto">Last 6 months</span>
+                        <span class="px-2.5 sm:px-3 py-1 sm:py-1.5 bg-blue-100 text-blue-700 rounded-full text-[10px] sm:text-xs font-semibold border border-blue-200 whitespace-nowrap self-start sm:self-auto">
+                            {{ $periodLabel ?? 'Current period' }}
+                        </span>
                     </div>
                     <div id="taskCompletionChart" style="height: 250px; min-height: 250px;" class="sm:h-[300px]"></div>
                 </div>
@@ -568,13 +572,10 @@
                                     <span class="text-xs sm:text-sm font-medium text-gray-700">Resolved</span>
                                     <span class="text-base sm:text-lg font-bold text-slate-700">{{ $incidentInsights['resolved_count'] ?? 0 }}</span>
                                 </div>
-                                @php
-                                    $avgResolutionHours = $incidentInsights['average_resolution_hours'] ?? null;
-                                @endphp
                                 <div class="flex justify-between items-center bg-white/80 backdrop-blur-sm rounded-lg px-3 sm:px-4 py-2.5 sm:py-3 border border-slate-100/50 group-hover:bg-white transition-colors">
-                                    <span class="text-xs sm:text-sm font-medium text-gray-700">Avg Resolution</span>
+                                    <span class="text-xs sm:text-sm font-medium text-gray-700">Overdue Reports</span>
                                     <span class="text-base sm:text-lg font-bold text-gray-900">
-                                        {{ $avgResolutionHours !== null ? $avgResolutionHours . 'h' : 'N/A' }}
+                                        {{ $incidentInsights['overdue_incidents'] ?? 0 }}
                                     </span>
                                 </div>
                             </div>

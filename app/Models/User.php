@@ -154,6 +154,33 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
+     * Check if user has any active task assignments (assigned or submitted)
+     * Users can only have one active task at a time
+     *
+     * @return bool
+     */
+    public function hasActiveTask(): bool
+    {
+        return $this->taskAssignments()
+            ->whereIn('status', ['assigned', 'submitted'])
+            ->exists();
+    }
+
+    /**
+     * Get the user's current active task assignment (first one found)
+     * Returns null if no active task exists
+     *
+     * @return TaskAssignment|null
+     */
+    public function getActiveTaskAssignment()
+    {
+        return $this->taskAssignments()
+            ->whereIn('status', ['assigned', 'submitted'])
+            ->orderBy('assigned_at', 'asc') // Get the first/oldest active task
+            ->first();
+    }
+
+    /**
      * Get uncompleted tasks for this user
      */
     public function uncompletedTasks()

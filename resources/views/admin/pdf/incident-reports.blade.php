@@ -51,6 +51,7 @@
     }
     $totalReports = $incidents->count();
     $pendingCount = $statusCounts['pending'] ?? 0;
+    $underReviewCount = $statusCounts['under_review'] ?? 0;
     $resolvedCount = $statusCounts['resolved'] ?? 0;
     $resolutionRate = $totalReports > 0 ? ($resolvedCount / $totalReports) * 100 : 0;
     $uniqueReporters = $incidents->pluck('FK1_reporterId')->unique()->count();
@@ -93,9 +94,9 @@
             <div class="stat-detail">Unique reporters this period</div>
         </div>
         <div class="stat-item">
-            <div class="stat-label">Average Resolution</div>
-            <div class="stat-value">{{ $averageResolutionHours !== null ? number_format($averageResolutionHours, 1).'h' : 'N/A' }}</div>
-            <div class="stat-detail">Median: {{ $medianResolutionHours !== null ? number_format($medianResolutionHours, 1).'h' : 'N/A' }}</div>
+            <div class="stat-label">Under Review</div>
+            <div class="stat-value">{{ number_format($underReviewCount) }}</div>
+            <div class="stat-detail">Active moderation</div>
         </div>
         <div class="stat-item">
             <div class="stat-label">Overdue Reports</div>
@@ -120,22 +121,10 @@
                     <th>Task</th>
                     <th>Moderator</th>
                     <th>Action</th>
-                    <th>Resolution Time (hrs)</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach($incidents as $incident)
-                    @php
-                        $resolutionHours = null;
-                        if ($incident->moderation_date && $incident->report_date) {
-                            $start = $incident->report_date;
-                            $end = $incident->moderation_date;
-                            if ($end->lessThan($start)) {
-                                [$start, $end] = [$end, $start];
-                            }
-                            $resolutionHours = $end->diffInHours($start);
-                        }
-                    @endphp
                     <tr>
                         <td>#{{ $incident->reportId }}</td>
                         <td>{{ optional($incident->report_date)->format('M d, Y g:i A') ?? '—' }}</td>
@@ -146,7 +135,6 @@
                         <td>{{ optional($incident->task)->title ?? ($incident->FK3_taskId ? 'Task #'.$incident->FK3_taskId : '—') }}</td>
                         <td>{{ optional($incident->moderator)->fullName ?? ($incident->FK4_moderatorId ? 'User #'.$incident->FK4_moderatorId : '—') }}</td>
                         <td>{{ ucfirst(str_replace('_', ' ', $incident->action_taken ?? 'pending')) }}</td>
-                        <td>{{ $resolutionHours !== null ? number_format($resolutionHours, 1) : '—' }}</td>
                     </tr>
                 @endforeach
             </tbody>

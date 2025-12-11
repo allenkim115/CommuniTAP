@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::table('rewards', function (Blueprint $table) {
             if (!Schema::hasColumn('rewards', 'image_path')) {
-                $table->string('image_path', 255)->nullable()->after('image_url');
+                $table->string('image_path', 255)->nullable();
             }
         });
     }

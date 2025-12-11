@@ -12,6 +12,7 @@ use App\Models\RewardRedemption;
 use App\Models\TaskAssignment;
 use App\Models\TapNomination;
 use App\Models\UserIncidentReport;
+use Illuminate\Database\Eloquent\Builder;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 
@@ -36,8 +37,8 @@ class DashboardController extends Controller
         [$currentStart, $currentEnd, $selectedPeriod, $periodLabel] = $this->resolveDateRange($request);
         [$previousStart, $previousEnd] = $this->buildComparisonRange($currentStart, $currentEnd);
 
-        $totalUsers = User::whereBetween('created_at', [$currentStart, $currentEnd])->count();
-        $totalUsersPrevious = User::whereBetween('created_at', [$previousStart, $previousEnd])->count();
+        $totalUsers = $this->nonAdminUsers()->whereBetween('created_at', [$currentStart, $currentEnd])->count();
+        $totalUsersPrevious = $this->nonAdminUsers()->whereBetween('created_at', [$previousStart, $previousEnd])->count();
         $totalUsersDelta = $this->calculateDelta($totalUsers, $totalUsersPrevious);
 
         $totalTasks = Task::whereBetween('created_at', [$currentStart, $currentEnd])->count();
@@ -59,7 +60,7 @@ class DashboardController extends Controller
         $tasksInactive = $taskStatusCounts['inactive'] ?? 0;
 
         [$labels, $userGrowth] = $this->buildTimeSeriesCounts(
-            User::query(),
+            $this->nonAdminUsers(),
             'created_at',
             $currentStart,
             $currentEnd
@@ -81,14 +82,14 @@ class DashboardController extends Controller
         $taskCompletionRate = $totalAssignments > 0 ? round(($completedAssignments / $totalAssignments) * 100, 1) : 0;
         
         // Active volunteers who completed at least one task in the period
-        $activeVolunteers = User::whereHas('taskAssignments', function ($query) use ($currentStart, $currentEnd) {
+        $activeVolunteers = $this->nonAdminUsers()->whereHas('taskAssignments', function ($query) use ($currentStart, $currentEnd) {
             $query->where('status', 'completed')
                 ->whereBetween('completed_at', [$currentStart, $currentEnd]);
         })->count();
         
         // Users with tasks assigned in the period (engagement rate = % of all users who engaged in this period)
-        $allTimeUsers = User::count();
-        $usersWithTasks = User::whereHas('taskAssignments', function ($query) use ($currentStart, $currentEnd) {
+        $allTimeUsers = $this->nonAdminUsers()->count();
+        $usersWithTasks = $this->nonAdminUsers()->whereHas('taskAssignments', function ($query) use ($currentStart, $currentEnd) {
             $query->whereBetween('assigned_at', [$currentStart, $currentEnd]);
         })->count();
         $engagementRate = $allTimeUsers > 0 ? round(($usersWithTasks / $allTimeUsers) * 100, 1) : 0;
@@ -122,7 +123,7 @@ class DashboardController extends Controller
         $chainEngagementRate = $totalNominations > 0 ? round(($taskChainNominations / $totalNominations) * 100, 1) : 0;
 
         // Top performers based on points earned from tasks completed in the period
-        $topPerformers = User::where('status', 'active')
+        $topPerformers = $this->nonAdminUsers()->where('status', 'active')
             ->whereHas('taskAssignments', function ($query) use ($currentStart, $currentEnd) {
                 $query->where('status', 'completed')
                     ->whereBetween('completed_at', [$currentStart, $currentEnd]);
@@ -144,14 +145,9 @@ class DashboardController extends Controller
             ->values();
 
         $periodOptions = [
-            'all' => 'All',
             'last_7_days' => 'Last 7 days',
             'last_30_days' => 'Last 30 days',
             'last_90_days' => 'Last 90 days',
-            'this_month' => 'This month',
-            'this_quarter' => 'This quarter',
-            'this_year' => 'This year',
-            'custom' => 'Custom range',
         ];
 
         $rangeSummary = [
@@ -207,6 +203,7 @@ class DashboardController extends Controller
             'taskCompletionLabels',
             'periodOptions',
             'selectedPeriod',
+            'periodLabel',
             'rangeSummary',
             'filterStartDate',
             'filterEndDate',
@@ -246,8 +243,8 @@ class DashboardController extends Controller
         [$currentStart, $currentEnd, $selectedPeriod, $periodLabel] = $this->resolveDateRange($request);
         [$previousStart, $previousEnd] = $this->buildComparisonRange($currentStart, $currentEnd);
 
-        $totalUsers = User::whereBetween('created_at', [$currentStart, $currentEnd])->count();
-        $totalUsersPrevious = User::whereBetween('created_at', [$previousStart, $previousEnd])->count();
+        $totalUsers = $this->nonAdminUsers()->whereBetween('created_at', [$currentStart, $currentEnd])->count();
+        $totalUsersPrevious = $this->nonAdminUsers()->whereBetween('created_at', [$previousStart, $previousEnd])->count();
         $totalUsersDelta = $this->calculateDelta($totalUsers, $totalUsersPrevious);
 
         $totalTasks = Task::whereBetween('created_at', [$currentStart, $currentEnd])->count();
@@ -269,7 +266,7 @@ class DashboardController extends Controller
         $tasksInactive = $taskStatusCounts['inactive'] ?? 0;
 
         [$labels, $userGrowth] = $this->buildTimeSeriesCounts(
-            User::query(),
+            $this->nonAdminUsers(),
             'created_at',
             $currentStart,
             $currentEnd
@@ -288,13 +285,13 @@ class DashboardController extends Controller
             ->count();
         $taskCompletionRate = $totalAssignments > 0 ? round(($completedAssignments / $totalAssignments) * 100, 1) : 0;
         
-        $activeVolunteers = User::whereHas('taskAssignments', function ($query) use ($currentStart, $currentEnd) {
+        $activeVolunteers = $this->nonAdminUsers()->whereHas('taskAssignments', function ($query) use ($currentStart, $currentEnd) {
             $query->where('status', 'completed')
                 ->whereBetween('completed_at', [$currentStart, $currentEnd]);
         })->count();
         
-        $allTimeUsers = User::count();
-        $usersWithTasks = User::whereHas('taskAssignments', function ($query) use ($currentStart, $currentEnd) {
+        $allTimeUsers = $this->nonAdminUsers()->count();
+        $usersWithTasks = $this->nonAdminUsers()->whereHas('taskAssignments', function ($query) use ($currentStart, $currentEnd) {
             $query->whereBetween('assigned_at', [$currentStart, $currentEnd]);
         })->count();
         $engagementRate = $allTimeUsers > 0 ? round(($usersWithTasks / $allTimeUsers) * 100, 1) : 0;
@@ -318,7 +315,7 @@ class DashboardController extends Controller
         $totalNominations = TapNomination::whereBetween('nomination_date', [$currentStart, $currentEnd])->count();
         $chainEngagementRate = $totalNominations > 0 ? round(($taskChainNominations / $totalNominations) * 100, 1) : 0;
 
-        $topPerformers = User::where('status', 'active')
+        $topPerformers = $this->nonAdminUsers()->where('status', 'active')
             ->whereHas('taskAssignments', function ($query) use ($currentStart, $currentEnd) {
                 $query->where('status', 'completed')
                     ->whereBetween('completed_at', [$currentStart, $currentEnd]);
@@ -682,6 +679,11 @@ class DashboardController extends Controller
         ];
     }
 
+    protected function nonAdminUsers(): Builder
+    {
+        return User::query()->where('role', '!=', 'admin');
+    }
+
     protected function buildTimeSeriesCounts($query, string $dateColumn, Carbon $start, Carbon $end): array
     {
         $rangeStart = $start->copy();
@@ -689,9 +691,28 @@ class DashboardController extends Controller
         $totalDays = $rangeStart->diffInDays($rangeEnd) + 1;
         $grouping = $totalDays > 62 ? 'month' : 'day';
 
-        $columnExpression = $grouping === 'month'
-            ? "DATE_FORMAT({$dateColumn}, '%Y-%m')"
-            : "DATE({$dateColumn})";
+        // Use database-agnostic date formatting
+        $driver = DB::getDriverName();
+        
+        if ($grouping === 'month') {
+            if ($driver === 'sqlite') {
+                $columnExpression = "strftime('%Y-%m', {$dateColumn})";
+            } elseif ($driver === 'mysql' || $driver === 'mariadb') {
+                $columnExpression = "DATE_FORMAT({$dateColumn}, '%Y-%m')";
+            } else {
+                // PostgreSQL or other databases
+                $columnExpression = "TO_CHAR({$dateColumn}, 'YYYY-MM')";
+            }
+        } else {
+            if ($driver === 'sqlite') {
+                $columnExpression = "DATE({$dateColumn})";
+            } elseif ($driver === 'mysql' || $driver === 'mariadb') {
+                $columnExpression = "DATE({$dateColumn})";
+            } else {
+                // PostgreSQL
+                $columnExpression = "DATE({$dateColumn})";
+            }
+        }
 
         $results = (clone $query)
             ->selectRaw("{$columnExpression} as period_key, COUNT(*) as total")
@@ -979,7 +1000,7 @@ class DashboardController extends Controller
                 $label = $point->format('M d');
             }
 
-            $users = User::select('firstName', 'middleName', 'lastName', 'email', 'created_at')
+            $users = $this->nonAdminUsers()->select('firstName', 'middleName', 'lastName', 'email', 'created_at')
                 ->whereBetween('created_at', [$periodStart, $periodEnd])
                 ->orderBy('created_at', 'desc')
                 ->limit(50)
@@ -1092,10 +1113,10 @@ class DashboardController extends Controller
             }
 
             // Find users who registered in the cohort period
-            $newUsers = User::whereBetween('created_at', [$cohortStart, $cohortEnd])->count();
+            $newUsers = $this->nonAdminUsers()->whereBetween('created_at', [$cohortStart, $cohortEnd])->count();
 
             // Check if these users were active (completed tasks) during the selected period
-            $retainedUsers = User::whereBetween('created_at', [$cohortStart, $cohortEnd])
+            $retainedUsers = $this->nonAdminUsers()->whereBetween('created_at', [$cohortStart, $cohortEnd])
                 ->whereHas('taskAssignments', function ($query) use ($periodStart, $periodEnd) {
                     $query->where('status', 'completed')
                         ->whereBetween('completed_at', [$periodStart, $periodEnd]);
@@ -1301,12 +1322,12 @@ class DashboardController extends Controller
         $completedTasksCount = $completedTasks->count();
 
         // Calculate user rank based on total points
-        $userRank = User::where('status', 'active')
+        $userRank = $this->nonAdminUsers()->where('status', 'active')
             ->where('points', '>', $user->points)
             ->count() + 1;
 
         // Get top 3 users for leaderboard (all-time by total points)
-        $topUsers = User::where('status', 'active')
+        $topUsers = $this->nonAdminUsers()->where('status', 'active')
             ->where('points', '>', 0)
             ->orderBy('points', 'desc')
             ->take(3)

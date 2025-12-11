@@ -338,6 +338,17 @@ class TapNominationController extends Controller
             return redirect()->back()->with('error', "Cannot accept nomination: The task '{$task->title}' is no longer available. It may have been completed, deactivated, or reached its participant limit.");
         }
 
+        // Check if user already has an active task (can only take one task at a time)
+        if ($user->hasActiveTask()) {
+            $activeTask = $user->taskAssignments()
+                ->whereIn('status', ['assigned', 'submitted'])
+                ->with('task')
+                ->first();
+            
+            $activeTaskTitle = $activeTask && $activeTask->task ? $activeTask->task->title : 'a task';
+            return redirect()->back()->with('error', "Cannot accept nomination for '{$task->title}': You already have an active task ('{$activeTaskTitle}'). Please complete your current task before accepting another one.");
+        }
+
         // Check if user is already assigned to this task
         if ($task->isAssignedTo($user->userId)) {
             return redirect()->back()->with('error', "Cannot accept nomination: You are already assigned to '{$task->title}'. Check your task list to view your progress.");

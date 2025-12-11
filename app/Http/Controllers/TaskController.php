@@ -35,6 +35,18 @@ class TaskController extends Controller
                 ->with('error', 'You can only update progress for tasks assigned to you.');
         }
 
+        // Check if user has an active task and ensure they can only update progress on that active task
+        if ($user->hasActiveTask()) {
+            $activeTaskAssignment = $user->getActiveTaskAssignment();
+            
+            // If the task being updated is not the active task, prevent the update
+            if ($activeTaskAssignment && $activeTaskAssignment->taskId !== $task->taskId) {
+                $activeTask = $activeTaskAssignment->task;
+                $activeTaskTitle = $activeTask ? $activeTask->title : 'a task';
+                return redirect()->back()->with('error', "Cannot update progress on '{$task->title}': You have an active task ('{$activeTaskTitle}') that must be completed first. Please complete your current task before updating progress on other tasks.");
+            }
+        }
+
         // Prevent moving to submitted_proof via this endpoint; that happens on submit
         if ($request->progress === 'submitted_proof') {
             return redirect()->back()->with('error', 'To submit proof, please use the "Submit Task" button with your photos and completion notes.');
@@ -1072,6 +1084,17 @@ class TaskController extends Controller
             return redirect()->back()->with('error', "Cannot join '{$task->title}': You created this task and cannot participate in it. You can view submissions and approve them instead.");
         }
 
+        // Check if user already has an active task (can only take one task at a time)
+        if ($user->hasActiveTask()) {
+            $activeTask = $user->taskAssignments()
+                ->whereIn('status', ['assigned', 'submitted'])
+                ->with('task')
+                ->first();
+            
+            $activeTaskTitle = $activeTask && $activeTask->task ? $activeTask->task->title : 'a task';
+            return redirect()->back()->with('error', "Cannot join '{$task->title}': You already have an active task ('{$activeTaskTitle}'). Please complete your current task before accepting another one.");
+        }
+
         // Check if user is already assigned to this task
         if ($task->isAssignedTo($user->userId)) {
             return redirect()->back()->with('error', "You are already assigned to '{$task->title}'. Check your task list to view your progress.");
@@ -1136,6 +1159,18 @@ class TaskController extends Controller
         if (!$assignment) {
             return redirect()->route('tasks.index')
                 ->with('error', 'You can only submit tasks assigned to you.');
+        }
+
+        // Check if user has an active task and ensure they can only submit that active task
+        if ($user->hasActiveTask()) {
+            $activeTaskAssignment = $user->getActiveTaskAssignment();
+            
+            // If the task being submitted is not the active task, prevent the submission
+            if ($activeTaskAssignment && $activeTaskAssignment->taskId !== $task->taskId) {
+                $activeTask = $activeTaskAssignment->task;
+                $activeTaskTitle = $activeTask ? $activeTask->title : 'a task';
+                return redirect()->back()->with('error', "Cannot submit '{$task->title}': You have an active task ('{$activeTaskTitle}') that must be completed first. Please complete your current task before submitting other tasks.");
+            }
         }
 
         $request->validate(

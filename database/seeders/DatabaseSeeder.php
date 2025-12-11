@@ -17,8 +17,12 @@ class DatabaseSeeder extends Seeder
 
         // Call the seeders
         $this->call([
-            AdminUserSeeder::class,
-            IncidentReportSeeder::class,
+            UserSeeder::class,
+            TaskSeeder::class,
+            TaskAssignmentSeeder::class,
+            UserUploadedTaskSeeder::class,
+            TapNominationSeeder::class,
+            IncidentReportsSeeder::class,
         ]);
     }
 }

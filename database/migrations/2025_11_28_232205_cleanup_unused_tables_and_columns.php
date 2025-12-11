@@ -23,9 +23,9 @@ return new class extends Migration
         Schema::dropIfExists('reports');
 
         // Remove redundant image_url column from rewards (keeping image_path)
-        Schema::table('rewards', function (Blueprint $table) {
-            $table->dropColumn('image_url');
-        });
+        //Schema::table('rewards', function (Blueprint $table) {
+            //$table->dropColumn('image_url');
+        //});
     }
 
     /**
