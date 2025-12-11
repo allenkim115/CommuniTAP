@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <h2 class="font-bold text-3xl bg-clip-text text-transparent" style="background: linear-gradient(to right, #F3A261, #2B9D8D); -webkit-background-clip: text;">
+            <h2 class="font-bold text-3xl text-gray-900">
                 {{ __('Tasks') }}
             </h2>
             <div class="flex items-center gap-3 flex-wrap">
@@ -906,7 +906,7 @@
                             if (isCreator) {
                                 return '<div class="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 text-sm text-center text-gray-600 dark:text-gray-400">You created this task</div>';
                             }
-                            return '<a href="/tasks/' + taskId + '" class="inline-flex items-center justify-center gap-2 w-full text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5" style="background-color: #F3A261;" onmouseover="this.style.backgroundColor=\'#E8944F\'" onmouseout="this.style.backgroundColor=\'#F3A261\'"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>Open Task</a>';
+                            return '<a href="/tasks/' + taskId + '" class="inline-flex items-center justify-center gap-2 w-full text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5" style="background-color: #F3A261;" onmouseover="this.style.backgroundColor=\'#E8944F\'" onmouseout="this.style.backgroundColor=\'#F3A261\'">Open Task</a>';
                         })()}
                     </div>
                 </div>

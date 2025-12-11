@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <h2 class="font-bold text-3xl bg-gradient-to-r from-orange-600 via-orange-500 to-teal-500 bg-clip-text text-transparent">
+            <h2 class="font-bold text-3xl text-gray-900">
                 {{ __('Progress') }}
             </h2>
             <div class="flex items-center gap-3 flex-wrap">

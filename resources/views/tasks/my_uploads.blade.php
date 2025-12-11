@@ -73,7 +73,7 @@
                    @if(($activeStatus ?? 'all') === $label) style="border-color: #F3A261; background-color: rgba(243, 162, 97, 0.1);" @endif
                    @if(($activeStatus ?? 'all') !== $label) onmouseover="this.style.borderColor='#F3A261';" onmouseout="this.style.borderColor='';" @endif>
                     <p class="text-[10px] xs:text-xs uppercase tracking-wide font-bold text-gray-500 dark:text-gray-400 mb-1 sm:mb-2 leading-tight">{{ ucfirst($label) }}</p>
-                    <p class="text-lg sm:text-xl md:text-2xl font-bold bg-clip-text text-transparent" style="background: linear-gradient(to right, #F3A261, #2B9D8D); -webkit-background-clip: text;">{{ $stats[$label] ?? 0 }}</p>
+                    <p class="text-lg sm:text-xl md:text-2xl font-bold text-gray-900" style="color: #2B9D8D;">{{ $stats[$label] ?? 0 }}</p>
                 </button>
                 @endforeach
             </div>
@@ -178,6 +178,7 @@
                                         'pending' => ['bg' => 'rgba(254, 210, 179, 0.2)', 'color' => '#FED2B3'],
                                         'draft' => ['bg' => 'rgba(229, 231, 235, 0.5)', 'color' => '#6B7280'],
                                         'inactive' => ['bg' => 'rgba(229, 231, 235, 0.5)', 'color' => '#6B7280'],
+                                        'uncompleted' => ['bg' => 'rgba(43, 157, 141, 0.12)', 'color' => '#2B9D8D'],
                                         'published' => ['bg' => '#2B9D8D', 'color' => '#FFFFFF'],
                                         'completed' => ['bg' => '#2B9D8D', 'color' => '#FFFFFF'],
                                         'rejected' => ['bg' => '#2B9D8D', 'color' => '#FFFFFF'],
@@ -226,9 +227,9 @@
                             <div class="pt-4 border-t-2 border-gray-100 dark:border-gray-700">
                                 <div class="flex items-center justify-between">
                                     <a href="{{ route('tasks.show', $task) }}" onclick="event.stopPropagation();" class="inline-flex items-center gap-2 dark:text-orange-400 dark:hover:text-orange-300 text-sm font-semibold transition-colors"
-                                       style="color: #F3A261;"
-                                       onmouseover="this.style.color='#E8944F';"
-                                       onmouseout="this.style.color='#F3A261';">
+                                       style="color: #2B9D8D;"
+                                       onmouseover="this.style.color='#248A7C';"
+                                       onmouseout="this.style.color='#2B9D8D';">
                                         View Details
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
@@ -374,7 +375,7 @@
                         </div>
                     </div>
                     <div class="pt-2">
-                        <a href="/tasks/${taskId}" class="inline-flex items-center justify-center gap-2 w-full text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5" style="background-color: #F3A261;" onmouseover="this.style.backgroundColor='#E8944F'" onmouseout="this.style.backgroundColor='#F3A261'"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>Open Task</a>
+                        <a href="/tasks/${taskId}" class="inline-flex items-center justify-center gap-2 w-full text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5" style="background-color: #F3A261;" onmouseover="this.style.backgroundColor='#E8944F'" onmouseout="this.style.backgroundColor='#F3A261'">Open Task</a>
                     </div>
                 </div>
                 </div>

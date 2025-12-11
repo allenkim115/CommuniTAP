@@ -107,7 +107,7 @@
                                             <span class="text-lg">💰</span> 
                                             <span>Points</span>
                                         </span>
-                                        <span class="text-sm font-bold text-gray-900 dark:text-white bg-gradient-to-r from-orange-500 to-orange-600 bg-clip-text text-transparent">{{ number_format($user->points ?? 0) }}</span>
+                                        <span class="text-sm font-bold text-orange-600 dark:text-orange-400">{{ number_format($user->points ?? 0) }}</span>
                                     </div>
                                     <div class="flex items-center justify-between p-2.5 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
                                         <span class="text-sm text-gray-600 dark:text-gray-400 flex items-center gap-2.5">

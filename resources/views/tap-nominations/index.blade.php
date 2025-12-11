@@ -1,15 +1,15 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <h2 class="font-bold text-3xl bg-clip-text text-transparent" style="background: linear-gradient(to right, #F3A261, #2B9D8D); -webkit-background-clip: text;">
+            <h2 class="font-bold text-3xl text-gray-900">
                 {{ __('Tap & Pass Nominations') }}
             </h2>
             <div class="flex items-center gap-3 flex-wrap">
                 <a href="{{ route('tap-nominations.my-nominations') }}" 
                    class="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-xl transition-all duration-200 shadow-sm hover:shadow-md"
-                   style="color: #F3A261; background-color: rgba(243, 162, 97, 0.1);"
-                   onmouseover="this.style.color='#E8944F'; this.style.backgroundColor='rgba(243, 162, 97, 0.2)';"
-                   onmouseout="this.style.color='#F3A261'; this.style.backgroundColor='rgba(243, 162, 97, 0.1)';">
+                   style="color: #2B9D8D; background-color: rgba(43, 157, 141, 0.12);"
+                   onmouseover="this.style.color='#237C71'; this.style.backgroundColor='rgba(43, 157, 141, 0.18)';"
+                   onmouseout="this.style.color='#2B9D8D'; this.style.backgroundColor='rgba(43, 157, 141, 0.12)';">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
@@ -42,10 +42,10 @@
                 </svg>
                 </div>
                 <div class="flex-1">
-                    <h3 class="text-lg font-bold dark:text-orange-100 mb-2" style="color: #F3A261;">Tap & Pass</h3>
-                    <p class="text-sm dark:text-orange-200 leading-relaxed" style="color: #F3A261;">
+                    <h3 class="text-lg font-bold text-gray-900 dark:text-orange-100 mb-2">Tap & Pass</h3>
+                    <p class="text-sm text-gray-800 dark:text-orange-200 leading-relaxed">
                         Accept or decline nominations sent to you for daily tasks. 
-                        Accepting a nomination assigns you to the task and awards <span class="font-bold dark:text-orange-400" style="color: #F3A261;">+1 point</span>.
+                        Accepting a nomination assigns you to the task and awards <span class="font-bold text-gray-900 dark:text-orange-400">+1 point</span>.
                 </p>
                 </div>
             </div>

@@ -157,13 +157,12 @@
                                 <input type="number" name="max_participants" id="max_participants"
                                     value="{{ old('max_participants', $task->max_participants) }}"
                                     class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
-                                    placeholder="Leave blank for unlimited" min="1">
-                                <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Leave blank for unlimited participants.</p>
+                                    placeholder="Leave blank for no limit" min="1">
                                 @error('max_participants')
                                     <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                                 @enderror
                             </div>
-                        </div>
+                        </div> 
                     </div>
 
                     <!-- Current Status (Read-only) -->

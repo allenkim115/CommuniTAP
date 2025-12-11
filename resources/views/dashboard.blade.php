@@ -50,12 +50,12 @@
                     <div class="absolute top-0 right-0 w-24 h-24 sm:w-32 sm:h-32 rounded-full -mr-12 -mt-12 sm:-mr-16 sm:-mt-16 blur-2xl group-hover:scale-150 transition-transform duration-500" style="background-color: rgba(243, 162, 97, 0.2);"></div>
                     <div class="relative p-4 sm:p-5 md:p-6">
                         <div class="flex items-center justify-between mb-3 sm:mb-4">
-                            <span class="text-[10px] xs:text-xs font-bold uppercase tracking-wider" style="color: #F3A261;">Total Points</span>
+                            <span class="text-[10px] xs:text-xs font-bold uppercase tracking-wider" style="color: #2B9D8D;">Total Points</span>
                             <div class="w-10 h-10 sm:w-12 sm:h-14 md:w-14 md:h-14 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg text-lg sm:text-xl md:text-2xl transform group-hover:scale-110 group-hover:rotate-6 transition-transform duration-300 flex-shrink-0" style="background-color: #F3A261;">
                                 🏆
                             </div>
                         </div>
-                        <div class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-gray-900 mb-1 sm:mb-2" style="color: #F3A261;">
+                        <div class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-gray-900 mb-1 sm:mb-2" style="color: #2B9D8D;">
                             {{ $stats['points'] ?? 0 }}
                         </div>
                         <div class="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm text-gray-600">

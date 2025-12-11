@@ -12,7 +12,7 @@
                                 <i class="fas fa-chart-line text-white text-lg sm:text-xl"></i>
                             </div>
                             <div class="min-w-0 flex-1">
-                                <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent mb-1 sm:mb-1.5">Dashboard</h1>
+                                <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 dark:text-gray-100 mb-1 sm:mb-1.5">Dashboard</h1>
                                 <p class="text-xs sm:text-sm text-gray-600">Platform metrics and performance insights</p>
                             </div>
                         </div>
@@ -73,7 +73,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent mb-1">{{ number_format($totalUsers) }}</div>
+                        <div class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-1">{{ number_format($totalUsers) }}</div>
                         <p class="text-xs sm:text-sm text-gray-600 font-medium mb-3 sm:mb-4">Total Users</p>
                         <div class="text-xs sm:text-sm text-blue-600 font-semibold inline-flex items-center gap-2 group-hover:gap-3 transition-all">
                             <span>View Details</span>
@@ -109,7 +109,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent mb-1">{{ number_format($totalTasks) }}</div>
+                        <div class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-1">{{ number_format($totalTasks) }}</div>
                         <p class="text-xs sm:text-sm text-gray-600 font-medium mb-3 sm:mb-4">Tasks Created</p>
                         <div class="text-xs sm:text-sm text-orange-600 font-semibold inline-flex items-center gap-2 group-hover:gap-3 transition-all">
                             <span>View Details</span>
@@ -145,7 +145,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent mb-1">{{ number_format($totalIncidents) }}</div>
+                        <div class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-1">{{ number_format($totalIncidents) }}</div>
                         <p class="text-xs sm:text-sm text-gray-600 font-medium mb-3 sm:mb-4">Incident Reports</p>
                         <div class="text-xs sm:text-sm text-red-600 font-semibold inline-flex items-center gap-2 group-hover:gap-3 transition-all">
                             <span>View Details</span>
@@ -167,7 +167,7 @@
                             <div class="w-1.5 h-1.5 rounded-full bg-blue-500 group-hover:scale-125 transition-transform flex-shrink-0"></div>
                             <div class="text-[9px] sm:text-[10px] lg:text-[11px] font-semibold uppercase tracking-wider text-gray-600 leading-tight">Total Users</div>
                         </div>
-                        <div class="text-xl sm:text-2xl lg:text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent mt-1 sm:mt-1.5 lg:mt-2">{{ number_format($totalUsers ?? 0) }}</div>
+                        <div class="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white mt-1 sm:mt-1.5 lg:mt-2">{{ number_format($totalUsers ?? 0) }}</div>
                         <div class="text-[9px] sm:text-[10px] lg:text-xs text-gray-500 mt-1 leading-tight">Total registered accounts</div>
                     </div>
                     <div class="p-3 sm:p-4 lg:p-5 hover:bg-green-50/30 transition-colors duration-200 group">
@@ -175,7 +175,7 @@
                             <div class="w-1.5 h-1.5 rounded-full bg-green-500 group-hover:scale-125 transition-transform flex-shrink-0"></div>
                             <div class="text-[9px] sm:text-[10px] lg:text-[11px] font-semibold uppercase tracking-wider text-gray-600 leading-tight">Task Completion Rate</div>
                         </div>
-                        <div class="text-xl sm:text-2xl lg:text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent mt-1 sm:mt-1.5 lg:mt-2">{{ number_format($taskCompletionRate ?? 0, 1) }}%</div>
+                        <div class="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white mt-1 sm:mt-1.5 lg:mt-2">{{ number_format($taskCompletionRate ?? 0, 1) }}%</div>
                         <div class="text-[9px] sm:text-[10px] lg:text-xs text-gray-500 mt-1 leading-tight">Based on all assignments</div>
                     </div>
                     <div class="p-3 sm:p-4 lg:p-5 hover:bg-purple-50/30 transition-colors duration-200 group col-span-2 sm:col-span-1">
@@ -183,7 +183,7 @@
                             <div class="w-1.5 h-1.5 rounded-full bg-purple-500 group-hover:scale-125 transition-transform flex-shrink-0"></div>
                             <div class="text-[9px] sm:text-[10px] lg:text-[11px] font-semibold uppercase tracking-wider text-gray-600 leading-tight">User Engagement</div>
                         </div>
-                        <div class="text-xl sm:text-2xl lg:text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent mt-1 sm:mt-1.5 lg:mt-2">{{ number_format($engagementRate ?? 0, 1) }}%</div>
+                        <div class="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white mt-1 sm:mt-1.5 lg:mt-2">{{ number_format($engagementRate ?? 0, 1) }}%</div>
                         <div class="text-[9px] sm:text-[10px] lg:text-xs text-gray-500 mt-1 leading-tight">Users with assigned tasks</div>
                     </div>
                     <div class="p-3 sm:p-4 lg:p-5 hover:bg-yellow-50/30 transition-colors duration-200 group col-span-2 sm:col-span-1">
@@ -191,7 +191,7 @@
                             <div class="w-1.5 h-1.5 rounded-full bg-yellow-500 group-hover:scale-125 transition-transform flex-shrink-0"></div>
                             <div class="text-[9px] sm:text-[10px] lg:text-[11px] font-semibold uppercase tracking-wider text-gray-600 leading-tight">Total Points Awarded</div>
                         </div>
-                        <div class="text-xl sm:text-2xl lg:text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent mt-1 sm:mt-1.5 lg:mt-2">{{ number_format($totalPointsAwarded ?? 0) }}</div>
+                        <div class="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white mt-1 sm:mt-1.5 lg:mt-2">{{ number_format($totalPointsAwarded ?? 0) }}</div>
                         @php
                             $avgPointsPerUser = ($totalUsers ?? 0) > 0 ? number_format(($totalPointsAwarded ?? 0) / max($totalUsers, 1), 1) : 0;
                         @endphp
@@ -202,7 +202,7 @@
                             <div class="w-1.5 h-1.5 rounded-full bg-orange-500 group-hover:scale-125 transition-transform flex-shrink-0"></div>
                             <div class="text-[9px] sm:text-[10px] lg:text-[11px] font-semibold uppercase tracking-wider text-gray-600 leading-tight">Active Volunteers</div>
                         </div>
-                        <div class="text-xl sm:text-2xl lg:text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent mt-1 sm:mt-1.5 lg:mt-2">{{ number_format($activeVolunteers ?? 0) }}</div>
+                        <div class="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white mt-1 sm:mt-1.5 lg:mt-2">{{ number_format($activeVolunteers ?? 0) }}</div>
                         <div class="text-[9px] sm:text-[10px] lg:text-xs text-gray-500 mt-1 leading-tight">Completed at least 1 task</div>
                     </div>
                 </div>
@@ -403,7 +403,7 @@
                                 <i class="fas fa-chart-line text-white text-base sm:text-lg"></i>
                             </div>
                             <div class="min-w-0">
-                                <h3 class="text-lg sm:text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">Reports</h3>
+                                <h3 class="text-lg sm:text-xl font-bold text-gray-900 dark:text-gray-100">Reports</h3>
                                 <p class="text-xs sm:text-sm text-gray-600 mt-0.5 sm:mt-1">Key performance indicators from generated reports</p>
                             </div>
                         </div>

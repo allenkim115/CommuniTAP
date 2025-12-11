@@ -1,12 +1,15 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <h2 class="font-bold text-3xl bg-gradient-to-r from-orange-600 via-orange-500 to-teal-500 bg-clip-text text-transparent">
+            <h2 class="font-bold text-3xl text-gray-900">
                 {{ __('My Nominations') }}
             </h2>
             <div class="flex items-center gap-3 flex-wrap">
                 <a href="{{ route('tap-nominations.index') }}" 
-                   class="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-orange-600 hover:text-orange-700 bg-orange-50 hover:bg-orange-100 rounded-xl transition-all duration-200 shadow-sm hover:shadow-md">
+                   class="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-xl transition-all duration-200 shadow-sm hover:shadow-md"
+                   style="color: #2B9D8D; background-color: rgba(43, 157, 141, 0.12);"
+                   onmouseover="this.style.color='#237C71'; this.style.backgroundColor='rgba(43, 157, 141, 0.18)';"
+                   onmouseout="this.style.color='#2B9D8D'; this.style.backgroundColor='rgba(43, 157, 141, 0.12)';">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
                               d="M9 5l7 7-7 7" />
@@ -40,10 +43,10 @@
                 </svg>
                 </div>
                 <div class="flex-1">
-                    <h3 class="text-lg font-bold text-orange-900 dark:text-orange-100 mb-2">Track Your Nominations</h3>
-                    <p class="text-sm text-orange-800 dark:text-orange-200 leading-relaxed">
+                    <h3 class="text-lg font-bold text-gray-900 dark:text-orange-100 mb-2">Track Your Nominations</h3>
+                    <p class="text-sm text-gray-800 dark:text-orange-200 leading-relaxed">
                         View all nominations you've sent to others. Track their status - pending, accepted, or declined. 
-                        You earned <span class="font-bold text-orange-600 dark:text-orange-400">+1 point</span> for each nomination you sent.
+                        You earned <span class="font-bold text-gray-900 dark:text-orange-400">+1 point</span> for each nomination you sent.
                 </p>
                 </div>
             </div>

@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <h2 class="font-bold text-3xl bg-clip-text text-transparent" style="background: linear-gradient(to right, #F3A261, #2B9D8D); -webkit-background-clip: text;">
+            <h2 class="font-bold text-3xl text-gray-900">
                 {{ __('Edit Task Proposal') }}
             </h2>
             <a href="{{ route('tasks.my-uploads') }}"
@@ -60,7 +60,7 @@
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                         <!-- Left column -->
                         <div class="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900/50 dark:to-gray-800/50 rounded-xl p-6 border-2 border-gray-200 dark:border-gray-700 space-y-6 shadow-sm">
-                            <h4 class="text-lg font-bold bg-clip-text text-transparent" style="background: linear-gradient(to right, #F3A261, #2B9D8D); -webkit-background-clip: text;">Basic Information</h4>
+                            <h4 class="text-lg font-bold text-gray-900" style="color: #2B9D8D;">Basic Information</h4>
 
                             <!-- Task Type (Read-only) -->
                             <div>
@@ -113,7 +113,7 @@
 
                         <!-- Right column -->
                         <div class="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900/50 dark:to-gray-800/50 rounded-xl p-6 border-2 border-gray-200 dark:border-gray-700 space-y-6 shadow-sm">
-                            <h4 class="text-lg font-bold bg-gradient-to-r from-orange-600 to-teal-500 bg-clip-text text-transparent">Schedule & Rewards</h4>
+                            <h4 class="text-lg font-bold text-gray-900" style="color: #2B9D8D;">Schedule & Rewards</h4>
 
                             <!-- Points -->
                             <div>
@@ -197,7 +197,7 @@
                                     value="{{ old('max_participants', $task->max_participants) }}"
                                     class="w-full px-4 py-2 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 dark:bg-gray-800 dark:text-white transition-all"
                                     placeholder="Leave blank for unlimited" min="1">
-                                <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Leave blank for unlimited participants.</p>
+                                <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Leave blank for no limit.</p>
                                 @error('max_participants')
                                     <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                                 @enderror
