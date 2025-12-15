@@ -115,15 +115,193 @@
                         <div class="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900/50 dark:to-gray-800/50 rounded-xl p-6 border-2 border-gray-200 dark:border-gray-700 space-y-6 shadow-sm">
                             <h4 class="text-lg font-bold text-gray-900" style="color: #2B9D8D;">Schedule & Rewards</h4>
 
-                            <!-- Points -->
+                            <!-- Points Category -->
                             <div>
                                 <label for="points_awarded" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                    Points to Award <span class="text-red-500">*</span>
+                                    Points Category <span class="text-red-500">*</span>
                                 </label>
-                                <input type="number" name="points_awarded" id="points_awarded" value="{{ old('points_awarded', $task->points_awarded) }}"
+                                @php
+                                    $currentPoints = old('points_awarded', $task->points_awarded);
+                                    $standardCategories = [5, 10, 25, 40, 60, 80, 100];
+                                    $isCustomValue = !in_array((int)$currentPoints, $standardCategories);
+                                @endphp
+                                
+                                <!-- Point Categories Guide (Collapsible) - Above dropdown -->
+                                <div class="mb-3">
+                                    <button type="button" onclick="togglePointsGuide()" class="inline-flex items-center gap-2 text-xs font-semibold px-3 py-1.5 rounded-full transition-all duration-200 border" style="color: #F3A261; background-color: rgba(243, 162, 97, 0.08); border-color: rgba(243, 162, 97, 0.2);" onmouseover="this.style.backgroundColor='rgba(243, 162, 97, 0.15)'" onmouseout="this.style.backgroundColor='rgba(243, 162, 97, 0.08)'">
+                                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                        </svg>
+                                        <span>Point Categories Guide</span>
+                                        <svg id="points-guide-icon" class="w-3 h-3 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                        </svg>
+                                    </button>
+                                    <div id="points-guide" class="hidden mt-3 rounded-xl p-4 border shadow-sm dark:shadow-none" style="background: linear-gradient(135deg, rgba(243, 162, 97, 0.05) 0%, rgba(43, 157, 141, 0.05) 100%); border-color: rgba(243, 162, 97, 0.2);">
+                                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                                            <!-- 5 Points -->
+                                            <div class="flex items-start gap-3 p-2.5 rounded-lg bg-white/70 dark:bg-gray-700/50 border border-gray-100 dark:border-gray-600 hover:shadow-sm transition-shadow">
+                                                <div class="flex flex-col items-center flex-shrink-0">
+                                                    <svg class="w-5 h-5" fill="#9CA3AF" viewBox="0 0 24 24">
+                                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                                    </svg>
+                                                    <span class="text-[10px] font-bold mt-0.5" style="color: #9CA3AF;">5 pts</span>
+                                                </div>
+                                                <div class="min-w-0 flex-1">
+                                                    <div class="flex items-center gap-2">
+                                                        <span class="font-semibold text-gray-800 dark:text-gray-200 text-sm">Quick</span>
+                                                        <span class="text-[10px] text-gray-400 bg-gray-100 dark:bg-gray-600 px-1.5 py-0.5 rounded">~5-10 mins</span>
+                                                    </div>
+                                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">Attendance, brief meetings, signing docs.</p>
+                                                </div>
+                                            </div>
+                                            <!-- 10 Points -->
+                                            <div class="flex items-start gap-3 p-2.5 rounded-lg bg-white/70 dark:bg-gray-700/50 border border-gray-100 dark:border-gray-600 hover:shadow-sm transition-shadow">
+                                                <div class="flex flex-col items-center flex-shrink-0">
+                                                    <svg class="w-5 h-5" fill="#60A5FA" viewBox="0 0 24 24">
+                                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                                    </svg>
+                                                    <span class="text-[10px] font-bold mt-0.5" style="color: #60A5FA;">10 pts</span>
+                                                </div>
+                                                <div class="min-w-0 flex-1">
+                                                    <div class="flex items-center gap-2">
+                                                        <span class="font-semibold text-gray-800 dark:text-gray-200 text-sm">Light</span>
+                                                        <span class="text-[10px] text-gray-400 bg-gray-100 dark:bg-gray-600 px-1.5 py-0.5 rounded">~15-30 mins</span>
+                                                    </div>
+                                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">Basic cleanup, distributing materials.</p>
+                                                </div>
+                                            </div>
+                                            <!-- 25 Points -->
+                                            <div class="flex items-start gap-3 p-2.5 rounded-lg bg-white/70 dark:bg-gray-700/50 border border-gray-100 dark:border-gray-600 hover:shadow-sm transition-shadow">
+                                                <div class="flex flex-col items-center flex-shrink-0">
+                                                    <svg class="w-5 h-5" fill="#34D399" viewBox="0 0 24 24">
+                                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                                    </svg>
+                                                    <span class="text-[10px] font-bold mt-0.5" style="color: #34D399;">25 pts</span>
+                                                </div>
+                                                <div class="min-w-0 flex-1">
+                                                    <div class="flex items-center gap-2">
+                                                        <span class="font-semibold text-gray-800 dark:text-gray-200 text-sm">Standard</span>
+                                                        <span class="text-[10px] text-gray-400 bg-gray-100 dark:bg-gray-600 px-1.5 py-0.5 rounded">~30-60 mins</span>
+                                                    </div>
+                                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">Community cleanup, event setup.</p>
+                                                </div>
+                                            </div>
+                                            <!-- 40 Points -->
+                                            <div class="flex items-start gap-3 p-2.5 rounded-lg bg-white/70 dark:bg-gray-700/50 border border-gray-100 dark:border-gray-600 hover:shadow-sm transition-shadow">
+                                                <div class="flex flex-col items-center flex-shrink-0">
+                                                    <svg class="w-5 h-5" fill="#FBBF24" viewBox="0 0 24 24">
+                                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                                    </svg>
+                                                    <span class="text-[10px] font-bold mt-0.5" style="color: #FBBF24;">40 pts</span>
+                                                </div>
+                                                <div class="min-w-0 flex-1">
+                                                    <div class="flex items-center gap-2">
+                                                        <span class="font-semibold text-gray-800 dark:text-gray-200 text-sm">Moderate</span>
+                                                        <span class="text-[10px] text-gray-400 bg-gray-100 dark:bg-gray-600 px-1.5 py-0.5 rounded">~1-2 hours</span>
+                                                    </div>
+                                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">Full cleanup, organizing, coordination.</p>
+                                                </div>
+                                            </div>
+                                            <!-- 60 Points -->
+                                            <div class="flex items-start gap-3 p-2.5 rounded-lg bg-white/70 dark:bg-gray-700/50 border border-gray-100 dark:border-gray-600 hover:shadow-sm transition-shadow">
+                                                <div class="flex flex-col items-center flex-shrink-0">
+                                                    <svg class="w-5 h-5" fill="#F97316" viewBox="0 0 24 24">
+                                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                                    </svg>
+                                                    <span class="text-[10px] font-bold mt-0.5" style="color: #F97316;">60 pts</span>
+                                                </div>
+                                                <div class="min-w-0 flex-1">
+                                                    <div class="flex items-center gap-2">
+                                                        <span class="font-semibold text-gray-800 dark:text-gray-200 text-sm">Substantial</span>
+                                                        <span class="text-[10px] text-gray-400 bg-gray-100 dark:bg-gray-600 px-1.5 py-0.5 rounded">~2-3 hours</span>
+                                                    </div>
+                                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">Major projects, workshops, beautification.</p>
+                                                </div>
+                                            </div>
+                                            <!-- 80 Points -->
+                                            <div class="flex items-start gap-3 p-2.5 rounded-lg bg-white/70 dark:bg-gray-700/50 border border-gray-100 dark:border-gray-600 hover:shadow-sm transition-shadow">
+                                                <div class="flex flex-col items-center flex-shrink-0">
+                                                    <svg class="w-5 h-5" fill="#EF4444" viewBox="0 0 24 24">
+                                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                                    </svg>
+                                                    <span class="text-[10px] font-bold mt-0.5" style="color: #EF4444;">80 pts</span>
+                                                </div>
+                                                <div class="min-w-0 flex-1">
+                                                    <div class="flex items-center gap-2">
+                                                        <span class="font-semibold text-gray-800 dark:text-gray-200 text-sm">Major</span>
+                                                        <span class="text-[10px] text-gray-400 bg-gray-100 dark:bg-gray-600 px-1.5 py-0.5 rounded">~3-4 hours</span>
+                                                    </div>
+                                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">Large events, community drives.</p>
+                                                </div>
+                                            </div>
+                                            <!-- 100 Points - Champion -->
+                                            <div class="flex items-start gap-3 p-3 rounded-lg border-2 col-span-1 sm:col-span-2" style="background: linear-gradient(135deg, rgba(243, 162, 97, 0.1) 0%, rgba(43, 157, 141, 0.1) 100%); border-color: rgba(243, 162, 97, 0.3);">
+                                                <div class="flex flex-col items-center flex-shrink-0">
+                                                    <div class="relative">
+                                                        <svg class="w-6 h-6" fill="#F3A261" viewBox="0 0 24 24">
+                                                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                                        </svg>
+                                                        <svg class="w-3 h-3 absolute -top-1 left-1/2 -translate-x-1/2" fill="#2B9D8D" viewBox="0 0 24 24">
+                                                            <path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5zm14 3c0 .6-.4 1-1 1H6c-.6 0-1-.4-1-1v-1h14v1z"/>
+                                                        </svg>
+                                                    </div>
+                                                    <span class="text-[10px] font-bold mt-0.5" style="background: linear-gradient(135deg, #F3A261, #2B9D8D); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">100 pts</span>
+                                                </div>
+                                                <div class="min-w-0 flex-1">
+                                                    <div class="flex items-center gap-2 flex-wrap">
+                                                        <span class="font-bold text-sm" style="color: #2B9D8D;">Community Champion</span>
+                                                        <span class="text-[10px] font-medium px-1.5 py-0.5 rounded" style="background-color: rgba(43, 157, 141, 0.15); color: #2B9D8D;">4+ hours</span>
+                                                    </div>
+                                                    <p class="text-xs text-gray-600 dark:text-gray-400 mt-1 leading-relaxed">Emergency response, project leadership, exceptional service, full-day events.</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center gap-2 mt-3 pt-3 border-t border-gray-100 dark:border-gray-600">
+                                            <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="#2B9D8D" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                            </svg>
+                                            <p class="text-[11px] text-gray-500 dark:text-gray-400">
+                                                <span class="font-medium">Max cap:</span> 500 points per user. Points awarded upon task completion verification.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <select name="points_awarded" id="points_awarded"
                                     class="w-full px-4 py-2 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 dark:bg-gray-800 dark:text-white transition-all"
-                                    placeholder="e.g., 50" min="1" required>
-                                <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Recommended: 5–100 points depending on effort.</p>
+                                    required onchange="updatePointDescription(this)">
+                                    <option value="" disabled hidden>Select Point Category</option>
+                                    <option value="5" {{ $currentPoints == 5 ? 'selected' : '' }} data-desc="Quick Task (~5-10 mins): Simple attendance, brief meetings">
+                                        5 pts - Quick Task
+                                    </option>
+                                    <option value="10" {{ $currentPoints == 10 ? 'selected' : '' }} data-desc="Light Task (~15-30 mins): Basic cleanup, distributing materials">
+                                        10 pts - Light Task
+                                    </option>
+                                    <option value="25" {{ $currentPoints == 25 ? 'selected' : '' }} data-desc="Standard Task (~30-60 mins): Community cleanup, event setup">
+                                        25 pts - Standard Task
+                                    </option>
+                                    <option value="40" {{ $currentPoints == 40 ? 'selected' : '' }} data-desc="Moderate Task (~1-2 hours): Full cleanup sessions, coordination">
+                                        40 pts - Moderate Task
+                                    </option>
+                                    <option value="60" {{ $currentPoints == 60 ? 'selected' : '' }} data-desc="Substantial Task (~2-3 hours): Major projects, workshop facilitation">
+                                        60 pts - Substantial Task
+                                    </option>
+                                    <option value="80" {{ $currentPoints == 80 ? 'selected' : '' }} data-desc="Major Task (~3-4 hours): Large events, community drives">
+                                        80 pts - Major Task
+                                    </option>
+                                    <option value="100" {{ $currentPoints == 100 ? 'selected' : '' }} data-desc="Community Champion (4+ hours): Emergency response, leadership roles">
+                                        100 pts - Community Champion
+                                    </option>
+                                    @if($isCustomValue && $currentPoints)
+                                    <option value="{{ $currentPoints }}" selected data-desc="Custom value (previously set)">
+                                        {{ $currentPoints }} pts - Custom
+                                    </option>
+                                    @endif
+                                </select>
+                                <p id="points-description" class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                                    Select a point category based on task effort and duration.
+                                </p>
                                 @error('points_awarded')
                                     <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                                 @enderror
@@ -248,6 +426,37 @@
                 textarea.addEventListener('input', update);
                 update();
             }
+
+            // Initialize points description on page load
+            const pointsSelect = document.getElementById('points_awarded');
+            if (pointsSelect && pointsSelect.value) {
+                updatePointDescription(pointsSelect);
+            }
         })();
+
+        function updatePointDescription(select) {
+            const descEl = document.getElementById('points-description');
+            if (!descEl) return;
+            
+            const selectedOption = select.options[select.selectedIndex];
+            if (selectedOption && selectedOption.dataset.desc) {
+                descEl.textContent = selectedOption.dataset.desc;
+                descEl.classList.remove('text-gray-500');
+                descEl.classList.add('text-gray-700', 'dark:text-gray-300', 'font-medium');
+            } else {
+                descEl.textContent = 'Select a point category based on task effort and duration.';
+                descEl.classList.add('text-gray-500');
+                descEl.classList.remove('text-gray-700', 'dark:text-gray-300', 'font-medium');
+            }
+        }
+
+        function togglePointsGuide() {
+            const guide = document.getElementById('points-guide');
+            const icon = document.getElementById('points-guide-icon');
+            if (guide && icon) {
+                guide.classList.toggle('hidden');
+                icon.style.transform = guide.classList.contains('hidden') ? 'rotate(0deg)' : 'rotate(180deg)';
+            }
+        }
     </script>
 </x-app-layout>

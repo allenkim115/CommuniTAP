@@ -72,9 +72,21 @@
                         <!-- Main Content Column -->
                         <div class="lg:col-span-2 space-y-4 sm:space-y-5">
                             <!-- Description -->
-                            <div class="bg-white rounded-lg p-4 sm:p-5 border border-gray-200 shadow-sm">
-                                <h3 class="text-base sm:text-lg font-semibold text-gray-900 mb-3">Description</h3>
-                                <p class="text-sm sm:text-base text-gray-700 whitespace-pre-wrap leading-relaxed">{{ $task->description }}</p>
+                            <div class="rounded-2xl shadow-lg border-2 overflow-hidden" style="border-color: #F3A261;">
+                                <!-- Header -->
+                                <div class="px-5 py-4 flex items-center gap-3" style="background: linear-gradient(135deg, #F3A261 0%, #e8944f 100%);">
+                                    <div class="flex items-center justify-center w-10 h-10 rounded-xl bg-white/25 shadow-sm">
+                                        <i class="fas fa-clipboard-list text-xl text-white"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-lg sm:text-xl font-bold text-white">Task Description</h3>
+                                        <p class="text-xs text-white/80">What you need to know</p>
+                                    </div>
+                                </div>
+                                <!-- Content -->
+                                <div class="p-5 sm:p-6" style="background: linear-gradient(180deg, rgba(243, 162, 97, 0.08) 0%, rgba(43, 157, 141, 0.05) 100%);">
+                                    <p class="text-base sm:text-lg text-gray-800 font-medium whitespace-pre-wrap leading-relaxed">{{ $task->description }}</p>
+                                </div>
                             </div>
 
                             <!-- Task Details -->

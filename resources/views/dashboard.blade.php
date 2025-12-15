@@ -165,8 +165,8 @@
                                     ⏳
                                 </div>
                                 <div class="min-w-0">
-                                    <h3 class="text-xl sm:text-2xl font-bold text-gray-900">On Going Tasks</h3>
-                                    <p class="text-xs sm:text-sm text-gray-500">Tasks you're currently working on</p>
+                                    <h3 class="text-xl sm:text-2xl font-bold text-gray-900">On Going Task</h3>
+                                    <p class="text-xs sm:text-sm text-gray-500">Task you're currently working on</p>
                                 </div>
                             </div>
                             @if(isset($ongoingTasks) && $ongoingTasks->count() > 0)
@@ -249,7 +249,7 @@
                                 <div class="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-3 sm:mb-4 rounded-full bg-gradient-to-br from-orange-100 to-orange-200 flex items-center justify-center text-3xl sm:text-4xl transform hover:scale-110 transition-transform duration-300">
                                     📋
                                 </div>
-                                <p class="text-gray-700 font-semibold text-base sm:text-lg mb-1 sm:mb-2">No ongoing tasks yet</p>
+                                <p class="text-gray-700 font-semibold text-base sm:text-lg mb-1 sm:mb-2">No ongoing task yet</p>
                                 <p class="text-xs sm:text-sm text-gray-500 mb-4 sm:mb-6">Start by browsing available tasks and contribute to your community</p>
                                 <a href="{{ route('tasks.index') }}" class="inline-flex items-center gap-1.5 sm:gap-2 px-4 sm:px-6 py-2 sm:py-3 text-white rounded-lg sm:rounded-xl font-semibold hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 text-sm sm:text-base"
                                    style="background-color: #F3A261;"

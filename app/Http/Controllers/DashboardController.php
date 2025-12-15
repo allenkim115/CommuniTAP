@@ -147,7 +147,6 @@ class DashboardController extends Controller
         $periodOptions = [
             'last_7_days' => 'Last 7 days',
             'last_30_days' => 'Last 30 days',
-            'last_90_days' => 'Last 90 days',
         ];
 
         $rangeSummary = [
@@ -603,11 +602,6 @@ class DashboardController extends Controller
                 $start = $now->copy()->subDays(29)->startOfDay();
                 $end = $now->copy()->endOfDay();
                 $label = 'Last 30 days';
-                break;
-            case 'last_90_days':
-                $start = $now->copy()->subDays(89)->startOfDay();
-                $end = $now->copy()->endOfDay();
-                $label = 'Last 90 days';
                 break;
             case 'this_month':
                 $start = $now->copy()->startOfMonth();

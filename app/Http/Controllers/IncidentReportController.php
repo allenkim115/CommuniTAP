@@ -73,16 +73,24 @@ class IncidentReportController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
+        $rules = [
             'reported_user_id' => 'required|exists:users,userId',
             'incident_type' => 'required|string|max:50',
-            'incident_type_specification' => 'required_if:incident_type,other|string|min:3|max:50',
             'description' => 'required|string|min:10|max:1000',
             'evidence' => 'nullable|string|max:1000',
             'evidence_images' => 'nullable|array',
             'evidence_images.*' => 'image|mimes:jpeg,png,jpg,gif|max:4096',
             'task_id' => 'required|exists:tasks,taskId',
-        ]);
+        ];
+
+        // Only validate incident_type_specification if incident_type is "other"
+        if ($request->incident_type === 'other') {
+            $rules['incident_type_specification'] = 'required|string|min:3|max:50';
+        } else {
+            $rules['incident_type_specification'] = 'nullable';
+        }
+
+        $request->validate($rules);
 
         // Prevent users from reporting themselves
         if ($request->reported_user_id == Auth::user()->userId) {

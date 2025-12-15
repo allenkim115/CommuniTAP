@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
             TaskSeeder::class,
             TaskAssignmentSeeder::class,
             UserUploadedTaskSeeder::class,
+            TaskFeedbackSeeder::class,
             TapNominationSeeder::class,
             IncidentReportsSeeder::class,
         ]);

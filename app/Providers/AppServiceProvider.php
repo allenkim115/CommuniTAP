@@ -43,6 +43,8 @@ class AppServiceProvider extends ServiceProvider
                 'task_progress_updated',
                 'task_deadline_reminder',
                 'task_marked_uncompleted',
+                // Reactivated tasks (returned to users after being inactive)
+                'task_reactivated',
                 'tap_nomination_received',
                 'tap_nomination_accepted',
                 'tap_nomination_declined',

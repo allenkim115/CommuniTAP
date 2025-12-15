@@ -158,9 +158,21 @@
                             <!-- Main Content Column -->
                             <div class="lg:col-span-2 space-y-4 sm:space-y-5">
                                 <!-- Description -->
-                                <div class="bg-white rounded-lg p-4 sm:p-5 border border-gray-200 shadow-sm">
-                                    <h3 class="text-base sm:text-lg font-semibold text-gray-900 mb-3">Description</h3>
-                                    <p class="text-sm sm:text-base text-gray-700 whitespace-pre-wrap leading-relaxed">{{ $task->description }}</p>
+                                <div class="rounded-2xl shadow-lg border-2 overflow-hidden" style="border-color: #F3A261;">
+                                    <!-- Header -->
+                                    <div class="px-5 py-4 flex items-center gap-3" style="background: linear-gradient(135deg, #F3A261 0%, #e8944f 100%);">
+                                        <div class="flex items-center justify-center w-10 h-10 rounded-xl bg-white/25 shadow-sm">
+                                            <i class="fas fa-clipboard-list text-xl text-white"></i>
+                                        </div>
+                                        <div>
+                                            <h3 class="text-lg sm:text-xl font-bold text-white">Task Description</h3>
+                                            <p class="text-xs text-white/80">What you need to know</p>
+                                        </div>
+                                    </div>
+                                    <!-- Content -->
+                                    <div class="p-5 sm:p-6" style="background: linear-gradient(180deg, rgba(243, 162, 97, 0.08) 0%, rgba(43, 157, 141, 0.05) 100%);">
+                                        <p class="text-base sm:text-lg text-gray-800 font-medium whitespace-pre-wrap leading-relaxed">{{ $task->description }}</p>
+                                    </div>
                                 </div>
 
                             <!-- Task Details -->
@@ -582,8 +594,21 @@
                     <!-- Details Tab Content -->
                     <div id="details-content" class="tab-content">
                         <!-- Task Description -->
-                        <div class="mb-4 sm:mb-6">
-                            <p class="text-sm sm:text-base text-gray-700 dark:text-gray-300 leading-relaxed">{{ $task->description }}</p>
+                        <div class="mb-4 sm:mb-6 rounded-2xl shadow-lg border-2 overflow-hidden" style="border-color: #F3A261;">
+                            <!-- Header -->
+                            <div class="px-5 py-4 flex items-center gap-3" style="background: linear-gradient(135deg, #F3A261 0%, #e8944f 100%);">
+                                <div class="flex items-center justify-center w-10 h-10 rounded-xl bg-white/25 shadow-sm">
+                                    <i class="fas fa-clipboard-list text-xl text-white"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg sm:text-xl font-bold text-white">Task Description</h3>
+                                    <p class="text-xs text-white/80">What you need to know</p>
+                                </div>
+                            </div>
+                            <!-- Content -->
+                            <div class="p-5 sm:p-6" style="background: linear-gradient(180deg, rgba(243, 162, 97, 0.08) 0%, rgba(43, 157, 141, 0.05) 100%);">
+                                <p class="text-base sm:text-lg text-gray-800 dark:text-gray-200 font-medium whitespace-pre-wrap leading-relaxed">{{ $task->description }}</p>
+                            </div>
                         </div>
 
                         <!-- Task Details Grid -->
@@ -740,16 +765,29 @@
                                                 $index = array_search($key, $stepKeys);
                                                 $isActive = $index <= $currentIndex;
                                                 $isCurrent = $index === $currentIndex;
+                                                $progressLabel = ucfirst(str_replace('_',' ', $key));
+                                                $order = ['accepted','on_the_way','working','done'];
+                                                $curr = $userAssignment->progress ?? 'accepted';
+                                                $currIdx = array_search($curr, $order);
+                                                $btnIdx = array_search($key, $order);
+                                                $canAdvance = $userAssignment->status === 'assigned'
+                                                    && $btnIdx !== false
+                                                    && $currIdx !== false
+                                                    && $btnIdx === $currIdx + 1;
                                             @endphp
                                             <div class="flex flex-col items-center flex-1 max-w-[20%] sm:max-w-none">
-                                                <!-- Step Circle -->
-                                                <div class="relative z-10 flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-full transition-all duration-300 {{ $isActive ? 'sm:scale-110' : 'scale-100' }}"
-                                                     style="background-color: {{ $isActive ? '#F3A261' : '#E5E7EB' }}; box-shadow: {{ $isActive ? '0 3px 8px rgba(243, 162, 97, 0.35)' : '0 2px 4px rgba(0, 0, 0, 0.1)' }};">
+                                                <!-- Step Circle (click to advance) -->
+                                                <button type="button"
+                                                        onclick="handleStepClick('{{ $progressLabel }}','{{ $key }}', {{ $canAdvance ? 'true' : 'false' }})"
+                                                        class="relative z-10 flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-full transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-300 {{ $isActive ? 'sm:scale-110' : 'scale-100' }} {{ $canAdvance ? 'cursor-pointer' : 'cursor-default' }}"
+                                                        style="background-color: {{ $isActive ? '#F3A261' : '#E5E7EB' }}; box-shadow: {{ $isActive ? '0 3px 8px rgba(243, 162, 97, 0.35)' : '0 2px 4px rgba(0, 0, 0, 0.1)' }};"
+                                                        aria-disabled="{{ $canAdvance ? 'false' : 'true' }}"
+                                                        title="{{ $canAdvance ? 'Click to move to ' . $progressLabel : $progressLabel }}">
                                                     <i class="fas {{ $step['icon'] }} text-white text-xs sm:text-sm md:text-base {{ $isActive ? 'opacity-100' : 'opacity-50' }}"></i>
                                                     @if($isCurrent && !$isActive)
                                                         <div class="absolute inset-0 rounded-full animate-pulse" style="background-color: #F3A261; opacity: 0.5;"></div>
                                                     @endif
-                                                </div>
+                                                </button>
                                                 
                                                 <!-- Step Label -->
                                                 <div class="mt-1.5 sm:mt-2 md:mt-3 text-center px-0.5 sm:px-1">
@@ -763,36 +801,17 @@
                                 </div>
                             </div>
                             
-                            <!-- Progress actions (except submitted_proof which is set by submit) -->
+                            <!-- Hidden progress forms triggered by clicking circles -->
                             @if($userAssignment->status === 'assigned')
-                                <div class="mb-4 sm:mb-6 flex flex-wrap gap-2">
+                                <div class="hidden">
                                     @foreach(['accepted','on_the_way','working','done'] as $p)
                                         @php
-                                            $order = ['accepted','on_the_way','working','done'];
-                                            $curr = $userAssignment->progress ?? 'accepted';
-                                            $currIdx = array_search($curr, $order);
-                                            $btnIdx = array_search($p, $order);
-                                            // Only allow the immediate next step; disable current, previous, or skipping ahead
-                                            $disabled = $btnIdx === false || $currIdx === false || $btnIdx !== $currIdx + 1;
                                             $progressLabel = ucfirst(str_replace('_',' ', $p));
                                         @endphp
-                                        <form id="progress-form-{{ $p }}" action="{{ route('tasks.progress', $task) }}" method="POST" class="inline flex-1 sm:flex-none min-w-[calc(50%-0.25rem)] sm:min-w-0" novalidate>
+                                        <form id="progress-form-{{ $p }}" action="{{ route('tasks.progress', $task) }}" method="POST" novalidate>
                                             @csrf
                                             @method('PATCH')
                                             <input type="hidden" name="progress" value="{{ $p }}">
-                                            <button type="button" 
-                                                    onclick="showProgressModal('{{ $progressLabel }}', '{{ $p }}')" 
-                                                    {{ $disabled ? 'disabled' : '' }} 
-                                                    class="w-full inline-flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 rounded-lg border-2 text-xs sm:text-sm font-bold transition-all duration-200 {{ ($userAssignment->progress ?? 'accepted') === $p ? 'text-white border-transparent shadow-md brand-primary-btn' : 'bg-white text-gray-700 border-gray-300 hover:border-orange-400' }} {{ $disabled ? 'opacity-50 cursor-not-allowed' : '' }}">
-                                                <i class="fas 
-                                                    @if($p === 'accepted') fa-handshake
-                                                    @elseif($p === 'on_the_way') fa-route
-                                                    @elseif($p === 'working') fa-tools
-                                                    @elseif($p === 'done') fa-clipboard-check
-                                                    @endif text-xs sm:text-sm"></i>
-                                                <span class="hidden sm:inline">{{ $progressLabel }}</span>
-                                                <span class="sm:hidden">{{ str_replace(' ', '', $progressLabel) }}</span>
-                                            </button>
                                         </form>
                                     @endforeach
                                 </div>
@@ -1344,6 +1363,13 @@
             if (pendingProgressForm) {
                 pendingProgressForm.submit();
             }
+        }
+
+        function handleStepClick(progressLabel, progressValue, isEnabled) {
+            if (!isEnabled) {
+                return;
+            }
+            showProgressModal(progressLabel, progressValue);
         }
         
         // Close modal on backdrop click

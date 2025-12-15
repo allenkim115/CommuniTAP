@@ -46,51 +46,61 @@
                 </div>
             </div>
             
+            @php
+                $avgPointsPerTask = ($completedTasksCount ?? 0) > 0
+                    ? round(($userPoints ?? 0) / max($completedTasksCount, 1), 1)
+                    : 0;
+                $recentCompletedCount = isset($completedTasks)
+                    ? $completedTasks->filter(function ($task) {
+                        $completedAt = $task->pivot->completed_at ?? $task->completed_at ?? null;
+                        return $completedAt && \Carbon\Carbon::parse($completedAt)->greaterThanOrEqualTo(now()->subDays(30));
+                    })->count()
+                    : 0;
+                $potentialRewards = max(($completedTasksCount ?? 0) - ($claimedRewardsCount ?? 0), 0);
+            @endphp
+
             <!-- Summary Cards -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-                <!-- Points Card -->
+                <!-- Points Efficiency -->
                 <div class="group relative bg-white dark:bg-gray-800 rounded-2xl shadow-lg border-2 border-orange-200 dark:border-orange-800 p-6 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 overflow-hidden">
-                    <!-- Decorative gradient background -->
                     <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-orange-400/10 to-orange-500/10 rounded-full -mr-16 -mt-16 blur-2xl group-hover:scale-150 transition-transform duration-500"></div>
                     <div class="relative">
                         <div class="flex items-center justify-between mb-4">
-                            <span class="text-sm font-bold text-gray-700 dark:text-gray-300">Total Points</span>
+                            <span class="text-sm font-bold text-gray-700 dark:text-gray-300">Points Efficiency</span>
                             <span class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 shadow-md">
                                 <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                 </svg>
                             </span>
                         </div>
-                        <div class="text-4xl font-bold text-gray-900 dark:text-white mb-1">{{ $userPoints ?? 0 }}</div>
-                        <p class="text-xs text-gray-500 dark:text-gray-400">Earned from completed tasks</p>
+                        <div class="text-4xl font-bold text-gray-900 dark:text-white mb-1">{{ $avgPointsPerTask }}</div>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">Avg points per completed task</p>
                     </div>
                 </div>
 
-                <!-- Completed Tasks Card -->
+                <!-- Recent Completions -->
                 <div class="group relative bg-white dark:bg-gray-800 rounded-2xl shadow-lg border-2 border-green-200 dark:border-green-800 p-6 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 overflow-hidden">
-                    <!-- Decorative gradient background -->
                     <div class="absolute top-0 right-0 w-32 h-32 rounded-full -mr-16 -mt-16 blur-2xl group-hover:scale-150 transition-transform duration-500" style="background-color: rgba(43, 157, 141, 0.1);"></div>
                     <div class="relative">
                         <div class="flex items-center justify-between mb-4">
-                            <span class="text-sm font-bold text-gray-700 dark:text-gray-300">Completed Tasks</span>
+                            <span class="text-sm font-bold text-gray-700 dark:text-gray-300">Recent Completions</span>
                             <span class="inline-flex items-center justify-center w-12 h-12 rounded-full shadow-md" style="background-color: #2B9D8D;">
                                 <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                 </svg>
                             </span>
                         </div>
-                        <div class="text-4xl font-bold text-gray-900 dark:text-white mb-1">{{ $completedTasksCount ?? 0 }}</div>
-                        <p class="text-xs text-gray-500 dark:text-gray-400">Tasks successfully completed</p>
+                        <div class="text-4xl font-bold text-gray-900 dark:text-white mb-1">{{ $recentCompletedCount }}</div>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">Last 30 days · All time {{ $completedTasksCount ?? 0 }}</p>
                     </div>
                 </div>
 
-                <!-- Claimed Rewards Card -->
+                <!-- Rewards Snapshot -->
                 <div class="group relative bg-white dark:bg-gray-800 rounded-2xl shadow-lg border-2 border-teal-200 dark:border-teal-800 p-6 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 overflow-hidden">
-                    <!-- Decorative gradient background -->
                     <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-teal-400/10 to-teal-500/10 rounded-full -mr-16 -mt-16 blur-2xl group-hover:scale-150 transition-transform duration-500"></div>
                     <div class="relative">
                         <div class="flex items-center justify-between mb-4">
-                            <span class="text-sm font-bold text-gray-700 dark:text-gray-300">Claimed Rewards</span>
+                            <span class="text-sm font-bold text-gray-700 dark:text-gray-300">Rewards Snapshot</span>
                             <span class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-br from-teal-500 to-teal-600 shadow-md">
                                 <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/>
@@ -98,7 +108,7 @@
                             </span>
                         </div>
                         <div class="text-4xl font-bold text-gray-900 dark:text-white mb-1">{{ $claimedRewardsCount ?? 0 }}</div>
-                        <p class="text-xs text-gray-500 dark:text-gray-400">Rewards redeemed</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">Potential unclaimed: {{ $potentialRewards }}</p>
                     </div>
                 </div>
             </div>

@@ -463,6 +463,10 @@ class TaskController extends Controller
         if ($task->task_type === 'user_uploaded') {
             return redirect()->route('admin.tasks.show', $task)->with('error', "Cannot deactivate '{$task->title}': User-uploaded tasks should be managed through the Reject action in the approval workflow.");
         }
+        // Block deactivation when participants already joined
+        if ($task->assignments()->exists()) {
+            return redirect()->route('admin.tasks.show', $task)->with('error', "Cannot deactivate '{$task->title}': Participants have already joined this task.");
+        }
         // Do not allow deactivation of completed tasks
         if ($task->status === 'completed') {
             return redirect()->route('admin.tasks.show', $task)->with('error', "Cannot deactivate '{$task->title}': Completed tasks are final and cannot be deactivated.");

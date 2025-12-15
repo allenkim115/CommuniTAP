@@ -8,8 +8,6 @@
     $accentHoverColor = '#237C71';
     $highlightBackground = 'rgba(43, 157, 141, 0.06)';
 
-    // Simple local filters (no backend changes) – used only for UI state
-    $activeFilter = request()->query('filter', 'all');
 @endphp
 
 <x-dynamic-component :component="$layoutComponent">
@@ -54,7 +52,7 @@
     <div class="py-10">
         <div class="max-w-5xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-2xl border border-gray-200">
-                <div class="border-b border-gray-100 px-4 sm:px-6 py-3.5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div class="border-b border-gray-100 px-4 sm:px-6 py-3.5 flex flex-col sm:flex-row sm:items-center sm:justify-between">
                     <div class="flex items-center gap-2 text-sm text-gray-600">
                         <span class="inline-flex h-2 w-2 rounded-full" style="background-color: {{ $accentColor }};"></span>
                         <span>
@@ -65,29 +63,6 @@
                                 · <span class="font-medium text-emerald-600">Inbox zero</span>
                             @endif
                         </span>
-                    </div>
-
-                    {{-- Simple client-side filter pills (no query changes needed) --}}
-                    <div class="inline-flex items-center gap-1 rounded-full bg-gray-50 px-1.5 py-1 text-xs text-gray-600">
-                        <span class="hidden sm:inline-block mr-1 text-[0.7rem] uppercase tracking-wide text-gray-400">Filter</span>
-                        <button type="button"
-                                class="notification-filter-pill px-2.5 py-1 rounded-full font-medium transition-colors"
-                                data-filter="all"
-                                @if($activeFilter === 'all') data-active="true" @endif>
-                            All
-                        </button>
-                        <button type="button"
-                                class="notification-filter-pill px-2.5 py-1 rounded-full font-medium transition-colors"
-                                data-filter="unread"
-                                @if($activeFilter === 'unread') data-active="true" @endif>
-                            Unread
-                        </button>
-                        <button type="button"
-                                class="notification-filter-pill px-2.5 py-1 rounded-full font-medium transition-colors"
-                                data-filter="read"
-                                @if($activeFilter === 'read') data-active="true" @endif>
-                            Read
-                        </button>
                     </div>
                 </div>
 
@@ -283,53 +258,7 @@
 @push('scripts')
     <script>
         (function () {
-            const ACCENT = @json($accentColor);
-            const ACCENT_HOVER = @json($accentHoverColor);
-
-            function applyPillStyles(pill, active) {
-                if (!pill) return;
-                pill.style.transition = 'background-color 150ms, color 150ms';
-                if (active) {
-                    pill.style.backgroundColor = ACCENT;
-                    pill.style.color = '#ffffff';
-                } else {
-                    pill.style.backgroundColor = 'transparent';
-                    pill.style.color = '#4b5563';
-                }
-            }
-
-            function updateFilter(filter) {
-                const rows = document.querySelectorAll('.notification-row');
-                rows.forEach(row => {
-                    const status = row.dataset.status || 'unread';
-                    if (filter === 'all') {
-                        row.classList.remove('hidden');
-                    } else {
-                        const shouldShow = filter === status;
-                        row.classList.toggle('hidden', !shouldShow);
-                    }
-                });
-
-                const pills = document.querySelectorAll('.notification-filter-pill');
-                pills.forEach(pill => {
-                    const pillFilter = pill.dataset.filter;
-                    const isActive = pillFilter === filter;
-                    applyPillStyles(pill, isActive);
-                });
-            }
-
             document.addEventListener('DOMContentLoaded', function () {
-                const pills = document.querySelectorAll('.notification-filter-pill');
-                const initialPill = document.querySelector('.notification-filter-pill[data-active="true"]');
-                const initialFilter = (initialPill && initialPill.dataset.filter) || 'all';
-
-                pills.forEach(pill => {
-                    pill.addEventListener('click', () => {
-                        const filter = pill.dataset.filter || 'all';
-                        updateFilter(filter);
-                    });
-                });
-
                 // Auto-mark notifications as read when clicked
                 const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
                 document.querySelectorAll('.notification-link').forEach(link => {
@@ -373,9 +302,6 @@
                         });
                     });
                 });
-
-                // Initial state
-                updateFilter(initialFilter);
             });
         })();
     </script>
